@@ -1,0 +1,114 @@
+{
+  "identifier" : "AF00AF00-AF00-AF00-AF00-AF00AF00AF00",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "AF000001",
+      "localizations" : [
+        {
+          "description" : "Unlock the Streetwear scorecard template pack.",
+          "displayName" : "Streetwear Template Pack",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.aurafit.template.streetwear",
+      "referenceName" : "Streetwear Template",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "AF000002",
+      "localizations" : [
+        {
+          "description" : "Unlock the Soft Luxury scorecard template pack.",
+          "displayName" : "Soft Luxury Template Pack",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.aurafit.template.softluxury",
+      "referenceName" : "Soft Luxury Template",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "AURAFIT",
+    "_developerTeamID" : "AURAFITTEAM",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 0,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "AF00GROUP01",
+      "localizations" : [
+
+      ],
+      "name" : "AuraFit Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "AF000010",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Unlimited scans, no watermark, reveal videos, all templates.",
+              "displayName" : "AuraFit Pro Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.aurafit.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Pro Monthly",
+          "subscriptionGroupID" : "AF00GROUP01",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "39.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "AF000011",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Unlimited scans, no watermark, reveal videos, all templates. Best value.",
+              "displayName" : "AuraFit Pro Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.aurafit.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Pro Yearly",
+          "subscriptionGroupID" : "AF00GROUP01",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}
