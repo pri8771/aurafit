@@ -199,7 +199,7 @@ struct FitResultView: View {
                     Task { await saveScorecardToPhotos() }
                 }
                 AFSecondaryButton(
-                    title: entitlements.canGenerateRevealVideo ? "Reveal Clip" : "Reveal Clip",
+                    title: entitlements.canGenerateRevealVideo ? "Reveal Clip" : "Reveal Clip · Pro",
                     systemImage: entitlements.canGenerateRevealVideo ? "play.rectangle.fill" : "lock.fill"
                 ) {
                     Task { await generateReveal() }
