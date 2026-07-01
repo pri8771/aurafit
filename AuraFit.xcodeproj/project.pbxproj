@@ -320,6 +320,7 @@
 				DEVELOPMENT_TEAM = 796XH483R4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "AuraFit AI";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "AuraFit uses the camera to capture your full-body fit photo for on-device analysis. Photos never leave your device.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "AuraFit saves your generated scorecards and reveal clips to your photo library.";
@@ -353,6 +354,7 @@
 				DEVELOPMENT_TEAM = 796XH483R4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "AuraFit AI";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "AuraFit uses the camera to capture your full-body fit photo for on-device analysis. Photos never leave your device.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "AuraFit saves your generated scorecards and reveal clips to your photo library.";
