@@ -27,8 +27,8 @@ enum SeedData {
     static func ensureChallenges(_ context: ModelContext) {
         let descriptor = FetchDescriptor<Challenge>()
         let existing = (try? context.fetch(descriptor)) ?? []
-        guard existing.isEmpty else { return }
-        for challenge in defaultChallenges() {
+        let existingIDs = Set(existing.map(\.id))
+        for challenge in defaultChallenges() where !existingIDs.contains(challenge.id) {
             context.insert(challenge)
         }
     }

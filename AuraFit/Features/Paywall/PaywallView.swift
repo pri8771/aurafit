@@ -225,10 +225,12 @@ struct PaywallView: View {
     }
 
     private func restore() async {
-        await entitlements.restore()
+        let synced = await entitlements.restore()
         if entitlements.isPro {
             HapticsManager.shared.notify(.success)
             dismiss()
+        } else if !synced {
+            errorMessage = "Couldn't connect to the App Store. Check your connection and try again."
         } else {
             errorMessage = "No purchases found to restore."
         }

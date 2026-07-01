@@ -83,8 +83,9 @@ final class ScoreEngineTests: XCTestCase {
 
     func testLabelMatchesScore() {
         let score = engine.score(from: signals(cohesion: 0.99, harmony: 0.99, posture: 0.99,
-                                               coverage: 0.9, centering: 0.99, exposure: 0.99,
-                                               contrast: 0.8, sharpness: 0.8, bgComplexity: 0.02))
+                                               coverage: 0.9, centering: 0.99,
+                                               contrast: 0.8, sharpness: 0.8, exposure: 0.99,
+                                               bgComplexity: 0.02))
         XCTAssertEqual(score.label, ScoreLabel.from(score: score.overall))
     }
 }

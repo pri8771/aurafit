@@ -35,8 +35,7 @@ struct ColorHarmonyService: @unchecked Sendable {
         let bytesPerRow = bytesPerPixel * width
         var pixels = [UInt8](repeating: 0, count: width * height * bytesPerPixel)
 
-        guard let colorSpace = cg.colorSpace ?? CGColorSpace(name: CGColorSpace.sRGB),
-              let ctx = CGContext(
+        guard let ctx = CGContext(
                 data: &pixels,
                 width: width,
                 height: height,
@@ -46,7 +45,6 @@ struct ColorHarmonyService: @unchecked Sendable {
                 bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
               )
         else {
-            _ = colorSpace
             return []
         }
         ctx.draw(cg, in: CGRect(x: 0, y: 0, width: width, height: height))

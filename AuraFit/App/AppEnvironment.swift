@@ -12,14 +12,15 @@ final class AppEnvironment {
     let analysisService: FitAnalysisService
 
     init(
-        store: any PurchaseProviding = StoreKitService(),
-        imageStore: ImageFileStore = ImageFileStore(),
-        analysisService: FitAnalysisService = FitAnalysisService()
+        store: (any PurchaseProviding)? = nil,
+        imageStore: ImageFileStore? = nil,
+        analysisService: FitAnalysisService? = nil
     ) {
-        self.store = store
-        self.imageStore = imageStore
-        self.analysisService = analysisService
-        self.entitlements = EntitlementManager(store: store)
+        let resolvedStore = store ?? StoreKitService()
+        self.store = resolvedStore
+        self.imageStore = imageStore ?? ImageFileStore()
+        self.analysisService = analysisService ?? FitAnalysisService()
+        self.entitlements = EntitlementManager(store: resolvedStore)
     }
 
     /// Loads products and entitlements; binds the persisted settings row.

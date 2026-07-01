@@ -18,9 +18,16 @@ struct TipsGenerator: Sendable {
         // Always include one persona-flavored, positive closer.
         tips.append(personaTip(persona))
 
-        // Guarantee at least 3 tips even on a near-perfect fit.
-        if tips.count < 3 {
-            tips.append("Lock in this setup — same lighting and framing — to keep your scores high.")
+        // Guarantee at least 3 tips even on a near-perfect fit (e.g. every metric already >= 82,
+        // in which case the loop above contributes nothing and only the persona tip is present).
+        let closers = [
+            "Lock in this setup — same lighting and framing — to keep your scores high.",
+            "This is a strong baseline fit — save the setup as a reference for future scans."
+        ]
+        var closerIndex = 0
+        while tips.count < 3 && closerIndex < closers.count {
+            tips.append(closers[closerIndex])
+            closerIndex += 1
         }
         return Array(tips.prefix(5))
     }

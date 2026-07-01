@@ -15,8 +15,11 @@ struct ScanView: View {
         var id: Int { hashValue }
     }
 
+    private enum CameraPermissionPrompt: Equatable { case primer, deniedSettings }
+
     @State private var activeSheet: Sheet?
-    @State private var showPrimer = false
+    @State private var cameraPermissionPrompt: CameraPermissionPrompt?
+    @State private var isProcessingScan = false
     @State private var photoItem: PhotosPickerItem?
     @State private var capturedImage: UIImage?
     @State private var analysisResult: FitAnalysisResult?
@@ -60,12 +63,25 @@ struct ScanView: View {
                 .interactiveDismissDisabled()
             }
         }
-        .sheet(isPresented: $showPrimer) {
+        .sheet(isPresented: Binding(
+            get: { cameraPermissionPrompt == .primer },
+            set: { if !$0 { cameraPermissionPrompt = nil } }
+        )) {
             PermissionPrimerView(
-                onContinue: { showPrimer = false; openCamera() },
-                onUseLibrary: { showPrimer = false; showLibraryPickerFlag = true },
-                onCancel: { showPrimer = false }
+                onContinue: { cameraPermissionPrompt = nil; openCamera() },
+                onUseLibrary: { cameraPermissionPrompt = nil; showLibraryPickerFlag = true },
+                onCancel: { cameraPermissionPrompt = nil }
             )
+        }
+        .alert("Camera Access Needed", isPresented: Binding(
+            get: { cameraPermissionPrompt == .deniedSettings },
+            set: { if !$0 { cameraPermissionPrompt = nil } }
+        )) {
+            Button("Open Settings") { PermissionManager.openAppSettings(); cameraPermissionPrompt = nil }
+            Button("Use Library") { cameraPermissionPrompt = nil; showLibraryPickerFlag = true }
+            Button("Cancel", role: .cancel) { cameraPermissionPrompt = nil }
+        } message: {
+            Text("Camera access is off. Enable it in Settings, or import a photo from your library instead.")
         }
         .photosPicker(isPresented: $showLibraryPickerFlag, selection: $photoItem, matching: .images)
         .onChange(of: photoItem) { _, newItem in
@@ -187,10 +203,8 @@ struct ScanView: View {
         guard ensureCanScan() else { return }
         switch PermissionManager.cameraStatus {
         case .authorized: openCamera()
-        case .notDetermined: showPrimer = true
-        case .denied, .restricted:
-            // Show primer that routes to library (camera access is off).
-            showPrimer = true
+        case .notDetermined: cameraPermissionPrompt = .primer
+        case .denied, .restricted, .limited: cameraPermissionPrompt = .deniedSettings
         }
     }
 
@@ -221,14 +235,26 @@ struct ScanView: View {
     }
 
     private func handleImage(_ image: UIImage) {
+        guard !isProcessingScan else { return }
         guard ensureCanScan() else { return }
+        isProcessingScan = true
         capturedImage = image
         activeSheet = .analyzing
-        Task { await runAnalysis(on: image) }
+        Task {
+            await runAnalysis(on: image)
+            isProcessingScan = false
+        }
     }
 
     private func runAnalysis(on image: UIImage) async {
         let result = await environment.analysisService.analyze(image)
+
+        guard !result.diagnostics.isLowConfidence else {
+            activeSheet = nil
+            errorMessage = "We couldn't detect a person in this photo. Make sure you're fully visible in good light, then try again."
+            return
+        }
+
         analysisResult = result
 
         // Persist original image + session.

@@ -135,13 +135,6 @@ enum StylePersona: String, Codable, CaseIterable, Identifiable, Sendable {
     }
 }
 
-// MARK: - Asset Kind
-
-enum ExportedAssetKind: String, Codable, Sendable {
-    case scorecard
-    case revealVideo
-}
-
 // MARK: - Entitlement Tier
 
 enum EntitlementTier: String, Codable, Sendable {

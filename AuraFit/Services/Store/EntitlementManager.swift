@@ -13,6 +13,13 @@ final class EntitlementManager {
     /// Set by the app on launch so the manager can read/update daily scan accounting.
     var settings: AppSettings?
 
+    #if DEBUG
+    /// Debug-only override so Pro features can be exercised on-device without a real purchase.
+    /// Compiled out entirely in Release builds — cannot ship or reach TestFlight/App Store.
+    /// Flip to `false` to test the real StoreKit purchase/entitlement flow instead.
+    static var forceProForTesting = true
+    #endif
+
     init(store: any PurchaseProviding) {
         self.store = store
     }
@@ -20,7 +27,10 @@ final class EntitlementManager {
     // MARK: - Derived entitlements
 
     var isPro: Bool {
-        !store.purchasedProductIDs.isDisjoint(with: ProductCatalog.proSubscriptionIDs)
+        #if DEBUG
+        if Self.forceProForTesting { return true }
+        #endif
+        return !store.purchasedProductIDs.isDisjoint(with: ProductCatalog.proSubscriptionIDs)
     }
 
     var tier: EntitlementTier { isPro ? .pro : .free }
@@ -69,7 +79,7 @@ final class EntitlementManager {
     var loadState: StoreKitService.LoadState { store.loadState }
 
     func loadProducts() async { await store.loadProducts() }
-    func restore() async { await store.restorePurchases() }
+    func restore() async -> Bool { await store.restorePurchases() }
     func purchase(_ product: Product) async throws -> StoreKitService.PurchaseOutcome {
         try await store.purchase(product)
     }

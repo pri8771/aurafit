@@ -90,7 +90,11 @@ struct OnboardingView: View {
             return new
         }()
         settings.hasCompletedOnboarding = true
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            AppLog.persistence.error("Onboarding completion save failed: \(error.localizedDescription)")
+        }
     }
 }
 

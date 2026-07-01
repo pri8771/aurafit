@@ -141,5 +141,9 @@ struct FitAnalysisResult: Sendable {
         var poseDetected: Bool
         var segmentationAvailable: Bool
         var usedOutfitModel: Bool
+
+        /// True when neither pose detection nor segmentation found a subject in the photo,
+        /// meaning the resulting score has no real signal behind it and shouldn't be shown as-is.
+        var isLowConfidence: Bool { !poseDetected && !segmentationAvailable }
     }
 }

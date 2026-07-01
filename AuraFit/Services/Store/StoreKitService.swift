@@ -10,7 +10,7 @@ protocol PurchaseProviding: AnyObject {
 
     func loadProducts() async
     func purchase(_ product: Product) async throws -> StoreKitService.PurchaseOutcome
-    func restorePurchases() async
+    func restorePurchases() async -> Bool
     func product(for id: String) -> Product?
 }
 
@@ -49,7 +49,7 @@ final class StoreKitService: PurchaseProviding {
     private(set) var purchasedProductIDs: Set<String> = []
     private(set) var loadState: LoadState = .idle
 
-    private var updatesTask: Task<Void, Never>?
+    nonisolated(unsafe) private var updatesTask: Task<Void, Never>?
 
     init() {
         // Begin listening for transaction updates immediately (renewals, refunds, Ask-to-Buy).
@@ -64,18 +64,22 @@ final class StoreKitService: PurchaseProviding {
 
     func loadProducts() async {
         loadState = .loading
+        // Runs concurrently with (not gated behind) the network-bound product fetch below:
+        // Transaction.currentEntitlements reads locally-cached, on-device StoreKit data and
+        // works offline, so a subscriber's entitlement shouldn't wait on App Store connectivity.
+        async let entitlementsRefresh: Void = refreshEntitlements()
         do {
             let storeProducts = try await Product.products(for: ProductCatalog.allProductIDs)
             // Stable ordering: subscriptions first (yearly, monthly), then templates.
             products = storeProducts.sorted { lhs, rhs in
                 rank(lhs.id) < rank(rhs.id)
             }
-            await refreshEntitlements()
             loadState = .loaded
         } catch {
             AppLog.store.error("Product load failed: \(error.localizedDescription)")
             loadState = .failed(error.localizedDescription)
         }
+        await entitlementsRefresh
     }
 
     private func rank(_ id: String) -> Int {
@@ -111,13 +115,18 @@ final class StoreKitService: PurchaseProviding {
         }
     }
 
-    func restorePurchases() async {
+    /// Returns whether the App Store sync itself succeeded (independent of whether it
+    /// yields any active entitlements) so callers can distinguish a network/auth failure
+    /// from a genuine "no purchases to restore".
+    func restorePurchases() async -> Bool {
         do {
             try await AppStore.sync()
         } catch {
             AppLog.store.error("Restore (AppStore.sync) failed: \(error.localizedDescription)")
+            return false
         }
         await refreshEntitlements()
+        return true
     }
 
     // MARK: - Entitlements

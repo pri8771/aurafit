@@ -32,7 +32,7 @@ final class CameraService: NSObject {
     private var photoContinuation: CheckedContinuation<UIImage, Error>?
     private var isConfigured = false
 
-    enum CameraError: LocalizedError {
+    enum CameraError: LocalizedError, Sendable {
         case noDevice
         case cannotAddInput
         case cannotAddOutput
@@ -92,52 +92,54 @@ final class CameraService: NSObject {
 
     private func configureIfNeeded() async -> Bool {
         guard !isConfigured else { return true }
-        return await withCheckedContinuation { continuation in
+        let outcome = await withCheckedContinuation { (continuation: CheckedContinuation<Result<Void, CameraError>, Never>) in
             sessionQueue.async { [weak self] in
-                guard let self else { continuation.resume(returning: false); return }
-                let result = self.configureSession()
-                continuation.resume(returning: result)
+                guard let self else { continuation.resume(returning: .failure(.noDevice)); return }
+                continuation.resume(returning: self.configureSession())
             }
+        }
+        switch outcome {
+        case .success:
+            isConfigured = true
+            return true
+        case .failure(let error):
+            fail(error)
+            return false
         }
     }
 
-    /// Runs on the session queue.
-    nonisolated private func configureSession() -> Bool {
+    /// Runs on the session queue. Pure — no actor hops, no side effects beyond session configuration.
+    nonisolated private func configureSession() -> Result<Void, CameraError> {
         session.beginConfiguration()
         session.sessionPreset = .photo
 
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
             ?? AVCaptureDevice.default(for: .video) else {
             session.commitConfiguration()
-            Task { @MainActor in self.fail(.noDevice) }
-            return false
+            return .failure(.noDevice)
         }
 
         do {
             let input = try AVCaptureDeviceInput(device: device)
             guard session.canAddInput(input) else {
                 session.commitConfiguration()
-                Task { @MainActor in self.fail(.cannotAddInput) }
-                return false
+                return .failure(.cannotAddInput)
             }
             session.addInput(input)
         } catch {
             session.commitConfiguration()
-            Task { @MainActor in self.fail(.cannotAddInput) }
-            return false
+            return .failure(.cannotAddInput)
         }
 
         guard session.canAddOutput(photoOutput) else {
             session.commitConfiguration()
-            Task { @MainActor in self.fail(.cannotAddOutput) }
-            return false
+            return .failure(.cannotAddOutput)
         }
         session.addOutput(photoOutput)
         photoOutput.maxPhotoQualityPrioritization = .quality
 
         session.commitConfiguration()
-        Task { @MainActor in self.isConfigured = true }
-        return true
+        return .success(())
     }
 
     private func startRunning() async {
@@ -160,6 +162,9 @@ final class CameraService: NSObject {
     /// Captures a single photo and returns a normalized `UIImage`.
     func capturePhoto() async throws -> UIImage {
         guard isAvailable else { throw CameraError.captureFailed("Camera not available.") }
+        guard photoContinuation == nil else {
+            throw CameraError.captureFailed("A capture is already in progress.")
+        }
         return try await withCheckedThrowingContinuation { continuation in
             self.photoContinuation = continuation
             let settings = AVCapturePhotoSettings()

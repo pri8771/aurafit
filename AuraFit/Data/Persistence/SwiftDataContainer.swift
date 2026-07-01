@@ -7,10 +7,12 @@ enum SwiftDataContainer {
     static let schema = Schema([
         FitSession.self,
         Challenge.self,
-        ExportedAsset.self,
-        PurchaseEntitlement.self,
         AppSettings.self
     ])
+
+    /// Set to true if `makeShared()` had to fall back to an in-memory store. The UI warns
+    /// the user that nothing will persist across app restarts when this is true.
+    private(set) static var isUsingFallbackStorage = false
 
     /// The shared, on-disk container for the running app.
     static func makeShared() -> ModelContainer {
@@ -19,6 +21,7 @@ enum SwiftDataContainer {
             return try ModelContainer(for: schema, configurations: [config])
         } catch {
             AppLog.persistence.error("Persistent container failed: \(error.localizedDescription). Falling back to in-memory.")
+            isUsingFallbackStorage = true
             // Graceful fallback: never crash the app over storage init.
             return makeInMemory()
         }

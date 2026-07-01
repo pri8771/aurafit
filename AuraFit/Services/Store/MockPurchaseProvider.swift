@@ -35,7 +35,7 @@ final class MockPurchaseProvider: PurchaseProviding {
         purchasedProductIDs.insert(id)
     }
 
-    func restorePurchases() async { restoreCallCount += 1 }
+    func restorePurchases() async -> Bool { restoreCallCount += 1; return true }
 
     func product(for id: String) -> Product? { nil }
 }

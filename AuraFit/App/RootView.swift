@@ -30,6 +30,11 @@ struct RootView: View {
                 .environment(environment)
                 .environment(router)
         }
+        .alert("Storage Unavailable", isPresented: .constant(SwiftDataContainer.isUsingFallbackStorage)) {
+            Button("OK") {}
+        } message: {
+            Text("AuraFit couldn't access on-device storage, so nothing you do this session will be saved after you close the app. Try restarting your device.")
+        }
     }
 
     private var mainTabs: some View {

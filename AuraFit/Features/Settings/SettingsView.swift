@@ -12,6 +12,8 @@ struct SettingsView: View {
     @Query private var sessions: [FitSession]
 
     @State private var showResetConfirm = false
+    @State private var isRestoringPurchases = false
+    @State private var restoreResultMessage: String?
 
     private var settings: AppSettings? { settingsRows.first }
     private var entitlements: EntitlementManager { environment.entitlements }
@@ -28,6 +30,14 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .afScreenBackground()
             .navigationTitle("Settings")
+            .alert("Restore Purchases", isPresented: Binding(
+                get: { restoreResultMessage != nil },
+                set: { if !$0 { restoreResultMessage = nil } }
+            )) {
+                Button("OK") { restoreResultMessage = nil }
+            } message: {
+                Text(restoreResultMessage ?? "")
+            }
         }
     }
 
@@ -61,10 +71,30 @@ struct SettingsView: View {
                 }
                 .foregroundStyle(AFColors.accent)
             }
-            Button("Restore Purchases") {
-                Task { await entitlements.restore() }
+            Button {
+                Task {
+                    isRestoringPurchases = true
+                    let synced = await entitlements.restore()
+                    isRestoringPurchases = false
+                    if entitlements.isPro {
+                        restoreResultMessage = "Your Pro subscription has been restored."
+                    } else if !synced {
+                        restoreResultMessage = "Couldn't connect to the App Store. Check your connection and try again."
+                    } else {
+                        restoreResultMessage = "No purchases found to restore."
+                    }
+                }
+            } label: {
+                HStack {
+                    Text("Restore Purchases")
+                    if isRestoringPurchases {
+                        Spacer()
+                        ProgressView()
+                    }
+                }
             }
             .foregroundStyle(AFColors.accent)
+            .disabled(isRestoringPurchases)
         } header: {
             Text("Membership")
         } footer: {

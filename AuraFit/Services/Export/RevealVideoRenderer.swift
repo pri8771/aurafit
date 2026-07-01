@@ -37,8 +37,13 @@ struct RevealVideoRenderer {
             .appendingPathComponent("reveal-\(name).mp4")
         try? FileManager.default.removeItem(at: tempURL)
 
-        try await render(model: model, to: tempURL)
-        return try store.adoptFile(at: tempURL, folder: .reveals, fileName: "\(name).mp4")
+        do {
+            try await render(model: model, to: tempURL)
+            return try store.adoptFile(at: tempURL, folder: .reveals, fileName: "\(name).mp4")
+        } catch {
+            try? FileManager.default.removeItem(at: tempURL)
+            throw error
+        }
     }
 
     /// Writes the animated reveal to `outputURL`.
@@ -87,6 +92,9 @@ struct RevealVideoRenderer {
 
             // Back-pressure: wait until the input is ready.
             while !input.isReadyForMoreMediaData {
+                if writer.status == .failed {
+                    throw RenderError.writeFailed(writer.error?.localizedDescription ?? "writer failed while waiting for input")
+                }
                 try await Task.sleep(for: .milliseconds(5))
             }
             let presentationTime = CMTime(value: CMTimeValue(frame), timescale: timescale)

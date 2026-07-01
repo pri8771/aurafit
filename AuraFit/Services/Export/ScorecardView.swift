@@ -134,6 +134,8 @@ struct ScorecardView: View {
                     Text(metric.title)
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.75))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                         .frame(width: 110, alignment: .leading)
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {

@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import Photos
+import UIKit
 
 /// Encapsulates runtime permission queries/requests for camera and photo library.
 /// All methods are async and safe to call from the main actor.
@@ -23,6 +24,12 @@ struct PermissionManager {
     static func requestCamera() async -> Status {
         let granted = await AVCaptureDevice.requestAccess(for: .video)
         return granted ? .authorized : .denied
+    }
+
+    /// Deep-links to this app's page in the Settings app, for when permission was permanently denied.
+    static func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 
     private static func map(_ status: AVAuthorizationStatus) -> Status {

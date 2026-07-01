@@ -277,7 +277,7 @@ struct FitResultView: View {
                                                    store: environment.imageStore,
                                                    name: session.id.uuidString)
             let repo = SessionRepository(context: modelContext, imageStore: environment.imageStore)
-            repo.attachScorecard(path, to: session)
+            repo.attachScorecard(path, includesWatermark: entitlements.exportsWatermarked, to: session)
             return environment.imageStore.absoluteURL(for: path)
         } catch {
             showToast("Couldn't render scorecard")
@@ -286,10 +286,9 @@ struct FitResultView: View {
         }
     }
 
-    /// Always re-render for Pro users if the cached card might still have a watermark.
+    /// Re-render only when the cached card's watermark state no longer matches the user's entitlement.
     private func needsWatermarkRerender(path: String) -> Bool {
-        // Simple heuristic: Pro users get a fresh, watermark-free render once.
-        entitlements.isPro
+        session.scorecardIncludesWatermark != entitlements.exportsWatermarked
     }
 
     private func shareScorecard() async {
