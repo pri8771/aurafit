@@ -259,6 +259,7 @@ Verified on the merged tree, not per-package:
 
 | Key | Blocker | Needs |
 |---|---|---|
+| `AURA-ENG-038` | **MobileCLIP must be removed or replaced** — `DEC-004`. Top engineering item | An MIT/Apache encoder converted and palettized, or a decision to ship v1.0 heuristic-only |
 | `AURA-QA-001` | UI smoke test still fails; the simulator cannot run Vision pose or segmentation | The DEBUG-gated Vision stub |
 | `AURA-QA-002` | The core loop has still never been verified on a physical device | A person, a phone, the §5.2 matrix |
 | `AURA-LEG-002` | MobileCLIP commercial licence unresolved | A human reading Apple's model licence. **Blocks M3** |
@@ -342,7 +343,7 @@ Manual, on a real iPhone. Results recorded in `docs/TEST_PLAN.md`. Minimum matri
 
 | Key | Task | Phase | Est | Acceptance |
 |---|---|---|---|---|
-| `AURA-LEG-002` | Resolve MobileCLIP licence for commercial distribution | 0 | 0.5d | Written `DECISIONS.md` confirmation, or model swapped/removed. **Blocks M3.** |
+| `AURA-LEG-002` | ~~Resolve MobileCLIP licence~~ | 0 | 0.5d | **CLOSED 2026-07-28 — negative. See `DEC-004`.** The Apple ML Research Model licence permits use *"exclusively for Research Purposes"* and explicitly excludes *"any commercial exploitation, product development or use in any commercial product or service."* MobileCLIP **cannot ship**. Superseded by `AURA-ENG-038` |
 | `AURA-LEG-003` | Terms of service | 0 | 0.3d | Apple standard EULA accepted or custom terms published |
 | `AURA-LEG-004` | App Store privacy nutrition labels | 0 | 0.3d | "Data Not Collected"; matches `PrivacyInfo.xcprivacy` and actual behaviour |
 | `AURA-LEG-005` | Age rating questionnaire (2026 schema) | 0 | 0.5d | New 13+/16+/18+ tiers; social-media questions (required from Sept 2026) answered; **the "medical or wellness topics" question answered carefully** — a body/appearance-adjacent app must not overclaim |
@@ -555,7 +556,7 @@ Extends `docs/RISKS.md`. P = probability, I = impact.
 | `AURA-R02` | Camera/import/export fails on real devices | med | high | `AURA-QA-002` device matrix | **open — top risk** |
 | `AURA-R03` | Privacy declarations don't match behaviour | low | high | Manifest committed and verified accurate | mitigated |
 | `AURA-R04` | Paywall precedes a credible first result | med | high | Monetization gated on `AURA-QA-002` | mitigating |
-| `AURA-R05` | MobileCLIP licence forbids commercial use | med | high | `AURA-LEG-002` before M3; fallback is heuristic or a permissively-licensed encoder | **open — blocks M3** |
+| `AURA-R05` | ~~MobileCLIP licence forbids commercial use~~ | — | high | **MATERIALISED 2026-07-28.** Confirmed research-only (`DEC-004`). No longer a risk; now scoped work as `AURA-ENG-038` | **realised → converted to work** |
 | `AURA-R06` | No analytics → product decisions made blind | high | med | `AURA-OPS-006` | open |
 | `AURA-R07` | Scope creep displaces the ship date | **high** | high | CR process §1.4; evidenced already by CR-001/002 | **open — active** |
 | `AURA-R08` | Demographic bias in scoring | med | high | `AURA-DATA-006` fairness check | open |
@@ -575,6 +576,7 @@ Extends `docs/RISKS.md`. P = probability, I = impact.
 | **CR-002** | 2026-07-28 | Owner | Add `PhotoCoach` retake guidance and the live camera coach | **Accepted** | +1d ENG · +2 source files · +1 SwiftData field, raising urgency of `AURA-ENG-030` · **Phase 0 +1d** |
 | **CR-003** | 2026-07-28 | Owner | Reposition "outfit scorer" → "look good in photos" | **Accepted** | Restructured roadmap; created Phase 1; invalidated draft store copy; no Phase 0 delay |
 | **CR-004** | 2026-07-28 | Owner | Expand plan from engineering-only to full program (MKT/UA/MON/QA/OPS/LEG) with CR tracking | **Accepted** | +0.5d PM · this document · surfaced ~15 previously-unplanned non-engineering tasks |
+| **CR-005** | 2026-07-28 | Licence finding | MobileCLIP must be removed or replaced before shipping (`DEC-004`) | **Forced** | Not optional scope — a licence breach. Invalidates the bundled encoder from CR-001. Est. 1–2d to swap to an MIT encoder + regenerate embeddings + re-verify, or 0.5d to remove and ship v1.0 heuristic-only. **Either displaces other Phase 0 work or moves M3** (§1.4 rule) |
 
 ### 9.1 Honest reading of CR-001 and CR-002
 
