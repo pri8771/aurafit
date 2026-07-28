@@ -2,56 +2,67 @@ import XCTest
 import UIKit
 @testable import AuraFit
 
-/// Exercises the bundled MobileCLIP zero-shot classifier end to end: asset presence,
-/// deterministic embedding + ranking, and integration through `OutfitClassifierService`.
+/// The zero-shot classifier is retained in the codebase but ships with **no bundled encoder**:
+/// MobileCLIP's licence permits research use only (see `docs/DECISIONS.md` DEC-004), so the
+/// weights were removed before release. A permissively-licensed encoder is planned for Phase 1
+/// (`AURA-ENG-038`).
+///
+/// These tests therefore assert the *absence* contract — that the app degrades cleanly to the
+/// heuristic path rather than crashing or silently producing model-shaped output — plus the
+/// encoder-agnostic helpers that survive the removal.
 final class CLIPZeroShotClassifierTests: XCTestCase {
 
-    /// The encoder and label embeddings must ship in the app bundle. This test is the
-    /// canary for the "model silently missing from the bundle" failure mode.
-    func testClassifierLoadsFromAppBundle() {
-        XCTAssertNotNil(
-            CLIPZeroShotClassifier(),
-            "MobileCLIPImageEncoder.mlmodelc / CLIPLabelEmbeddings.json missing from app bundle."
+    /// Guards the removal: if an encoder is ever re-bundled, this fails and forces a
+    /// deliberate revisit of the licence decision and of the tests below.
+    func testNoEncoderIsBundled() {
+        XCTAssertNil(
+            Bundle.main.url(forResource: CLIPZeroShotClassifier.modelResourceName, withExtension: "mlmodelc"),
+            "An encoder is bundled again — re-check licensing (DEC-004) before shipping."
         )
+        XCTAssertNil(CLIPZeroShotClassifier(), "Classifier must not initialize without a bundled encoder.")
     }
 
-    func testClassifyProducesModelBackedSignals() throws {
-        let classifier = try XCTUnwrap(CLIPZeroShotClassifier())
-        let colors = ColorSignals(palette: [], harmony: 0.6, cohesion: 0.7)
-        let signals = try XCTUnwrap(classifier.classify(image: Self.silhouetteImage(), colors: colors))
-
-        XCTAssertTrue(signals.usedModel)
-        XCTAssertNotEqual(signals.persona, .undetermined)
-        XCTAssertFalse(signals.tags.isEmpty)
-        for tag in signals.tags {
-            XCTAssertGreaterThan(tag.confidence, 0)
-            XCTAssertLessThanOrEqual(tag.confidence, 1)
-        }
-        // The persona tag's confidence is a real softmax probability, not a constant.
-        XCTAssertNotEqual(signals.tags[0].confidence, 0.6, accuracy: 0.0001)
-    }
-
-    func testClassificationIsDeterministic() throws {
-        let classifier = try XCTUnwrap(CLIPZeroShotClassifier())
-        let colors = ColorSignals(palette: [], harmony: 0.5, cohesion: 0.5)
-        let image = Self.silhouetteImage()
-        let first = try XCTUnwrap(classifier.classify(image: image, colors: colors))
-        let second = try XCTUnwrap(classifier.classify(image: image, colors: colors))
-
-        XCTAssertEqual(first.persona, second.persona)
-        XCTAssertEqual(first.tags.map(\.label), second.tags.map(\.label))
-        for (a, b) in zip(first.tags, second.tags) {
-            XCTAssertEqual(a.confidence, b.confidence, accuracy: 0.001)
-        }
-    }
-
-    func testServicePrefersClipOverHeuristic() {
+    /// The service must fall through to the heuristic instead of failing.
+    func testServiceFallsBackToHeuristicWithoutAnEncoder() {
         let service = OutfitClassifierService()
+        XCTAssertNil(service.zeroShotClassifier)
+
         let colors = ColorSignals(palette: [RGBColor(0.1, 0.1, 0.12)], harmony: 0.7, cohesion: 0.8)
         let signals = service.classify(image: Self.silhouetteImage(), colors: colors, pose: .unavailable)
-        XCTAssertTrue(signals.usedModel, "Service should route through the bundled MobileCLIP classifier.")
+
+        XCTAssertFalse(signals.usedModel, "Without an encoder the result must be marked heuristic.")
+        XCTAssertFalse(signals.tags.isEmpty)
     }
 
+    /// Heuristic tags must not carry a fabricated confidence (AURA-ENG-005).
+    func testHeuristicTagsCarryNoFabricatedConfidence() {
+        let colors = ColorSignals(palette: [RGBColor(0.1, 0.1, 0.12)], harmony: 0.7, cohesion: 0.8)
+        let signals = OutfitClassifierService().classify(
+            image: Self.silhouetteImage(), colors: colors, pose: .unavailable
+        )
+        for tag in signals.tags {
+            XCTAssertEqual(tag.confidence, OutfitClassifierService.noModelConfidence,
+                           "Heuristic tag \(tag.label) must use the documented sentinel, not a made-up value.")
+        }
+    }
+
+    /// PhotoCoach must still produce guidance with no CLIP issue assessment available.
+    func testPhotoCoachWorksWithoutIssueAssessment() {
+        let signals = AnalysisSignals(
+            pose: PoseSignals(detected: true, confidence: 0.8, fullBodyVisible: false,
+                              verticalCoverage: 0.7, horizontalCentering: 0.9,
+                              posture: 0.8, boundingBox: nil),
+            segmentation: .unavailable,
+            quality: QualitySignals(brightness: 0.2, contrast: 0.5, sharpness: 0.6, exposureBalance: 0.4),
+            color: .neutral,
+            outfit: .neutral
+        )
+        let tips = PhotoCoach().tips(signals: signals, issues: nil)
+        XCTAssertFalse(tips.isEmpty, "Signal-derived tips must survive without CLIP issue labels.")
+        XCTAssertNil(PhotoCoach().rejectionDetail(issues: nil))
+    }
+
+    /// Encoder-agnostic geometry helper, still used by whatever encoder lands next.
     func testCenterCropProducesRequestedSize() throws {
         let buffer = try XCTUnwrap(
             CLIPZeroShotClassifier.centerCroppedPixelBuffer(from: Self.silhouetteImage(), side: 256)
@@ -60,24 +71,21 @@ final class CLIPZeroShotClassifierTests: XCTestCase {
         XCTAssertEqual(CVPixelBufferGetHeight(buffer), 256)
     }
 
+    func testPersonCropFallsBackWithoutABox() {
+        let image = Self.silhouetteImage()
+        XCTAssertEqual(CLIPZeroShotClassifier.personCrop(from: image, boundingBox: nil).size, image.size)
+    }
+
     // MARK: - Fixture
 
-    /// Draws a simple dark full-body silhouette on a light background — the same shape
-    /// family as the UI-test QA fixture, generated in code so the unit target needs no asset.
     private static func silhouetteImage() -> UIImage {
         let size = CGSize(width: 512, height: 768)
         return UIGraphicsImageRenderer(size: size).image { ctx in
             UIColor(white: 0.93, alpha: 1).setFill()
             ctx.fill(CGRect(origin: .zero, size: size))
             UIColor(white: 0.12, alpha: 1).setFill()
-            // Head.
             ctx.cgContext.fillEllipse(in: CGRect(x: 216, y: 60, width: 80, height: 80))
-            // Torso.
             ctx.fill(CGRect(x: 196, y: 150, width: 120, height: 240))
-            // Arms.
-            ctx.fill(CGRect(x: 156, y: 160, width: 36, height: 200))
-            ctx.fill(CGRect(x: 320, y: 160, width: 36, height: 200))
-            // Legs.
             ctx.fill(CGRect(x: 200, y: 395, width: 48, height: 280))
             ctx.fill(CGRect(x: 264, y: 395, width: 48, height: 280))
         }

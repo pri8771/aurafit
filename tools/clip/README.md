@@ -1,4 +1,17 @@
-# MobileCLIP zero-shot assets
+# CLIP zero-shot assets
+
+> **MobileCLIP was removed from the app on 2026-07-28 — do not re-bundle it.**
+> Apple's ML Research Model licence permits use *"exclusively for Research Purposes"* and
+> explicitly excludes *"any commercial exploitation, product development or use in any
+> commercial product or service."* See `docs/DECISIONS.md` DEC-004.
+>
+> The tooling below is encoder-agnostic and is retained for `AURA-ENG-038`, which will convert
+> a permissively-licensed encoder (LAION OpenCLIP ViT-B-32 is MIT and the leading candidate;
+> Google SigLIP is Apache-2.0 but uses a different tokenizer, so `tokenize_prompts.py` would
+> need rewriting). Image and text encoders must always come from the same model variant.
+> The historical MobileCLIP instructions below are kept as a worked example of the process.
+
+## Original notes (MobileCLIP)
 
 The app bundles `AuraFit/Resources/MobileCLIPImageEncoder.mlpackage` (MobileCLIP-S0
 image encoder, from Apple's official Core ML release at
