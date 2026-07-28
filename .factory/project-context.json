@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pri8771/iOS_app_factory_rules/main/schemas/project-context.schema.json",
+  "projectName": "AuraFit",
+  "projectType": "existing",
+  "lifecycleStatus": "mvp_development",
+  "platforms": [
+    "ios"
+  ],
+  "frameworks": [
+    "SwiftUI",
+    "SwiftData",
+    "Vision",
+    "CoreML",
+    "AVFoundation",
+    "StoreKit"
+  ],
+  "registeredAt": "2026-07-23",
+  "existingCodeBaselineRequired": true,
+  "constraints": {
+    "localFirst": true,
+    "backendAllowed": false,
+    "thirdPartyDependenciesAllowed": false
+  },
+  "agentEntryPoints": {
+    "generic": "AGENTS.md",
+    "claudeCode": "CLAUDE.md",
+    "gemini": "GEMINI.md",
+    "cursor": ".cursor/rules/app-factory.mdc",
+    "githubCopilot": ".github/copilot-instructions.md",
+    "canonicalLocalRules": ".factory/AGENTS.factory.md"
+  },
+  "requiredReading": [
+    "AGENTS.md",
+    ".factory/AGENTS.factory.md",
+    "quality/quality-manifest.json",
+    "docs/STATUS.md",
+    "docs/ARCHITECTURE.md",
+    "docs/BUGS.md",
+    "docs/DECISIONS.md"
+  ]
+}

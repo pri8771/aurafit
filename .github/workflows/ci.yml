@@ -1,0 +1,99 @@
+name: CI
+
+# Build and test AuraFit on every push and pull request. This is a native SwiftUI/SwiftData
+# app with no backend, so CI's only job is: does it still build, and do the unit + UI tests
+# still pass on a simulator. See docs/STATUS.md / docs/BUGS.md for the project's quality bar.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and test (iOS Simulator)
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select the newest installed Xcode (needs iOS 18 SDK support)
+        run: |
+          set -euo pipefail
+          latest=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -n1)
+          if [ -n "$latest" ]; then
+            sudo xcode-select -switch "$latest/Contents/Developer"
+          fi
+          xcodebuild -version
+
+      - name: Pick an available iOS runtime + device type
+        id: sim
+        run: |
+          set -euo pipefail
+          runtime=$(xcrun simctl list runtimes available -j \
+            | /usr/bin/python3 -c "import json,sys; rs=[r for r in json.load(sys.stdin)['runtimes'] if r['name'].startswith('iOS')]; print(sorted(rs, key=lambda r: r['version'])[-1]['identifier'])")
+          device_type=$(xcrun simctl list devicetypes -j \
+            | /usr/bin/python3 -c "import json,sys; ds=[d for d in json.load(sys.stdin)['devicetypes'] if 'iPhone' in d['name']]; print(next(d['identifier'] for d in ds if 'iPhone 16' in d['name']), file=sys.stdout)" 2>/dev/null \
+            || xcrun simctl list devicetypes -j | /usr/bin/python3 -c "import json,sys; ds=[d for d in json.load(sys.stdin)['devicetypes'] if 'iPhone' in d['name']]; print(ds[0]['identifier'])")
+          echo "runtime=$runtime" >> "$GITHUB_OUTPUT"
+          echo "device_type=$device_type" >> "$GITHUB_OUTPUT"
+          echo "Selected runtime: $runtime"
+          echo "Selected device type: $device_type"
+
+      - name: Create a dedicated CI simulator
+        id: create_sim
+        run: |
+          set -euo pipefail
+          udid=$(xcrun simctl create AuraFitCI "${{ steps.sim.outputs.device_type }}" "${{ steps.sim.outputs.runtime }}")
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+
+      - name: Seed the QA fit-photo fixture into the simulator's Photos library
+        # AuraFitUITests drives the real "Import from Library" flow (see
+        # AuraFitUITests/ScanCoreLoopUITests.swift), so the simulator needs at least one photo
+        # available for the system picker to select. `QAFitPhoto.jpg` is a generated, synthetic
+        # fixture — not a real photo — checked in for deterministic QA (docs/STATUS.md AURA-CORE-001).
+        run: |
+          xcrun simctl addmedia "${{ steps.create_sim.outputs.udid }}" AuraFitUITests/Fixtures/QAFitPhoto.jpg
+
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project AuraFit.xcodeproj \
+            -scheme AuraFit \
+            -destination "id=${{ steps.create_sim.outputs.udid }}" \
+            2>&1 | tee xcodebuild-build.log
+
+      - name: Test (unit + UI)
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project AuraFit.xcodeproj \
+            -scheme AuraFit \
+            -destination "id=${{ steps.create_sim.outputs.udid }}" \
+            -resultBundlePath AuraFit.xcresult \
+            2>&1 | tee xcodebuild-test.log
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: AuraFit-xcresult
+          path: |
+            AuraFit.xcresult
+            xcodebuild-build.log
+            xcodebuild-test.log
+          retention-days: 14
+
+      - name: Delete the CI simulator
+        if: always()
+        run: xcrun simctl delete "${{ steps.create_sim.outputs.udid }}" || true

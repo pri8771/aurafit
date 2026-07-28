@@ -1,0 +1,11 @@
+{
+  "standardRepository": "pri8771/iOS_app_factory_rules",
+  "standardRepositoryUrl": "https://github.com/pri8771/iOS_app_factory_rules",
+  "standardVersion": "0.2.0",
+  "standardRef": "main",
+  "profiles": [
+    "common",
+    "ios"
+  ],
+  "installedAt": "2026-07-23"
+}

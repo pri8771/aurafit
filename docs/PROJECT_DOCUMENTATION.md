@@ -1,5 +1,10 @@
 # AuraFit — Project Documentation
 
+> Historical overview. For current lifecycle, scope, architecture, risks, tests,
+> release gates, and agent handoff, use the factory-governed documents in this
+> directory beginning with `STATUS.md`. Code remains authoritative for implemented
+> behavior.
+
 GitHub is the source of truth for this project documentation. Notion indexes this file in the Priyansh App Factory Command Center.
 
 ## 00. Executive Summary

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	AuraFit is a local-first, on-device app: no backend, no analytics/advertising SDKs,
+	and no networking calls beyond opening Apple's own web pages (Terms/Privacy links,
+	App Store subscription management) via `Link`/`UIApplication.open`, which do not
+	transmit user data. Camera and Photos images are processed on-device (Vision/Core
+	Image/Core ML with a heuristic fallback) and persisted only in the app's local
+	sandbox (SwiftData + local files); nothing is uploaded or shared with the developer
+	or any third party. See docs/ARCHITECTURE.md and docs/DECISIONS.md (DEC-003) for
+	the on-device analysis architecture this manifest reflects.
+	-->
+
+	<!-- No tracking (as defined by Apple's App Tracking Transparency) is performed. -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+
+	<!-- No tracking domains are contacted. -->
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<!--
+	No user data is collected (i.e. transmitted off-device or linked to identity and
+	shared with the developer/third parties). Photos and camera captures are analyzed
+	and stored locally only; StoreKit purchase state is managed by Apple's own
+	on-device StoreKit APIs and is not collected by this app.
+	-->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+
+	<!--
+	Required-reason API declarations: the app's own code was audited (2026-07-27) for
+	calls into Apple's required-reason API categories (User Defaults, File Timestamp,
+	System Boot Time, Disk Space, Active Keyboard). None of these APIs are used:
+	- No `UserDefaults`/`@AppStorage` anywhere in the app target.
+	- No file/attribute timestamp APIs (`creationDate`, `contentModificationDate`,
+	  `fileModificationDate`, `attributesOfItem`, `getattrlist`, `stat`/`fstat`, etc.).
+	  `ImageFileStore` (AuraFit/Data/Persistence/ImageFileStore.swift) only calls
+	  `fileExists`, `createDirectory`, `write(to:)`, `moveItem`, and `removeItem`, none
+	  of which require a reason declaration.
+	- No disk-space APIs (`volumeAvailableCapacity`, `NSFileSystemFreeSize`, `statfs`).
+	- No `ProcessInfo.systemUptime`/boot-time APIs.
+	Consequently this array is intentionally empty. If a future change introduces one
+	of these APIs (directly or via a new dependency), this manifest must be updated
+	alongside it.
+	-->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array/>
+</dict>
+</plist>

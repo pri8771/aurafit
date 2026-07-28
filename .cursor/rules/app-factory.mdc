@@ -1,0 +1,15 @@
+---
+description: App Factory project registration and quality rules
+globs:
+alwaysApply: true
+---
+
+Before editing this repository, read:
+
+- `.factory/project-context.json`
+- `.factory/standard-lock.json`
+- `.factory/AGENTS.factory.md`
+- `quality/quality-manifest.json`
+- relevant project docs and feature contracts
+
+The `projectType` field is authoritative. Do not re-scaffold an existing project. Do not use undisclosed fake production data, disconnected controls, or unverified completion claims. Report checks run and checks not run. `code_complete` is not `done`.
