@@ -57,9 +57,16 @@ final class EntitlementManager {
     // MARK: - Daily scan gate
 
     /// Remaining free scans today (large sentinel when Pro).
+    ///
+    /// With no bound `AppSettings` row there is nowhere to record usage, so this fails **closed**
+    /// (zero remaining) rather than open. Returning the full limit here would have handed every
+    /// free user unlimited scans for the session, silently, if the row never bound (AURA-ENG-011).
     var remainingFreeScansToday: Int {
         guard !isPro else { return .max }
-        guard let settings else { return ProductCatalog.freeDailyScanLimit }
+        guard let settings else {
+            AppLog.store.error("Free-scan quota queried with no bound AppSettings row; failing closed (0 remaining).")
+            return 0
+        }
         let used = settings.rolloverIfNeeded()
         return max(0, ProductCatalog.freeDailyScanLimit - used)
     }
@@ -68,7 +75,11 @@ final class EntitlementManager {
 
     /// Records a scan against the daily quota (no-op for Pro). Caller must save the context.
     func registerScan() {
-        guard !isPro, let settings else { return }
+        guard !isPro else { return }
+        guard let settings else {
+            AppLog.store.error("registerScan() with no bound AppSettings row; scan not counted against the daily quota.")
+            return
+        }
         settings.rolloverIfNeeded()
         settings.scanCountToday += 1
     }

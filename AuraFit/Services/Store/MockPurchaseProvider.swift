@@ -1,10 +1,15 @@
 import Foundation
 import StoreKit
 
+#if DEBUG
+
 /// A lightweight `PurchaseProviding` mock for SwiftUI previews and unit tests.
 ///
 /// It cannot fabricate real `Product` values (StoreKit forbids it), so `products` is empty;
 /// entitlement logic is driven entirely by `purchasedProductIDs`, which is what the tests exercise.
+///
+/// Debug-only (AURA-ENG-014): previews and the test bundle both build against a Debug host, so
+/// nothing needs this in Release and it must not be linked into the shipped binary.
 @MainActor
 final class MockPurchaseProvider: PurchaseProviding {
     var products: [Product] = []
@@ -39,3 +44,5 @@ final class MockPurchaseProvider: PurchaseProviding {
 
     func product(for id: String) -> Product? { nil }
 }
+
+#endif

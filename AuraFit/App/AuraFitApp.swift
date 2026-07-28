@@ -12,7 +12,13 @@ struct AuraFitApp: App {
     init() {
         // UI tests pass this to force a clean in-memory store so every test run starts from
         // deterministic first-launch state (see `SwiftDataContainer.makeShared(forceInMemory:)`).
+        // Debug-only (AURA-ENG-014): `AuraFitUITests` runs against a Debug host, so the escape
+        // hatch stays available to the tests while being compiled out of the shipped binary.
+        #if DEBUG
         let forceInMemory = ProcessInfo.processInfo.arguments.contains("-UITestInMemoryStore")
+        #else
+        let forceInMemory = false
+        #endif
         let container = SwiftDataContainer.makeShared(forceInMemory: forceInMemory)
         self.modelContainer = container
         _environment = State(initialValue: AppEnvironment())

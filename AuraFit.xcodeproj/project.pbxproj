@@ -29,8 +29,27 @@
 		AF0000000000000000000022 /* AuraFitUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AuraFitUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AF0000000000000000000013 /* Exceptions for "AuraFit" folder in "AuraFit" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/AuraFit.storekit,
+			);
+			target = AF0000000000000000000040 /* AuraFit */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		AF0000000000000000000010 /* AuraFit */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AuraFit; sourceTree = "<group>"; };
+		AF0000000000000000000010 /* AuraFit */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AF0000000000000000000013 /* Exceptions for "AuraFit" folder in "AuraFit" target */,
+			);
+			explicitFileTypes = {};
+			explicitFolders = ();
+			path = AuraFit;
+			sourceTree = "<group>";
+		};
 		AF0000000000000000000011 /* AuraFitTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AuraFitTests; sourceTree = "<group>"; };
 		AF0000000000000000000012 /* AuraFitUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AuraFitUITests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -384,6 +403,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "AuraFit AI";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "AuraFit uses the camera to capture your full-body fit photo for on-device analysis. Photos never leave your device.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "AuraFit saves your generated scorecards and reveal clips to your photo library.";
@@ -418,6 +438,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "AuraFit AI";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "AuraFit uses the camera to capture your full-body fit photo for on-device analysis. Photos never leave your device.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "AuraFit saves your generated scorecards and reveal clips to your photo library.";

@@ -70,6 +70,48 @@ final class EntitlementManagerTests: XCTestCase {
         XCTAssertTrue(manager.canScan)
     }
 
+    // MARK: - AURA-ENG-011: unbound settings row must fail closed
+
+    func testUnboundSettingsFailsClosedForFreeUser() {
+        let manager = EntitlementManager(store: MockPurchaseProvider(isPro: false))
+        XCTAssertNil(manager.settings)
+        // Never hand out the full free allowance with nowhere to record usage.
+        XCTAssertEqual(manager.remainingFreeScansToday, 0)
+        XCTAssertFalse(manager.canScan)
+    }
+
+    func testRegisterScanWithUnboundSettingsIsSafeNoOp() {
+        let manager = EntitlementManager(store: MockPurchaseProvider(isPro: false))
+        manager.registerScan()   // must not trap
+        XCTAssertEqual(manager.remainingFreeScansToday, 0)
+
+        // Late binding restores normal quota behaviour.
+        let settings = AppSettings()
+        manager.settings = settings
+        XCTAssertEqual(manager.remainingFreeScansToday, ProductCatalog.freeDailyScanLimit)
+        XCTAssertTrue(manager.canScan)
+        manager.registerScan()
+        XCTAssertEqual(settings.scanCountToday, 1)
+    }
+
+    func testUnboundSettingsStillAllowsProUser() {
+        let manager = EntitlementManager(store: MockPurchaseProvider(isPro: true))
+        XCTAssertNil(manager.settings)
+        XCTAssertTrue(manager.canScan)
+        XCTAssertEqual(manager.remainingFreeScansToday, .max)
+    }
+
+    func testBindSettingsIgnoresNilRatherThanClearingBinding() {
+        let environment = AppEnvironment(store: MockPurchaseProvider(isPro: false))
+        let settings = AppSettings()
+        environment.bindSettings(settings)
+        XCTAssertTrue(environment.entitlements.settings === settings)
+
+        // A later nil (row not yet materialized) must not drop a good binding.
+        environment.bindSettings(nil)
+        XCTAssertTrue(environment.entitlements.settings === settings)
+    }
+
     func testPurchaseUpdatesEntitlement() async throws {
         let mock = MockPurchaseProvider(isPro: false)
         let manager = EntitlementManager(store: mock)
