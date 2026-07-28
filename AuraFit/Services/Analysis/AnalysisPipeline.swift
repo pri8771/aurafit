@@ -43,8 +43,8 @@ enum AnalysisStep: Int, CaseIterable, Sendable, Identifiable {
 actor AnalysisPipeline {
 
     // Injected collaborators (value types / Sendable) for testability.
-    private let pose: VisionPoseService
-    private let segmentation: VisionSegmentationService
+    private let pose: any PoseAnalyzing
+    private let segmentation: any SegmentationAnalyzing
     private let quality: ImageQualityService
     private let colorHarmony: ColorHarmonyService
     private let classifier: any OutfitClassifying
@@ -53,8 +53,8 @@ actor AnalysisPipeline {
     private let photoCoach: PhotoCoach
 
     init(
-        pose: VisionPoseService = VisionPoseService(),
-        segmentation: VisionSegmentationService = VisionSegmentationService(),
+        pose: (any PoseAnalyzing)? = nil,
+        segmentation: (any SegmentationAnalyzing)? = nil,
         quality: ImageQualityService = ImageQualityService(),
         colorHarmony: ColorHarmonyService = ColorHarmonyService(),
         classifier: (any OutfitClassifying)? = nil,
@@ -62,8 +62,8 @@ actor AnalysisPipeline {
         tipsGenerator: TipsGenerator = TipsGenerator(),
         photoCoach: PhotoCoach = PhotoCoach()
     ) {
-        self.pose = pose
-        self.segmentation = segmentation
+        self.pose = pose ?? VisionPoseService()
+        self.segmentation = segmentation ?? VisionSegmentationService()
         self.quality = quality
         self.colorHarmony = colorHarmony
         self.classifier = classifier ?? OutfitClassifierService()

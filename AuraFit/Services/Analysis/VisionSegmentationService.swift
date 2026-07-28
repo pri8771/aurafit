@@ -4,9 +4,17 @@ import CoreImage
 import UIKit
 #endif
 
+/// Seam for person-segmentation analysis so `AnalysisPipeline` can be driven by a stub.
+/// Mirrors `OutfitClassifying`: the real implementation is `VisionSegmentationService`.
+protocol SegmentationAnalyzing: Sendable {
+    #if canImport(UIKit)
+    func analyze(_ image: UIImage) -> SegmentationSignals
+    #endif
+}
+
 /// Generates a person segmentation mask and derives subject-coverage & background-complexity
 /// signals. Degrades to neutral signals if segmentation is unavailable.
-struct VisionSegmentationService: @unchecked Sendable {
+struct VisionSegmentationService: SegmentationAnalyzing, @unchecked Sendable {
 
     private let context: CIContext
 

@@ -16,6 +16,15 @@ import XCTest
 /// The CI workflow (`.github/workflows/ci.yml`) does this automatically. `QAFitPhoto.jpg` is a
 /// generated, synthetic full-body silhouette fixture — not a real photo — checked in for
 /// deterministic QA per `docs/STATUS.md` (AURA-CORE-001).
+///
+/// What this test asserts is the **UI contract** — navigation, analysis completion, persistence
+/// and the result screen — not model quality. Vision's pose and person-segmentation requests do
+/// not run on the Simulator at all ("Unable to setup request" / "E5RT is not supported"), so the
+/// app is launched with `-UITestStubVision`, which swaps those two services for the deterministic
+/// stubs in `AuraFit/Services/Analysis/UITestVisionStub.swift` (AURA-QA-001). Everything else in
+/// the pipeline — colour, quality, the heuristic outfit classifier, scoring, tips, persistence,
+/// export — is the real code path. Model quality is validated on a physical device instead
+/// (AURA-QA-002, `docs/PLAN.md` §5.2).
 final class ScanCoreLoopUITests: XCTestCase {
 
     override func setUpWithError() throws {
@@ -24,9 +33,13 @@ final class ScanCoreLoopUITests: XCTestCase {
 
     func testLaunchOnboardingScanImportReachesFitScore() throws {
         let app = XCUIApplication()
-        // Forces a clean in-memory SwiftData store so the run always starts at onboarding,
-        // regardless of state left over from a previous test run on this simulator.
-        app.launchArguments += ["-UITestInMemoryStore"]
+        // `-UITestInMemoryStore` forces a clean in-memory SwiftData store so the run always
+        // starts at onboarding, regardless of state left over from a previous run on this
+        // simulator. `-UITestStubVision` substitutes deterministic full-body pose and
+        // segmentation signals for the Vision requests the Simulator cannot execute. Both are
+        // `#if DEBUG`-only escape hatches and are absent from a Release build (AURA-ENG-014,
+        // AURA-QA-001).
+        app.launchArguments += ["-UITestInMemoryStore", "-UITestStubVision"]
         app.launch()
 
         // MARK: Onboarding
@@ -99,9 +112,11 @@ final class ScanCoreLoopUITests: XCTestCase {
         }
 
         // MARK: Analysis -> Fit Score result
-        // The heuristic classifier fallback still exercises the full `AnalysisPipeline` (pose,
-        // segmentation, color, quality, scoring) because no `OutfitClassifier.mlmodelc` is
-        // bundled (confirmed absent; see docs/BUGS.md and docs/ARCHITECTURE.md).
+        // With the stubbed pose/segmentation signals the pipeline yields a scoreable result
+        // rather than the "we couldn't detect a person" refusal `ScanView` raises when
+        // `FitAnalysisResult.Diagnostics.isLowConfidence` is true. The outfit classifier runs its
+        // heuristic fallback because no `OutfitClassifier.mlmodelc` is bundled (confirmed absent;
+        // see docs/BUGS.md and docs/ARCHITECTURE.md).
         let resultTitle = app.navigationBars["Your Fit Score"]
         XCTAssertTrue(resultTitle.waitForExistence(timeout: 60),
                       "Did not reach the Fit Score result screen after picking a photo.")

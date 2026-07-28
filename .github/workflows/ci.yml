@@ -61,7 +61,10 @@ jobs:
         # AuraFitUITests/ScanCoreLoopUITests.swift), so the simulator needs at least one photo
         # available for the system picker to select. `QAFitPhoto.jpg` is a generated, synthetic
         # fixture — not a real photo — checked in for deterministic QA (docs/STATUS.md AURA-CORE-001).
+        # Must run after the device is booted. `set -e` so a seeding failure fails here, rather
+        # than surfacing later as an unexplained "the picker showed no photo" UI-test failure.
         run: |
+          set -euo pipefail
           xcrun simctl addmedia "${{ steps.create_sim.outputs.udid }}" AuraFitUITests/Fixtures/QAFitPhoto.jpg
 
       - name: Build
@@ -74,11 +77,17 @@ jobs:
             2>&1 | tee xcodebuild-build.log
 
       - name: Test (unit + UI)
+        # `-configuration Debug` is load-bearing, not decoration: the UI test launches the app
+        # with `-UITestStubVision`, and the stub that flag selects is `#if DEBUG`-only
+        # (AuraFit/Services/Analysis/UITestVisionStub.swift). Vision's pose and person
+        # segmentation cannot run on the Simulator, so without the stub the pipeline reports low
+        # confidence and the scan is refused before any result screen appears (AURA-QA-001).
         run: |
           set -o pipefail
           xcodebuild test \
             -project AuraFit.xcodeproj \
             -scheme AuraFit \
+            -configuration Debug \
             -destination "id=${{ steps.create_sim.outputs.udid }}" \
             -resultBundlePath AuraFit.xcresult \
             2>&1 | tee xcodebuild-test.log

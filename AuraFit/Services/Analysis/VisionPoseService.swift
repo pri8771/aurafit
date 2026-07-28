@@ -3,9 +3,17 @@ import Vision
 import UIKit
 #endif
 
+/// Seam for body-pose analysis so `AnalysisPipeline` can be driven by a stub.
+/// Mirrors `OutfitClassifying`: the real implementation is `VisionPoseService`.
+protocol PoseAnalyzing: Sendable {
+    #if canImport(UIKit)
+    func analyze(_ image: UIImage) -> PoseSignals
+    #endif
+}
+
 /// Detects human body pose with Vision and derives normalized posture/framing signals.
 /// Returns `.unavailable` on any failure so the pipeline degrades gracefully.
-struct VisionPoseService: Sendable {
+struct VisionPoseService: PoseAnalyzing, Sendable {
 
     #if canImport(UIKit)
     func analyze(_ image: UIImage) -> PoseSignals {

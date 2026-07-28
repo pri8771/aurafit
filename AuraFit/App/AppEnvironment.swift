@@ -19,9 +19,31 @@ final class AppEnvironment {
         let resolvedStore = store ?? StoreKitService()
         self.store = resolvedStore
         self.imageStore = imageStore ?? ImageFileStore()
-        self.analysisService = analysisService ?? FitAnalysisService()
+        self.analysisService = analysisService ?? AppEnvironment.makeAnalysisService()
         self.entitlements = EntitlementManager(store: resolvedStore)
     }
+
+    #if DEBUG
+
+    /// Builds the analysis facade, substituting the Vision stubs when the UI test asked for them
+    /// (AURA-QA-001). Vision's pose and segmentation requests cannot run on the Simulator, so
+    /// without this the smoke test can never reach the result screen. `UITestVisionStub` — and
+    /// with it the launch-argument string — is compiled out of Release entirely.
+    private static func makeAnalysisService() -> FitAnalysisService {
+        guard UITestVisionStub.isEnabled else { return FitAnalysisService() }
+        AppLog.app.notice("UI test Vision stub active: pose and segmentation are synthetic.")
+        return FitAnalysisService(
+            pipeline: AnalysisPipeline(pose: StubPoseService(), segmentation: StubSegmentationService())
+        )
+    }
+
+    #else
+
+    private static func makeAnalysisService() -> FitAnalysisService {
+        FitAnalysisService()
+    }
+
+    #endif
 
     /// Loads products and entitlements; binds the persisted settings row.
     func bootstrap(settings: AppSettings?) async {
