@@ -42,6 +42,10 @@ struct RootView: View {
         .task {
             presentStorageWarningIfNeeded()
             await environment.bootstrap(settings: settings)
+            // Housekeeping runs last and off the main thread: sweeping stranded capture files
+            // must never delay first paint or the entitlement load (AURA-ENG-035).
+            let repo = SessionRepository(context: modelContext, imageStore: environment.imageStore)
+            await repo.reconcileOrphanedAssets()
         }
         // The `@Query` row can materialize after this view first appears. Re-bind whenever it
         // changes so the free-scan quota is never left unenforced (AURA-ENG-011).

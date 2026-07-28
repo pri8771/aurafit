@@ -102,6 +102,59 @@ struct SessionRepository {
         save()
     }
 
+    // MARK: - Orphaned assets
+
+    /// Guards the launch sweep so it runs at most once per process, even if the view that kicks it
+    /// off re-appears or its task re-fires. Main-actor isolated along with the rest of the type.
+    private static var hasReconciledAssets = false
+
+    /// Every asset path the persisted sessions still point at.
+    ///
+    /// Throws instead of degrading to an empty set: "no paths are referenced" is precisely the
+    /// instruction to delete everything, so a failed fetch has to abort the sweep, not drive it.
+    func referencedAssetPaths() throws -> Set<String> {
+        let sessions = try context.fetch(FetchDescriptor<FitSession>())
+        var paths = Set<String>()
+        for session in sessions {
+            paths.formUnion([
+                session.originalImagePath,
+                session.scorecardImagePath,
+                session.revealVideoPath
+            ].compactMap { $0 })
+        }
+        return paths
+    }
+
+    /// Collects staged files that no session ever claimed (AURA-ENG-035).
+    ///
+    /// A capture is written to disk before analysis runs, so a crash mid-pipeline leaves a file
+    /// nothing references and nothing deletes. This is the launch-time sweep for those.
+    ///
+    /// Runs at most once per launch. The fetch happens here on the main actor — a personal scan
+    /// history stays small — and the disk work is handed to a detached background task, so the
+    /// caller only ever awaits a suspension. `ImageFileStore` additionally spares any file younger
+    /// than its grace period, which is what keeps a scan that is *currently* in flight safe.
+    ///
+    /// Every failure is logged and swallowed: this is housekeeping, and it must never be able to
+    /// hold up launch.
+    func reconcileOrphanedAssets(minimumAge: TimeInterval = ImageFileStore.orphanGracePeriod) async {
+        guard !Self.hasReconciledAssets else { return }
+        Self.hasReconciledAssets = true
+
+        let referenced: Set<String>
+        do {
+            referenced = try referencedAssetPaths()
+        } catch {
+            AppLog.persistence.error("Asset reconcile skipped; session fetch failed: \(error.localizedDescription)")
+            return
+        }
+
+        let store = imageStore
+        _ = await Task.detached(priority: .utility) {
+            store.reconcileOrphans(referencedRelativePaths: referenced, minimumAge: minimumAge)
+        }.value
+    }
+
     // MARK: - Challenges
 
     /// Updates challenge progress when a new qualifying session is created.

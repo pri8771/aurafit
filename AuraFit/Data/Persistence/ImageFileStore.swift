@@ -18,7 +18,7 @@ import UIKit
 ///   with ImageIO on a background task and serves repeats from `ImageThumbnailCache`.
 struct ImageFileStore: @unchecked Sendable {
 
-    enum Folder: String {
+    enum Folder: String, CaseIterable {
         case originals
         case scorecards
         case reveals
@@ -40,18 +40,24 @@ struct ImageFileStore: @unchecked Sendable {
 
     private let fileManager: FileManager
     private let thumbnailCache: ImageThumbnailCache
+    /// Overrides the container the managed folders live in. Production always leaves this nil;
+    /// tests point it at a scratch directory so a reconcile pass can't reach real files.
+    private let rootDirectory: URL?
 
     init(fileManager: FileManager = .default,
-         thumbnailCache: ImageThumbnailCache = .shared) {
+         thumbnailCache: ImageThumbnailCache = .shared,
+         rootDirectory: URL? = nil) {
         self.fileManager = fileManager
         self.thumbnailCache = thumbnailCache
+        self.rootDirectory = rootDirectory
     }
 
     // MARK: - Directory resolution
 
     private var documentsURL: URL {
+        if let rootDirectory { return rootDirectory }
         // `.documentDirectory` is guaranteed to exist for an app sandbox.
-        fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+        return fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
             ?? fileManager.temporaryDirectory
     }
 
@@ -214,5 +220,117 @@ struct ImageFileStore: @unchecked Sendable {
         delete(relativePath: session.originalImagePath)
         delete(relativePath: session.scorecardImagePath)
         delete(relativePath: session.revealVideoPath)
+    }
+
+    // MARK: - Reconciling orphans
+
+    /// How long a file is protected from the sweep purely by being new.
+    ///
+    /// A capture is written to `originals/` *before* analysis runs (AURA-ENG-008), so between the
+    /// write and the `FitSession` that adopts it there is a window where a perfectly live file has
+    /// no referrer at all. The grace period only has to outlast that window — analysis plus the
+    /// user reading the reveal, seconds to a couple of minutes — and fifteen minutes buys a wide
+    /// margin at the cost of one extra launch before a true orphan is collected.
+    static let orphanGracePeriod: TimeInterval = 15 * 60
+
+    /// Tally of a single `reconcileOrphans` pass. `scanned` is the sum of the other four.
+    struct ReconcileReport: Sendable, Equatable {
+        var scanned = 0
+        var deleted = 0
+        var keptReferenced = 0
+        var keptRecent = 0
+        var failed = 0
+    }
+
+    /// Deletes files in the managed folders that no persisted model points at.
+    ///
+    /// A crash or force-quit between staging a capture and saving its session strands the file:
+    /// nothing references it, and none of the cancel/error/rejection cleanup paths ever run, so
+    /// without a sweep `originals/` grows without bound.
+    ///
+    /// Scope is deliberately narrow. Only direct children of `originals/`, `scorecards/` and
+    /// `reveals/` are considered; sub-directories and anything whose parent isn't the folder being
+    /// enumerated are skipped, so nothing outside the app's own managed folders can be removed.
+    /// Files younger than `minimumAge` are left alone — see `orphanGracePeriod` — which is what
+    /// makes the pass safe to run while a scan is in flight.
+    ///
+    /// Blocking disk I/O, like the rest of this type: call it from a background context.
+    ///
+    /// - Parameters:
+    ///   - referencedRelativePaths: *every* path persisted models still point at. Anything absent
+    ///     is treated as garbage, so callers must never pass a partial set (a failed fetch has to
+    ///     abort the sweep, not run it with an empty set).
+    ///   - minimumAge: files modified within this interval of `now` are kept regardless.
+    ///   - now: injectable clock for tests.
+    @discardableResult
+    func reconcileOrphans(referencedRelativePaths: Set<String>,
+                          minimumAge: TimeInterval = ImageFileStore.orphanGracePeriod,
+                          now: Date = .now) -> ReconcileReport {
+        let root = documentsURL.standardizedFileURL
+        // Compare on absolute standardized paths so a stored path that picked up a `./` or a
+        // redundant separator still matches the file it names.
+        let referenced = Set(referencedRelativePaths.map {
+            root.appendingPathComponent($0).standardizedFileURL.path
+        })
+        let keys: [URLResourceKey] = [.isRegularFileKey, .contentModificationDateKey, .creationDateKey]
+        var report = ReconcileReport()
+
+        for folder in Folder.allCases {
+            let folderURL = root.appendingPathComponent(folder.rawValue, isDirectory: true).standardizedFileURL
+            // Missing folder simply means nothing has been written there yet; don't create it.
+            guard fileManager.fileExists(atPath: folderURL.path) else { continue }
+
+            let contents: [URL]
+            do {
+                contents = try fileManager.contentsOfDirectory(
+                    at: folderURL,
+                    includingPropertiesForKeys: keys,
+                    options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]
+                )
+            } catch {
+                report.failed += 1
+                AppLog.persistence.error("Asset reconcile could not read \(folder.rawValue): \(error.localizedDescription)")
+                continue
+            }
+
+            for candidate in contents {
+                let url = candidate.standardizedFileURL
+                // Re-derive the parent rather than trusting the enumeration: only a direct child
+                // of this managed folder is ever a deletion candidate.
+                guard url.deletingLastPathComponent().path == folderURL.path else { continue }
+                let values = try? url.resourceValues(forKeys: Set(keys))
+                guard values?.isRegularFile == true else { continue }
+
+                report.scanned += 1
+                if referenced.contains(url.path) {
+                    report.keptReferenced += 1
+                    continue
+                }
+                // A file whose timestamp can't be read is assumed brand new. If it really is
+                // garbage the next launch gets another chance; deleting a live capture doesn't.
+                let stamp = values?.contentModificationDate ?? values?.creationDate
+                guard let stamp, now.timeIntervalSince(stamp) >= minimumAge else {
+                    report.keptRecent += 1
+                    continue
+                }
+
+                do {
+                    // No cache eviction needed: an orphan is by definition unreferenced, so no
+                    // live view can be holding a thumbnail of it.
+                    try fileManager.removeItem(at: url)
+                    report.deleted += 1
+                } catch {
+                    report.failed += 1
+                    AppLog.persistence.error("Asset reconcile could not delete a file in \(folder.rawValue): \(error.localizedDescription)")
+                }
+            }
+        }
+
+        if report.deleted > 0 || report.failed > 0 {
+            AppLog.persistence.info("Asset reconcile: scanned \(report.scanned), deleted \(report.deleted), kept \(report.keptReferenced) referenced and \(report.keptRecent) recent, \(report.failed) failed.")
+        } else {
+            AppLog.persistence.debug("Asset reconcile: scanned \(report.scanned), nothing to collect.")
+        }
+        return report
     }
 }

@@ -172,6 +172,100 @@ final class ImageFileStoreTests: XCTestCase {
         XCTAssertNil(nilResult)
     }
 
+    // MARK: - Orphan reconciliation
+
+    /// A store rooted in a scratch container, so a sweep can never reach the real documents
+    /// directory (or files another test is mid-way through using).
+    private func makeSandboxedStore() throws -> (store: ImageFileStore, root: URL) {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("reconcile-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        addTeardownBlock { try? FileManager.default.removeItem(at: root) }
+        return (ImageFileStore(thumbnailCache: ImageThumbnailCache(), rootDirectory: root), root)
+    }
+
+    /// A clock far enough past the grace period that everything written now reads as old.
+    private var wellPastGracePeriod: Date {
+        Date().addingTimeInterval(ImageFileStore.orphanGracePeriod + 3600)
+    }
+
+    func testReconcileDeletesUnreferencedFiles() throws {
+        let (store, _) = try makeSandboxedStore()
+        let orphan = try store.saveData(Data("orphan".utf8), folder: .originals, fileName: "orphan.jpg")
+        let card = try store.savePNG(makeImage(), folder: .scorecards, name: "card")
+        let reveal = try store.saveData(Data("mp4".utf8), folder: .reveals, fileName: "reveal.mp4")
+
+        let report = store.reconcileOrphans(referencedRelativePaths: [], now: wellPastGracePeriod)
+
+        XCTAssertEqual(report.scanned, 3)
+        XCTAssertEqual(report.deleted, 3, "Every managed folder should be swept")
+        XCTAssertEqual(report.failed, 0)
+        XCTAssertFalse(store.fileExists(relativePath: orphan))
+        XCTAssertFalse(store.fileExists(relativePath: card))
+        XCTAssertFalse(store.fileExists(relativePath: reveal))
+    }
+
+    func testReconcileKeepsReferencedFiles() throws {
+        let (store, _) = try makeSandboxedStore()
+        let kept = try store.saveData(Data("kept".utf8), folder: .originals, fileName: "kept.jpg")
+        let orphan = try store.saveData(Data("orphan".utf8), folder: .originals, fileName: "orphan.jpg")
+
+        let report = store.reconcileOrphans(referencedRelativePaths: [kept], now: wellPastGracePeriod)
+
+        XCTAssertEqual(report.keptReferenced, 1)
+        XCTAssertEqual(report.deleted, 1)
+        XCTAssertTrue(store.fileExists(relativePath: kept))
+        XCTAssertFalse(store.fileExists(relativePath: orphan))
+    }
+
+    /// The staging window: a capture written seconds ago has no session pointing at it yet.
+    func testReconcileKeepsRecentlyStagedFile() throws {
+        let (store, _) = try makeSandboxedStore()
+        let staged = try store.saveData(Data("staging".utf8), folder: .originals, fileName: "staged.jpg")
+
+        let report = store.reconcileOrphans(referencedRelativePaths: [])
+
+        XCTAssertEqual(report.keptRecent, 1)
+        XCTAssertEqual(report.deleted, 0)
+        XCTAssertTrue(store.fileExists(relativePath: staged), "A scan in flight must survive the sweep")
+    }
+
+    func testReconcileNeverTouchesFilesOutsideManagedFolders() throws {
+        let (store, root) = try makeSandboxedStore()
+        let fm = FileManager.default
+
+        // A stray file at the container root, and a whole unmanaged sub-tree.
+        let looseFile = root.appendingPathComponent("Preferences.plist")
+        try Data("keep me".utf8).write(to: looseFile)
+        let unmanagedDir = root.appendingPathComponent("Inbox", isDirectory: true)
+        try fm.createDirectory(at: unmanagedDir, withIntermediateDirectories: true)
+        let unmanagedFile = unmanagedDir.appendingPathComponent("photo.jpg")
+        try Data("keep me too".utf8).write(to: unmanagedFile)
+
+        // A sub-directory *inside* a managed folder is skipped as well.
+        let nestedDir = root.appendingPathComponent("originals/nested", isDirectory: true)
+        try fm.createDirectory(at: nestedDir, withIntermediateDirectories: true)
+        let nestedFile = nestedDir.appendingPathComponent("deep.jpg")
+        try Data("nested".utf8).write(to: nestedFile)
+
+        let report = store.reconcileOrphans(referencedRelativePaths: [], now: wellPastGracePeriod)
+
+        XCTAssertEqual(report.scanned, 0, "Only regular files directly inside managed folders count")
+        XCTAssertEqual(report.deleted, 0)
+        XCTAssertTrue(fm.fileExists(atPath: looseFile.path))
+        XCTAssertTrue(fm.fileExists(atPath: unmanagedFile.path))
+        XCTAssertTrue(fm.fileExists(atPath: nestedDir.path))
+        XCTAssertTrue(fm.fileExists(atPath: nestedFile.path))
+    }
+
+    func testReconcileOnEmptyContainerIsANoOp() throws {
+        let (store, _) = try makeSandboxedStore()
+        let report = store.reconcileOrphans(referencedRelativePaths: ["originals/gone.jpg"],
+                                            now: wellPastGracePeriod)
+        XCTAssertEqual(report, ImageFileStore.ReconcileReport(),
+                       "Missing folders and dangling references are both survivable")
+    }
+
     func testCacheRemoveAllClearsEntries() throws {
         let cache = ImageThumbnailCache()
         let store = ImageFileStore(thumbnailCache: cache)

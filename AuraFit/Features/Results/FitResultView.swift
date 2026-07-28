@@ -465,9 +465,16 @@ struct FitResultView: View {
     private func loadImage() async {
         if let providedImage {
             fitImage = providedImage
-        } else {
-            fitImage = environment.imageStore.loadImage(relativePath: session.originalImagePath)
+            return
         }
+        // Full resolution is needed here — the scorecard and reveal video render from this
+        // image — so decode off the main actor rather than blocking the detail screen on a
+        // multi-megapixel decode.
+        let store = environment.imageStore
+        let path = session.originalImagePath
+        fitImage = await Task.detached(priority: .userInitiated) {
+            store.loadImage(relativePath: path)
+        }.value
     }
 
     private func showToast(_ message: String) {
