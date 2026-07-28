@@ -14,17 +14,20 @@ protocol OutfitClassifying {
     #endif
 }
 
-/// Default classifier: attempts to load a bundled Core ML model named `OutfitClassifier`.
-/// If absent (the common case during early development), it transparently uses a deterministic
-/// heuristic based on color & pose signals. The app therefore compiles and runs with no models.
+/// Default classifier. Tries, in order:
+/// 1. The bundled MobileCLIP zero-shot classifier (`CLIPZeroShotClassifier`).
+/// 2. An optional dedicated Core ML model named `OutfitClassifier`, if ever bundled.
+/// 3. A deterministic heuristic based on color & pose signals, so the app always runs.
 struct OutfitClassifierService: OutfitClassifying {
 
     /// Name of the optional compiled Core ML model resource (`OutfitClassifier.mlmodelc`).
     static let modelResourceName = "OutfitClassifier"
 
+    private let clip: CLIPZeroShotClassifier?
     private let model: VNCoreMLModel?
 
     init() {
+        self.clip = CLIPZeroShotClassifier()
         self.model = Self.loadModelIfAvailable()
     }
 
@@ -46,7 +49,13 @@ struct OutfitClassifierService: OutfitClassifying {
     }
 
     #if canImport(UIKit)
+    /// The zero-shot classifier, exposed so the pipeline can reuse it for photo-issue checks.
+    var zeroShotClassifier: CLIPZeroShotClassifier? { clip }
+
     func classify(image: UIImage, colors: ColorSignals, pose: PoseSignals) -> OutfitSignals {
+        if let clip, let clipResult = clip.classify(image: image, colors: colors, pose: pose) {
+            return clipResult
+        }
         if let model, let cg = image.normalizedOrientation().cgImage {
             if let modelResult = runModel(model, cgImage: cg, colors: colors) {
                 return modelResult
