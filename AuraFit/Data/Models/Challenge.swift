@@ -2,6 +2,10 @@ import Foundation
 import SwiftData
 
 /// A style challenge the user can participate in (e.g. "Monochrome Week").
+///
+/// `goalCount` and `minScore` cover the rules every challenge shares; anything more specific
+/// (distinct days, palette shape, a per-metric floor) lives in
+/// `SessionRepository.qualifies(session:for:)`, keyed by `id` and kept in step with `details`.
 @Model
 final class Challenge {
     @Attribute(.unique) var id: String

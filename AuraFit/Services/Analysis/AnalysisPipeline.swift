@@ -75,32 +75,39 @@ actor AnalysisPipeline {
     #if canImport(UIKit)
     /// Runs the full pipeline. `onStep` is invoked (on the main actor) as each step begins.
     /// A small artificial delay per step makes the animated progress legible without blocking.
+    ///
+    /// Cancellable: `Task.checkCancellation()` runs between stages and the per-step delay is
+    /// cancellation-aware, so cancelling the calling task throws `CancellationError` within
+    /// (at most) one stage. The individual Vision/Core Image stages are synchronous and cannot
+    /// themselves be interrupted, which bounds how quickly cancellation takes effect.
     func analyze(
         image: UIImage,
         stepDelay: Duration = .milliseconds(420),
         onStep: (@MainActor @Sendable (AnalysisStep) -> Void)? = nil
-    ) async -> FitAnalysisResult {
+    ) async throws -> FitAnalysisResult {
 
         // (A) Normalize
-        await emit(.normalizing, onStep, delay: stepDelay)
+        try await emit(.normalizing, onStep, delay: stepDelay)
         let working = image.normalizedOrientation().resized(maxDimension: 1280)
 
         // (B) Pose
-        await emit(.detectingPose, onStep, delay: stepDelay)
+        try await emit(.detectingPose, onStep, delay: stepDelay)
         let poseSignals = pose.analyze(working)
 
         // (C) Segmentation (grouped under pose/composition visually) + (E) color
-        await emit(.readingColors, onStep, delay: stepDelay)
+        try await emit(.readingColors, onStep, delay: stepDelay)
         let colorSignals = colorHarmony.analyze(working)
+        try Task.checkCancellation()
         let segmentationSignals = segmentation.analyze(working)
 
         // (D) Lighting / quality
-        await emit(.checkingLighting, onStep, delay: stepDelay)
+        try await emit(.checkingLighting, onStep, delay: stepDelay)
         let qualitySignals = quality.analyze(working)
 
         // (F) Outfit classification + (G) scoring
-        await emit(.scoringComposition, onStep, delay: stepDelay)
+        try await emit(.scoringComposition, onStep, delay: stepDelay)
         let outfitSignals = classifier.classify(image: working, colors: colorSignals, pose: poseSignals)
+        try Task.checkCancellation()
 
         let signals = AnalysisSignals(
             pose: poseSignals,
@@ -120,7 +127,7 @@ actor AnalysisPipeline {
         let rejectionDetail = photoCoach.rejectionDetail(issues: issues)
 
         // (Build scorecard step — actual rendering happens later in the Results layer)
-        await emit(.buildingScorecard, onStep, delay: stepDelay)
+        try await emit(.buildingScorecard, onStep, delay: stepDelay)
 
         return FitAnalysisResult(
             score: score,
@@ -157,16 +164,20 @@ actor AnalysisPipeline {
         )
     }
 
+    /// Announces a step and pauses briefly so the progress UI reads as a sequence.
+    /// Both the checkpoint and the sleep throw `CancellationError` when the task is cancelled —
+    /// the delay must *not* swallow it, or a cancelled run would keep marching through stages.
     private func emit(
         _ step: AnalysisStep,
         _ onStep: (@MainActor @Sendable (AnalysisStep) -> Void)?,
         delay: Duration
-    ) async {
+    ) async throws {
+        try Task.checkCancellation()
         if let onStep {
             await MainActor.run { onStep(step) }
         }
         if delay > .zero {
-            try? await Task.sleep(for: delay)
+            try await Task.sleep(for: delay)
         }
     }
 }

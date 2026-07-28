@@ -25,6 +25,8 @@ struct ScanView: View {
     @State private var analysisResult: FitAnalysisResult?
     @State private var resultSession: FitSession?
     @State private var errorMessage: String?
+    /// The in-flight analysis, retained so the Cancel button can stop it.
+    @State private var analysisTask: Task<Void, Never>?
 
     private var entitlements: EntitlementManager { environment.entitlements }
 
@@ -58,8 +60,11 @@ struct ScanView: View {
                 AnalysisProgressView(
                     image: capturedImage,
                     currentStep: environment.analysisService.currentStep,
-                    completedSteps: environment.analysisService.completedSteps
+                    completedSteps: environment.analysisService.completedSteps,
+                    onCancel: cancelAnalysis
                 )
+                // Swipe-to-dismiss stays off so the cover can't be dismissed while the task keeps
+                // running; Cancel is the one exit, and it stops the work as well as the screen.
                 .interactiveDismissDisabled()
             }
         }
@@ -241,16 +246,57 @@ struct ScanView: View {
         isProcessingScan = true
         capturedImage = image
         activeSheet = .analyzing
-        Task {
+        analysisTask = Task {
             await runAnalysis(on: image)
             isProcessingScan = false
+            analysisTask = nil
         }
     }
 
+    /// Stops an in-flight analysis. The progress cover is dismissed immediately so the user is
+    /// never stuck waiting for a stalled Vision request to notice; `runAnalysis` does the rest of
+    /// the cleanup (deleting the staged photo, resetting the step indicator) as it unwinds.
+    private func cancelAnalysis() {
+        guard let analysisTask else { return }
+        analysisTask.cancel()
+        activeSheet = nil
+    }
+
     private func runAnalysis(on image: UIImage) async {
-        let result = await environment.analysisService.analyze(image)
+        // Stage the capture on disk *before* analysis. A camera capture is unrepeatable, so it must
+        // survive a crash or a hang in the pipeline rather than living only in memory until a
+        // result exists. Cleaned up below on every path that doesn't produce a session.
+        let originalPath = await stageOriginal(image)
+
+        let result: FitAnalysisResult
+        do {
+            result = try await environment.analysisService.analyze(image)
+        } catch is CancellationError {
+            discardStagedOriginal(originalPath)
+            environment.analysisService.reset()
+            activeSheet = nil
+            return
+        } catch {
+            discardStagedOriginal(originalPath)
+            environment.analysisService.reset()
+            activeSheet = nil
+            errorMessage = error.localizedDescription
+            return
+        }
+
+        // The task can be cancelled between the last checkpoint and here; honor it before any
+        // state is committed, so cancelling never persists a session or spends a scan.
+        guard !Task.isCancelled else {
+            discardStagedOriginal(originalPath)
+            environment.analysisService.reset()
+            activeSheet = nil
+            return
+        }
 
         guard !result.diagnostics.isLowConfidence else {
+            // No session references the staged file on this path, so remove it rather than leaving
+            // an orphan; `capturedImage` still holds the photo for the rest of this session.
+            discardStagedOriginal(originalPath)
             activeSheet = nil
             errorMessage = result.rejectionDetail
                 ?? "We couldn't detect a person in this photo. Make sure you're fully visible in good light, then try again."
@@ -259,18 +305,21 @@ struct ScanView: View {
 
         analysisResult = result
 
-        // Persist original image + session.
+        // Persist the session, reusing the JPEG staged above rather than encoding a second copy.
         let repository = SessionRepository(context: modelContext, imageStore: environment.imageStore)
-        var originalPath: String?
+        let session: FitSession
         do {
-            originalPath = try environment.imageStore.saveJPEG(image, folder: .originals)
+            session = try repository.createSession(result: result, originalImagePath: originalPath)
         } catch {
-            AppLog.persistence.error("Failed to save original: \(error.localizedDescription)")
+            // A silent failure here would show a result screen for a scan that disappears on
+            // relaunch. Tell the user instead, and don't charge them a scan for it.
+            discardStagedOriginal(originalPath)
+            analysisResult = nil
+            activeSheet = nil
+            errorMessage = error.localizedDescription
+            return
         }
-
-        let session = repository.createSession(result: result, originalImagePath: originalPath)
         entitlements.registerScan()
-        repository.save()
 
         // Honor the "Save originals to Photos" setting by copying the captured photo to the library.
         if let originalPath, entitlements.settings?.saveOriginalsToPhotos == true {
@@ -283,6 +332,27 @@ struct ScanView: View {
         // Dismiss the analyzing cover and navigate to results.
         activeSheet = nil
         resultSession = session
+    }
+
+    /// Writes the capture to the originals folder off the main actor. Returns nil (and logs) if
+    /// the write fails — a storage problem shouldn't stop the user from seeing their score.
+    private func stageOriginal(_ image: UIImage) async -> String? {
+        let store = environment.imageStore
+        return await Task.detached(priority: .userInitiated) { () -> String? in
+            do {
+                return try store.saveJPEG(image, folder: .originals)
+            } catch {
+                AppLog.persistence.error("Failed to save original: \(error.localizedDescription)")
+                return nil
+            }
+        }.value
+    }
+
+    /// Removes a staged capture that no session will ever point at.
+    private func discardStagedOriginal(_ path: String?) {
+        guard let path else { return }
+        let store = environment.imageStore
+        Task.detached(priority: .utility) { store.delete(relativePath: path) }
     }
 }
 

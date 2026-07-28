@@ -21,13 +21,16 @@ final class FitAnalysisService {
 
     #if canImport(UIKit)
     /// Runs analysis end-to-end, updating `currentStep`/`completedSteps` for the progress UI.
-    func analyze(_ image: UIImage, stepDelay: Duration = .milliseconds(420)) async -> FitAnalysisResult {
+    ///
+    /// Throws `CancellationError` if the calling task is cancelled (the user tapped Cancel on the
+    /// progress screen). Callers should `reset()` afterwards so a later run starts from step one.
+    func analyze(_ image: UIImage, stepDelay: Duration = .milliseconds(420)) async throws -> FitAnalysisResult {
         isAnalyzing = true
         completedSteps = []
         currentStep = .normalizing
         defer { isAnalyzing = false }
 
-        let result = await pipeline.analyze(image: image, stepDelay: stepDelay) { [weak self] step in
+        let result = try await pipeline.analyze(image: image, stepDelay: stepDelay) { [weak self] step in
             guard let self else { return }
             // Mark the previous step complete as we advance.
             if let previous = AnalysisStep(rawValue: step.rawValue - 1) {

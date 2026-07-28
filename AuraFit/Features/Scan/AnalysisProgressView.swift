@@ -6,6 +6,9 @@ struct AnalysisProgressView: View {
     let image: UIImage?
     let currentStep: AnalysisStep
     let completedSteps: Set<AnalysisStep>
+    /// Cancels the in-flight analysis. Without this the user is stranded here if a Vision
+    /// request stalls, so the screen always offers a way out.
+    var onCancel: (() -> Void)?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var pulse = false
@@ -28,16 +31,26 @@ struct AnalysisProgressView: View {
             .frame(maxWidth: .infinity)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AFRadius.lg, style: .continuous))
             Spacer()
-            Text("Analyzing on-device…")
-                .font(AFTypography.footnote())
-                .foregroundStyle(AFColors.textTertiary)
+            VStack(spacing: AFSpacing.sm) {
+                Text("Analyzing on-device…")
+                    .font(AFTypography.footnote())
+                    .foregroundStyle(AFColors.textTertiary)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Analyzing your fit. Current step: \(currentStep.title)")
+
+                if let onCancel {
+                    Button("Cancel", role: .cancel, action: onCancel)
+                        .font(AFTypography.body(.semibold))
+                        .foregroundStyle(AFColors.textSecondary)
+                        .accessibilityIdentifier("analysisProgressView.cancelButton")
+                        .accessibilityHint("Stops the analysis and returns to the scan screen")
+                }
+            }
         }
         .padding(AFSpacing.lg)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .afScreenBackground()
         .onAppear { pulse = true }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Analyzing your fit. Current step: \(currentStep.title)")
     }
 
     private var previewThumb: some View {
@@ -98,5 +111,8 @@ struct AnalysisProgressView: View {
 }
 
 #Preview {
-    AnalysisProgressView(image: nil, currentStep: .checkingLighting, completedSteps: [.detectingPose, .readingColors])
+    AnalysisProgressView(image: nil,
+                         currentStep: .checkingLighting,
+                         completedSteps: [.detectingPose, .readingColors],
+                         onCancel: {})
 }

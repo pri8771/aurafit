@@ -27,19 +27,38 @@ enum SeedData {
     static func ensureChallenges(_ context: ModelContext) {
         let descriptor = FetchDescriptor<Challenge>()
         let existing = (try? context.fetch(descriptor)) ?? []
-        let existingIDs = Set(existing.map(\.id))
-        for challenge in defaultChallenges() where !existingIDs.contains(challenge.id) {
-            context.insert(challenge)
+        let existingByID = Dictionary(existing.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+
+        for challenge in defaultChallenges() {
+            guard let current = existingByID[challenge.id] else {
+                context.insert(challenge)
+                continue
+            }
+            // Refresh the presentation/rule fields on stores seeded by an older build so the
+            // description a user reads always matches the rule the repository enforces.
+            // Progress (`contributingSessionIDs`, `isCompleted`, `startDate`) is left untouched.
+            current.title = challenge.title
+            current.subtitle = challenge.subtitle
+            current.details = challenge.details
+            current.systemImage = challenge.systemImage
+            current.accentHex = challenge.accentHex
+            current.goalCount = challenge.goalCount
+            current.minScore = challenge.minScore
+            current.isFeatured = challenge.isFeatured
         }
     }
 
+    /// The shipped challenge set.
+    ///
+    /// `details` is a contract: every rule described here is enforced by
+    /// `SessionRepository.qualifies(session:for:)`, and nothing is enforced that isn't described.
     static func defaultChallenges() -> [Challenge] {
         [
             Challenge(
                 id: "challenge.monochrome",
                 title: "Monochrome Mastery",
                 subtitle: "Five tonal fits",
-                details: "Score 5 fits built around a single color family. Show off your range within one palette.",
+                details: "Score 60+ on 5 fits whose colors stay in a single family. Show off your range within one palette.",
                 systemImage: "circle.lefthalf.filled",
                 accentHex: "8E73F5",
                 goalCount: 5,
@@ -49,8 +68,8 @@ enum SeedData {
             Challenge(
                 id: "challenge.streak7",
                 title: "7-Day Glow Up",
-                subtitle: "A week of fits",
-                details: "Scan a fit every day for 7 days and watch your weekly average climb.",
+                subtitle: "Seven different days",
+                details: "Scan a fit on 7 different days and watch your average climb. Extra scans in a day don't count twice.",
                 systemImage: "flame.fill",
                 accentHex: "FB8B6B",
                 goalCount: 7,
