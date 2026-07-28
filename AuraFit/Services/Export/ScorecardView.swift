@@ -39,7 +39,7 @@ struct ScorecardView: View {
             .padding(20)
         }
         .frame(width: Self.canvasSize.width, height: Self.canvasSize.height)
-        .background(AFColors.background)
+        .background(model.theme.baseColor)
         .clipShape(RoundedRectangle(cornerRadius: 0))
     }
 
@@ -47,10 +47,9 @@ struct ScorecardView: View {
 
     private var background: some View {
         ZStack {
-            AFColors.background
+            model.theme.baseColor
             RadialGradient(
-                colors: [AFColors.scoreColor(for: model.score.overall).opacity(0.4),
-                         AFColors.accent.opacity(0.12), .clear],
+                colors: model.theme.ambientColors,
                 center: .top,
                 startRadius: 10,
                 endRadius: 520
@@ -63,7 +62,7 @@ struct ScorecardView: View {
         HStack {
             HStack(spacing: 6) {
                 Image(systemName: "sparkles")
-                    .foregroundStyle(AFColors.brandGradient)
+                    .foregroundStyle(model.theme.accent)
                 Text("AuraFit")
                     .font(.system(size: 18, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white)

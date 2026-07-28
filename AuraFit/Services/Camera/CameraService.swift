@@ -23,12 +23,18 @@ final class CameraService: NSObject {
 
     private(set) var state: CameraState = .idle
     private(set) var isAvailable: Bool = false
+    /// Live framing suggestion for the viewfinder overlay (nil until the first stable read).
+    private(set) var coachHint: CoachHint?
 
     /// The underlying session, exposed for the preview layer.
     let session = AVCaptureSession()
 
     private let sessionQueue = DispatchQueue(label: "com.aurafit.camera.session")
     private let photoOutput = AVCapturePhotoOutput()
+    private let videoOutput = AVCaptureVideoDataOutput()
+    private let videoQueue = DispatchQueue(label: "com.aurafit.camera.frames", qos: .utility)
+    /// Touched only on `videoQueue`.
+    private let frameAnalyzer = LiveFrameAnalyzer()
     private var photoContinuation: CheckedContinuation<UIImage, Error>?
     private var isConfigured = false
 
@@ -138,6 +144,16 @@ final class CameraService: NSObject {
         session.addOutput(photoOutput)
         photoOutput.maxPhotoQualityPrioritization = .quality
 
+        // Live-coach frame tap. Optional: capture still works if the session refuses it.
+        if session.canAddOutput(videoOutput) {
+            videoOutput.videoSettings = [
+                kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
+            ]
+            videoOutput.alwaysDiscardsLateVideoFrames = true
+            videoOutput.setSampleBufferDelegate(self, queue: videoQueue)
+            session.addOutput(videoOutput)
+        }
+
         session.commitConfiguration()
         return .success(())
     }
@@ -172,6 +188,22 @@ final class CameraService: NSObject {
             sessionQueue.async { [photoOutput] in
                 photoOutput.capturePhoto(with: settings, delegate: self)
             }
+        }
+    }
+}
+
+// MARK: - AVCaptureVideoDataOutputSampleBufferDelegate (live coach)
+
+extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
+    nonisolated func captureOutput(_ output: AVCaptureOutput,
+                                   didOutput sampleBuffer: CMSampleBuffer,
+                                   from connection: AVCaptureConnection) {
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        // Buffers arrive sensor-landscape; .right maps them upright for the portrait UI.
+        guard let hint = frameAnalyzer.process(pixelBuffer, orientation: .right) else { return }
+        Task { @MainActor in
+            guard self.state == .running else { return }
+            self.coachHint = hint
         }
     }
 }

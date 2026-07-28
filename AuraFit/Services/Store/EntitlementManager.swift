@@ -17,7 +17,7 @@ final class EntitlementManager {
     /// Debug-only override so Pro features can be exercised on-device without a real purchase.
     /// Compiled out entirely in Release builds — cannot ship or reach TestFlight/App Store.
     /// Flip to `false` to test the real StoreKit purchase/entitlement flow instead.
-    static var forceProForTesting = true
+    static var forceProForTesting = false
     #endif
 
     init(store: any PurchaseProviding) {

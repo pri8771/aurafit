@@ -125,6 +125,7 @@ struct ScanView: View {
                     AFSecondaryButton(title: "Import from Library", systemImage: "photo.on.rectangle") {
                         beginLibraryFlow()
                     }
+                    .accessibilityIdentifier("scanView.importFromLibraryButton")
                 }
                 .padding(.horizontal)
 
@@ -251,7 +252,8 @@ struct ScanView: View {
 
         guard !result.diagnostics.isLowConfidence else {
             activeSheet = nil
-            errorMessage = "We couldn't detect a person in this photo. Make sure you're fully visible in good light, then try again."
+            errorMessage = result.rejectionDetail
+                ?? "We couldn't detect a person in this photo. Make sure you're fully visible in good light, then try again."
             return
         }
 
@@ -269,6 +271,12 @@ struct ScanView: View {
         let session = repository.createSession(result: result, originalImagePath: originalPath)
         entitlements.registerScan()
         repository.save()
+
+        // Honor the "Save originals to Photos" setting by copying the captured photo to the library.
+        if let originalPath, entitlements.settings?.saveOriginalsToPhotos == true {
+            let url = environment.imageStore.absoluteURL(for: originalPath)
+            Task { await ShareManager.saveImageToPhotos(url) }
+        }
 
         HapticsManager.shared.celebrate()
 

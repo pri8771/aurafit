@@ -50,6 +50,7 @@ actor AnalysisPipeline {
     private let classifier: any OutfitClassifying
     private let scoreEngine: ScoreEngine
     private let tipsGenerator: TipsGenerator
+    private let photoCoach: PhotoCoach
 
     init(
         pose: VisionPoseService = VisionPoseService(),
@@ -58,7 +59,8 @@ actor AnalysisPipeline {
         colorHarmony: ColorHarmonyService = ColorHarmonyService(),
         classifier: (any OutfitClassifying)? = nil,
         scoreEngine: ScoreEngine = ScoreEngine(),
-        tipsGenerator: TipsGenerator = TipsGenerator()
+        tipsGenerator: TipsGenerator = TipsGenerator(),
+        photoCoach: PhotoCoach = PhotoCoach()
     ) {
         self.pose = pose
         self.segmentation = segmentation
@@ -67,6 +69,7 @@ actor AnalysisPipeline {
         self.classifier = classifier ?? OutfitClassifierService()
         self.scoreEngine = scoreEngine
         self.tipsGenerator = tipsGenerator
+        self.photoCoach = photoCoach
     }
 
     #if canImport(UIKit)
@@ -109,6 +112,13 @@ actor AnalysisPipeline {
         let score = scoreEngine.score(from: signals)
         let tips = tipsGenerator.tips(for: score, signals: signals, persona: outfitSignals.persona)
 
+        // Photo coaching: CLIP's frame-level issue read (when bundled) + signal heuristics.
+        let issues = (classifier as? OutfitClassifierService)?
+            .zeroShotClassifier?
+            .assessPhotoIssues(image: working)
+        let photoTips = photoCoach.tips(signals: signals, issues: issues)
+        let rejectionDetail = photoCoach.rejectionDetail(issues: issues)
+
         // (Build scorecard step — actual rendering happens later in the Results layer)
         await emit(.buildingScorecard, onStep, delay: stepDelay)
 
@@ -118,6 +128,8 @@ actor AnalysisPipeline {
             tips: tips,
             outfitTags: outfitSignals.tags,
             palette: colorSignals.palette,
+            photoTips: photoTips,
+            rejectionDetail: rejectionDetail,
             diagnostics: .init(
                 poseDetected: poseSignals.detected,
                 segmentationAvailable: segmentationSignals.available,

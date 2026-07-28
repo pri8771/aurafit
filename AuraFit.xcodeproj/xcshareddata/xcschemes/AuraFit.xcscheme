@@ -38,6 +38,16 @@
                ReferencedContainer = "container:AuraFit.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AF0000000000000000000042"
+               BuildableName = "AuraFitUITests.xctest"
+               BlueprintName = "AuraFitUITests"
+               ReferencedContainer = "container:AuraFit.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

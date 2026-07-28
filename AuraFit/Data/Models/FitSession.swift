@@ -28,6 +28,9 @@ final class FitSession {
     /// Stored inline as Codable arrays.
     var metrics: [FitMetric]
     var tips: [String]
+    /// Photo-technique guidance for retakes. Default keeps pre-existing stores loading
+    /// via lightweight migration.
+    var photoTips: [String] = []
     var outfitTags: [OutfitTag]
     /// Dominant palette as hex strings.
     var paletteHex: [String]
@@ -45,6 +48,7 @@ final class FitSession {
         stylePersona: StylePersona,
         metrics: [FitMetric],
         tips: [String] = [],
+        photoTips: [String] = [],
         outfitTags: [OutfitTag] = [],
         paletteHex: [String] = [],
         originalImagePath: String? = nil,
@@ -63,6 +67,7 @@ final class FitSession {
         self.stylePersonaRaw = stylePersona.rawValue
         self.metrics = metrics
         self.tips = tips
+        self.photoTips = photoTips
         self.outfitTags = outfitTags
         self.paletteHex = paletteHex
         self.originalImagePath = originalImagePath

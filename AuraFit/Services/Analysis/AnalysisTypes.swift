@@ -64,10 +64,14 @@ struct PoseSignals: Sendable, Equatable {
     var horizontalCentering: Double
     /// Postural uprightness/openness (1 = upright & balanced).
     var posture: Double
+    /// Bounding box of confident joints in normalized image coordinates
+    /// (origin top-left, like UIKit), nil when no person was found.
+    var boundingBox: CGRect?
 
     static let unavailable = PoseSignals(
         detected: false, confidence: 0, fullBodyVisible: false,
-        verticalCoverage: 0, horizontalCentering: 0.5, posture: 0.5
+        verticalCoverage: 0, horizontalCentering: 0.5, posture: 0.5,
+        boundingBox: nil
     )
 }
 
@@ -134,6 +138,10 @@ struct FitAnalysisResult: Sendable {
     var tips: [String]
     var outfitTags: [OutfitTag]
     var palette: [RGBColor]
+    /// Photo-technique guidance ("how to take a better picture"), empty when the shot is fine.
+    var photoTips: [String] = []
+    /// Specific user-facing reason when the photo is refused; nil = use the generic message.
+    var rejectionDetail: String? = nil
     /// Diagnostics about which subsystems produced real data.
     var diagnostics: Diagnostics
 

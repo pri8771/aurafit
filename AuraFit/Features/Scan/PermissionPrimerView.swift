@@ -38,7 +38,9 @@ struct PermissionPrimerView: View {
 
             VStack(spacing: AFSpacing.sm) {
                 AFPrimaryButton(title: "Enable Camera", systemImage: "camera.fill", action: onContinue)
+                    .accessibilityIdentifier("permissionPrimer.enableCameraButton")
                 AFSecondaryButton(title: "Import from Library", systemImage: "photo.on.rectangle", action: onUseLibrary)
+                    .accessibilityIdentifier("permissionPrimer.importFromLibraryButton")
             }
         }
         .padding(AFSpacing.lg)

@@ -26,6 +26,7 @@ struct SessionRepository {
             stylePersona: result.persona,
             metrics: result.score.metrics,
             tips: result.tips,
+            photoTips: result.photoTips,
             outfitTags: result.outfitTags,
             paletteHex: result.palette.map(\.hexString),
             originalImagePath: originalImagePath

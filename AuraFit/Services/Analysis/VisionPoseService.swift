@@ -40,13 +40,22 @@ struct VisionPoseService: Sendable {
         guard confident.count >= 4 else {
             return PoseSignals(detected: true, confidence: Double(observation.confidence),
                                fullBodyVisible: false, verticalCoverage: 0.3,
-                               horizontalCentering: 0.5, posture: 0.5)
+                               horizontalCentering: 0.5, posture: 0.5, boundingBox: nil)
         }
 
         let ys = confident.map { Double($0.location.y) }
         let xs = confident.map { Double($0.location.x) }
         let minY = ys.min() ?? 0, maxY = ys.max() ?? 1
+        let minX = xs.min() ?? 0, maxX = xs.max() ?? 1
         let verticalCoverage = (maxY - minY).clamped(to: 0...1)
+
+        // Joint bounding box, flipped from Vision's bottom-left origin to top-left.
+        let boundingBox = CGRect(
+            x: minX.clamped(to: 0...1),
+            y: (1 - maxY).clamped(to: 0...1),
+            width: (maxX - minX).clamped(to: 0...1),
+            height: (maxY - minY).clamped(to: 0...1)
+        )
 
         // Center of mass horizontal position; centering = 1 when near 0.5.
         let avgX = xs.reduce(0, +) / Double(xs.count)
@@ -66,7 +75,8 @@ struct VisionPoseService: Sendable {
             fullBodyVisible: fullBody,
             verticalCoverage: verticalCoverage,
             horizontalCentering: horizontalCentering,
-            posture: posture
+            posture: posture,
+            boundingBox: boundingBox
         )
     }
 

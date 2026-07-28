@@ -23,6 +23,7 @@ struct CameraCaptureView: View {
                     .ignoresSafeArea()
                 alignmentGuide
                 controls
+                coachChip
             case .unavailable(let reason), .failed(let reason):
                 unavailableView(reason: reason)
             default:
@@ -70,6 +71,34 @@ struct CameraCaptureView: View {
                 .background(.ultraThinMaterial, in: Capsule())
                 .padding(.top, 60)
                 .accessibilityAddTraits(.isStaticText)
+        }
+    }
+
+    /// One live suggestion at a time, floating above the shutter. Green when the shot is set.
+    @ViewBuilder
+    private var coachChip: some View {
+        if let hint = camera.coachHint {
+            VStack {
+                Spacer()
+                Label(hint.message, systemImage: hint.systemImage)
+                    .font(AFTypography.subheadline(.semibold))
+                    .foregroundStyle(hint.isPositive ? AFColors.success : .white)
+                    .padding(.horizontal, AFSpacing.md)
+                    .padding(.vertical, AFSpacing.sm)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .overlay(
+                        Capsule().strokeBorder(
+                            hint.isPositive ? AFColors.success.opacity(0.6) : .white.opacity(0.15),
+                            lineWidth: 1
+                        )
+                    )
+                    .padding(.bottom, 148)
+                    .id(hint)
+                    .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
+                    .accessibilityAddTraits(.updatesFrequently)
+            }
+            .animation(reduceMotion ? nil : .spring(response: 0.35), value: hint)
+            .allowsHitTesting(false)
         }
     }
 
