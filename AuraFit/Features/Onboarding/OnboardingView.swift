@@ -15,10 +15,10 @@ struct OnboardingView: View {
               message: "Snap or import a full-body photo. Everything is analyzed right on your device — nothing ever leaves your phone."),
         .init(systemImage: "wand.and.stars",
               title: "On-Device AI Coach",
-              message: "We read your outfit, color harmony, posture, lighting, and framing to score your main character energy."),
+              message: "An image model reads your outfit and Apple's Vision framework reads your pose, both on your iPhone. You get notes on the clothes and on the photograph: color, lighting, framing, and background."),
         .init(systemImage: "square.and.arrow.up",
               title: "Share Your Score",
-              message: "Get a sleek Fit Score card and an optional 5-second reveal clip to share anywhere.")
+              message: "Get a Fit Score card and an optional 5-second reveal clip to share anywhere. Scores rate the outfit and the shot, never the person in it.")
     ]
 
     var body: some View {

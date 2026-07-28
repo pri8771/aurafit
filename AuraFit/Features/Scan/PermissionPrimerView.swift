@@ -29,7 +29,7 @@ struct PermissionPrimerView: View {
 
             VStack(alignment: .leading, spacing: AFSpacing.sm) {
                 PrimerBullet(icon: "camera.fill", text: "Capture a quick full-body photo")
-                PrimerBullet(icon: "cpu", text: "On-device AI scores your fit instantly")
+                PrimerBullet(icon: "cpu", text: "On-device models score the outfit and the shot")
                 PrimerBullet(icon: "hand.raised.fill", text: "Nothing ever leaves your device")
             }
             .padding(.vertical, AFSpacing.sm)

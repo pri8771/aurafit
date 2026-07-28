@@ -18,6 +18,12 @@ struct SettingsView: View {
     private var settings: AppSettings? { settingsRows.first }
     private var entitlements: EntitlementManager { environment.entitlements }
 
+    /// Whether any non-consumable template is owned. Only meaningful once Pro has been ruled
+    /// out, since `isTemplateUnlocked` reports true for everything while Pro is active.
+    private var hasUnlockedTemplates: Bool {
+        ProductCatalog.templateIDs.contains { entitlements.isTemplateUnlocked($0) }
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -80,6 +86,8 @@ struct SettingsView: View {
                         restoreResultMessage = "Your Pro subscription has been restored."
                     } else if !synced {
                         restoreResultMessage = "Couldn't connect to the App Store. Check your connection and try again."
+                    } else if hasUnlockedTemplates {
+                        restoreResultMessage = "Your template packs have been restored."
                     } else {
                         restoreResultMessage = "No purchases found to restore."
                     }
@@ -194,7 +202,11 @@ struct SettingsView: View {
                 Spacer()
                 Text(AppInfo.version).foregroundStyle(AFColors.textSecondary)
             }
-            Link(destination: URL(string: "https://www.apple.com/legal/privacy/")!) {
+            // AuraFit's own policy, not Apple's: App Review 5.1.1(i) requires a policy for
+            // this app, and it must stay reachable even before a hosted URL exists.
+            NavigationLink {
+                PrivacyPolicyView()
+            } label: {
                 Label("Privacy Policy", systemImage: "hand.raised.fill")
             }
             Link(destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!) {

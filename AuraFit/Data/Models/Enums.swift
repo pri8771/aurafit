@@ -84,7 +84,7 @@ enum ScoreLabel: String, Codable, CaseIterable, Sendable {
 
     var blurb: String {
         switch self {
-        case .mainCharacter: return "You're radiating main character energy."
+        case .mainCharacter: return "This one's radiating main character energy."
         case .sharp: return "Crisp, intentional, and dialed in."
         case .clean: return "Solid look with a clean finish."
         case .almostThere: return "Strong base — a few tweaks away."
@@ -95,7 +95,8 @@ enum ScoreLabel: String, Codable, CaseIterable, Sendable {
 
 // MARK: - Style Persona
 
-/// The detected aesthetic archetype for a fit.
+/// The closest aesthetic archetype for a fit. This is the classifier's nearest match,
+/// not a certainty — surface it with its confidence rather than as a detected fact.
 enum StylePersona: String, Codable, CaseIterable, Identifiable, Sendable {
     case streetwear = "Streetwear"
     case softLuxury = "Soft Luxury"

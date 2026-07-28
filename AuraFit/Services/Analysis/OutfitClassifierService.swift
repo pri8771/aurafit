@@ -5,8 +5,8 @@ import Vision
 import UIKit
 #endif
 
-/// Abstraction over an outfit-classification model so a real Core ML model can be dropped in
-/// later without touching the pipeline.
+/// Abstraction over an outfit-classification model so an alternative Core ML model can be
+/// dropped in without touching the pipeline.
 protocol OutfitClassifying {
     /// Returns persona + cohesion + tags for an image, given already-computed color signals.
     #if canImport(UIKit)
@@ -145,10 +145,22 @@ struct OutfitClassifierService: OutfitClassifying {
         return .classic
     }
 
+    /// Sentinel confidence for tags that did not come from a model.
+    ///
+    /// The heuristic path is a deterministic rule over the palette, not a probabilistic
+    /// classifier, so it has no probability to report. Earlier versions stored invented
+    /// constants (0.6 for the persona, 0.5 for colors) that were indistinguishable from
+    /// real model output once persisted. `OutfitTag.confidence` is non-optional and shared
+    /// with call sites outside this file, so the honest value is this documented zero:
+    /// UI must treat it as "no confidence available" and never render it as a percentage.
+    static let noModelConfidence: Double = 0
+
     static func makeTags(colors: ColorSignals, persona: StylePersona) -> [OutfitTag] {
-        var tags: [OutfitTag] = [OutfitTag(label: persona.rawValue, confidence: 0.6)]
+        var tags: [OutfitTag] = [OutfitTag(label: persona.rawValue, confidence: noModelConfidence)]
         for color in colors.palette.prefix(3) {
-            tags.append(OutfitTag(label: Self.colorName(for: color), confidence: 0.5, hex: color.hexString))
+            tags.append(OutfitTag(label: Self.colorName(for: color),
+                                  confidence: noModelConfidence,
+                                  hex: color.hexString))
         }
         return tags
     }

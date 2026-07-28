@@ -13,8 +13,15 @@ struct PaywallView: View {
     @State private var selectedProductID: String?
     @State private var isPurchasing = false
     @State private var errorMessage: String?
+    @State private var restoreMessage: String?
 
     private var entitlements: EntitlementManager { environment.entitlements }
+
+    /// Whether any non-consumable template is owned. Only meaningful once Pro has been ruled
+    /// out, since `isTemplateUnlocked` reports true for everything while Pro is active.
+    private var hasUnlockedTemplates: Bool {
+        ProductCatalog.templateIDs.contains { entitlements.isTemplateUnlocked($0) }
+    }
 
     private var subscriptions: [Product] {
         entitlements.products.filter { ProductCatalog.isProSubscription($0.id) }
@@ -58,6 +65,14 @@ struct PaywallView: View {
                 Button("OK") { errorMessage = nil }
             } message: {
                 Text(errorMessage ?? "")
+            }
+            .alert("Restore Purchases", isPresented: Binding(
+                get: { restoreMessage != nil },
+                set: { if !$0 { restoreMessage = nil } }
+            )) {
+                Button("OK") { restoreMessage = nil }
+            } message: {
+                Text(restoreMessage ?? "")
             }
             .onChange(of: entitlements.isPro) { _, isPro in
                 if isPro { dismiss() }
@@ -189,7 +204,8 @@ struct PaywallView: View {
                 .multilineTextAlignment(.center)
             HStack(spacing: AFSpacing.md) {
                 Link("Terms", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
-                Link("Privacy", destination: URL(string: "https://www.apple.com/legal/privacy/")!)
+                // A subscription paywall must link this app's privacy policy, not Apple's.
+                NavigationLink("Privacy") { PrivacyPolicyView() }
             }
             .font(AFTypography.caption(.semibold))
             .foregroundStyle(AFColors.accent)
@@ -224,6 +240,8 @@ struct PaywallView: View {
         }
     }
 
+    /// `AppStore.sync()` restores every owned product, not just subscriptions, so a
+    /// template-only owner must be told the restore worked rather than that nothing was found.
     private func restore() async {
         let synced = await entitlements.restore()
         if entitlements.isPro {
@@ -231,6 +249,9 @@ struct PaywallView: View {
             dismiss()
         } else if !synced {
             errorMessage = "Couldn't connect to the App Store. Check your connection and try again."
+        } else if hasUnlockedTemplates {
+            HapticsManager.shared.notify(.success)
+            restoreMessage = "Your template packs have been restored."
         } else {
             errorMessage = "No purchases found to restore."
         }

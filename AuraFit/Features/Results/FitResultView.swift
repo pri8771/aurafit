@@ -110,7 +110,7 @@ struct FitResultView: View {
                         .foregroundStyle(AFColors.accent)
                 }
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Style Persona")
+                    Text("Closest Style Match")
                         .font(AFTypography.caption(.semibold))
                         .foregroundStyle(AFColors.textTertiary)
                     Text(session.stylePersona.rawValue)
@@ -119,11 +119,36 @@ struct FitResultView: View {
                     Text(session.stylePersona.tagline)
                         .font(AFTypography.caption())
                         .foregroundStyle(AFColors.textSecondary)
+                    Text(personaProvenance)
+                        .font(AFTypography.caption())
+                        .foregroundStyle(AFColors.textTertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, AFSpacing.xxs)
                 }
                 Spacer()
             }
         }
         .accessibilityElement(children: .combine)
+    }
+
+    /// The confidence the classifier actually reported for the persona it picked.
+    ///
+    /// The heuristic fallback stores `OutfitClassifierService.noModelConfidence` (zero), so a
+    /// non-positive value means "no model probability available" rather than "certainly not".
+    private var personaConfidence: Double? {
+        let name = session.stylePersona.rawValue.lowercased()
+        let tag = session.outfitTags.first { $0.label.lowercased() == name } ?? session.outfitTags.first
+        guard let confidence = tag?.confidence, confidence > 0 else { return nil }
+        return confidence
+    }
+
+    /// One honest line about where the persona came from, so it never reads as a certainty.
+    private var personaProvenance: String {
+        if let personaConfidence {
+            let percent = Int((personaConfidence * 100).rounded())
+            return "The model's closest match at \(percent)% confidence, not a certainty."
+        }
+        return "Estimated from your color palette, without a model confidence."
     }
 
     private var metricsCard: some View {
@@ -135,9 +160,17 @@ struct FitResultView: View {
                 ForEach(metrics) { metric in
                     AFMetricBar(label: metric.title, value: metric.value, systemImage: metric.systemImage)
                 }
+                Text(Self.scoreDisclaimer)
+                    .font(AFTypography.caption())
+                    .foregroundStyle(AFColors.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
+
+    /// Shown wherever a score is broken down, so the numbers read as craft feedback on the
+    /// outfit and the photograph rather than as a measurement of the person in the frame.
+    static let scoreDisclaimer = "These scores rate the outfit and the photograph, not you. They're subjective styling and photography guidance from an on-device model, not a measurement of anything about a person."
 
     private var tipsCard: some View {
         AFGlassCard {
