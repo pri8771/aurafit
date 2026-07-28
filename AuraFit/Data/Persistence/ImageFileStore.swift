@@ -1,4 +1,5 @@
 import Foundation
+import ImageIO
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -6,7 +7,15 @@ import UIKit
 /// Stores and retrieves image/video binaries in the app's documents directory.
 ///
 /// Persisted models store *relative* paths (e.g. `originals/<uuid>.jpg`) so the store keeps
-/// working across app container relocations. All file I/O is performed off the main actor.
+/// working across app container relocations.
+///
+/// Every read and write here is **synchronous on the calling thread** — the type is `Sendable`
+/// so callers can hop off the main actor themselves. Two rules follow from that:
+///
+/// - `loadImage(relativePath:)` decodes the original at full resolution (a 12MP JPEG is ~45MB
+///   of bitmap). Call it only for detail/export paths, and only from a background context.
+/// - List and carousel UI must use `thumbnail(relativePath:maxPixelSize:)`, which downsamples
+///   with ImageIO on a background task and serves repeats from `ImageThumbnailCache`.
 struct ImageFileStore: @unchecked Sendable {
 
     enum Folder: String {
@@ -30,9 +39,12 @@ struct ImageFileStore: @unchecked Sendable {
     }
 
     private let fileManager: FileManager
+    private let thumbnailCache: ImageThumbnailCache
 
-    init(fileManager: FileManager = .default) {
+    init(fileManager: FileManager = .default,
+         thumbnailCache: ImageThumbnailCache = .shared) {
         self.fileManager = fileManager
+        self.thumbnailCache = thumbnailCache
     }
 
     // MARK: - Directory resolution
@@ -101,13 +113,86 @@ struct ImageFileStore: @unchecked Sendable {
     // MARK: - Reading
 
     #if canImport(UIKit)
-    /// Loads a UIImage from a stored relative path, or nil if missing/unreadable.
+    /// Loads a UIImage at **full resolution** from a stored relative path, or nil if
+    /// missing/unreadable.
+    ///
+    /// Decoding happens synchronously on the calling thread and costs roughly
+    /// `width × height × 4` bytes. Reserve this for the detail and export paths that actually
+    /// need every pixel; grids and carousels want `thumbnail(relativePath:maxPixelSize:)`.
     func loadImage(relativePath: String?) -> UIImage? {
         guard let relativePath else { return nil }
         let url = absoluteURL(for: relativePath)
         guard fileManager.fileExists(atPath: url.path),
               let data = try? Data(contentsOf: url) else { return nil }
         return UIImage(data: data)
+    }
+
+    /// Returns an already-cached thumbnail without touching the disk, or nil on a miss.
+    ///
+    /// Lets a view render a cached photo in its first frame instead of flashing a placeholder.
+    func cachedThumbnail(relativePath: String?, maxPixelSize: CGFloat) -> UIImage? {
+        guard let relativePath, let pixelSize = Self.normalizedPixelSize(maxPixelSize) else { return nil }
+        return thumbnailCache.image(relativePath: relativePath, maxPixelSize: pixelSize)
+    }
+
+    /// Loads a thumbnail whose longest edge is at most `maxPixelSize`, off the main actor.
+    ///
+    /// A cache hit returns without suspending. A miss decodes on a background task — ImageIO
+    /// downsamples straight from the file, so the full-resolution bitmap is never
+    /// materialized. An in-flight decode cannot be interrupted, but a cancelled caller is
+    /// handed `nil` rather than a stale image; the finished thumbnail still lands in the cache
+    /// for whoever asks next.
+    func thumbnail(relativePath: String?, maxPixelSize: CGFloat) async -> UIImage? {
+        guard let relativePath else { return nil }
+        if let cached = cachedThumbnail(relativePath: relativePath, maxPixelSize: maxPixelSize) {
+            return cached
+        }
+        if Task.isCancelled { return nil }
+
+        let store = self
+        let image = await Task.detached(priority: .userInitiated) {
+            store.loadThumbnail(relativePath: relativePath, maxPixelSize: maxPixelSize)
+        }.value
+        return Task.isCancelled ? nil : image
+    }
+
+    /// Synchronous downsampling primitive behind `thumbnail(relativePath:maxPixelSize:)`.
+    ///
+    /// Exposed for tests and for callers that are already on a background thread. Never call
+    /// this from the main actor.
+    func loadThumbnail(relativePath: String?, maxPixelSize: CGFloat) -> UIImage? {
+        guard let relativePath, let pixelSize = Self.normalizedPixelSize(maxPixelSize) else { return nil }
+        if let cached = thumbnailCache.image(relativePath: relativePath, maxPixelSize: pixelSize) {
+            return cached
+        }
+
+        let url = absoluteURL(for: relativePath)
+        guard fileManager.fileExists(atPath: url.path) else { return nil }
+
+        // `kCGImageSourceShouldCache: false` keeps the *original* out of the decode cache; we
+        // only ever want the downsampled copy resident.
+        let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+        guard let source = CGImageSourceCreateWithURL(url as CFURL, sourceOptions) else { return nil }
+
+        let thumbnailOptions: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,   // honour EXIF orientation
+            kCGImageSourceShouldCacheImmediately: true,         // decode here, not on first draw
+            kCGImageSourceThumbnailMaxPixelSize: pixelSize
+        ]
+        guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
+            return nil
+        }
+
+        let image = UIImage(cgImage: cgImage)
+        thumbnailCache.insert(image, relativePath: relativePath, maxPixelSize: pixelSize)
+        return image
+    }
+
+    /// Clamps a requested edge budget to a whole, positive pixel count.
+    private static func normalizedPixelSize(_ maxPixelSize: CGFloat) -> Int? {
+        guard maxPixelSize.isFinite, maxPixelSize >= 1 else { return nil }
+        return Int(maxPixelSize.rounded())
     }
     #endif
 

@@ -111,7 +111,7 @@ struct ChallengeDetailView: View {
                                 FitDetailView(session: session)
                             } label: {
                                 FitCardView(session: session,
-                                            image: environment.imageStore.loadImage(relativePath: session.originalImagePath))
+                                            imageStore: environment.imageStore)
                             }
                             .buttonStyle(.plain)
                         }

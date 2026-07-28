@@ -142,7 +142,7 @@ struct HomeView: View {
                         NavigationLink {
                             FitDetailView(session: session)
                         } label: {
-                            FitCardView(session: session, image: environment.imageStore.loadImage(relativePath: session.originalImagePath))
+                            FitCardView(session: session, imageStore: environment.imageStore)
                         }
                         .buttonStyle(.plain)
                     }

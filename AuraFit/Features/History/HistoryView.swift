@@ -83,7 +83,7 @@ struct HistoryView: View {
                 } label: {
                     FitCardView(session: session,
                                 width: nil,
-                                image: environment.imageStore.loadImage(relativePath: session.originalImagePath))
+                                imageStore: environment.imageStore)
                 }
                 .buttonStyle(.plain)
                 .contextMenu {
