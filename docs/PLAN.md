@@ -240,6 +240,33 @@ loop verified on a physical iPhone · store submission prepared.
 
 **Phase 0 estimate: ~11 ideal days** (≈3 calendar weeks at the 1.6× factor).
 
+### 4.6 Phase 0 progress — as of 2026-07-28
+
+**Engineering is essentially complete.** 16 tasks closed in one orchestrated session across
+four parallel agents: `ENG-001/002/004/005/006/007/008/009/010/011/012/013/014`, `LEG-001`,
+`LEG-007`, `MON-001`.
+
+Verified on the merged tree, not per-package:
+
+- **88/88 unit tests pass** (was 50 at the audit, 67 before this session).
+- **Release build succeeds.**
+- **Release bundle audited:** `AuraFit.storekit` absent; `PrivacyInfo.xcprivacy`,
+  `MobileCLIPImageEncoder.mlmodelc`, `CLIPLabelEmbeddings.json` present;
+  `ITSAppUsesNonExemptEncryption = false`; zero `MockPurchaseProvider` symbols and no
+  `UITestInMemoryStore` string in the Release binary.
+
+**What still gates the phase — none of it is code:**
+
+| Key | Blocker | Needs |
+|---|---|---|
+| `AURA-QA-001` | UI smoke test still fails; the simulator cannot run Vision pose or segmentation | The DEBUG-gated Vision stub |
+| `AURA-QA-002` | The core loop has still never been verified on a physical device | A person, a phone, the §5.2 matrix |
+| `AURA-LEG-002` | MobileCLIP commercial licence unresolved | A human reading Apple's model licence. **Blocks M3** |
+| `AURA-MKT-*`, `AURA-OPS-*`, `AURA-DES-*` | Store assets, landing page, release automation, featuring nomination | Owner time; the featuring nomination is due **Aug 10** |
+
+The audit's original top finding is unchanged: **the loop has never run end to end on real
+hardware.** Every engineering fix above is verified by unit tests and inspection only.
+
 ---
 
 ## 5. Quality assurance — `QA`
@@ -511,8 +538,10 @@ and the stated reason matches the actual change.
 | Key | Task | Due by | Why |
 |---|---|---|---|
 | `AURA-ENG-030` | SwiftData versioned schema + migration plan | **before Phase 1 ships** | Schema is unversioned; Phases 1 and 2 both add fields. A failed store-open currently falls back to in-memory *forever*, stranding all user data with no export path. |
-| `AURA-ENG-035` | Orphan reconciliation for image files | Phase 2 | Sessions and files written non-atomically, no sweep either direction |
+| `AURA-ENG-035` | Orphan reconciliation for image files | **Phase 0 → raised to P1** | Was "sessions and files written non-atomically." `AURA-ENG-008` now *deliberately* stages the JPEG before analysis to protect an unrepeatable capture, so a crash mid-pipeline reliably leaves an unreferenced file. The debt is no longer incidental — it is created by design and needs a launch-time sweep in `AuraFitApp`/`ImageFileStore`. |
 | `AURA-ENG-036` | Move reveal-video rendering off the main actor | Phase 1 | 120 full-res frames render on `@MainActor`; UI freezes throughout |
+| `AURA-ENG-037` | `FitResultView` still decodes full-resolution on the main actor | Phase 1 | Missed by `AURA-ENG-007`, which only owned the grid call sites. One decode on a detail screen, not per-cell, so materially smaller — but it is the same ~45MB main-thread decode |
+| `AURA-DATA-008` | Calibrate monochrome-detection thresholds against real captures | Phase 0 (during `AURA-QA-002`) | `dominant: 3` / `maxHueSpread: 0.10` were tuned on synthetic palettes. Real photos carry background colour buckets. Too strict and "Monochrome Mastery" becomes uncompletable — the inverse of the bug just fixed |
 
 ---
 
@@ -566,10 +595,25 @@ Populated as tasks complete; feeds the §1.5 metrics at each retro.
 
 | Key | Est | Actual | Δ | Note |
 |---|---|---|---|---|
-| `AURA-ENG-001` | 0.5d | 0.3d | −0.2d | Three commits; volume was large but mechanical |
-| `AURA-ENG-002` | 0.1d | 0.1d | 0 | — |
-| `AURA-PM-001` | 1d | 1.2d | +0.2d | Research pass (§6.9) added scope but corrected two real errors |
-| `AURA-UA-001` | 0.5d | 0.2d | −0.3d | Folded into the same research pass |
+Actuals are recorded as **agent-sessions (AS)** plus orchestrator review, not ideal days — see
+PM-04 below for why the two are not converted.
+
+| Key(s) | Est | Actual | Note |
+|---|---|---|---|
+| `ENG-001`, `ENG-002` | 0.6d | orchestrator, ~0.3d | Large but mechanical; 4 commits |
+| `PM-001` | 1d | ~1.2d + 2 research AS | Research added scope and corrected 3 planning errors |
+| `UA-001` | 0.5d | folded into research | — |
+| `ENG-007` (pkg A) | 1.5d | 1 AS | 5→13 tests. Effect is arithmetic, unprofiled |
+| `ENG-008/009/010` (pkg B) | 1.8d | 1 AS | 79→88 tests. Largest package; 3 follow-ups discovered |
+| `ENG-004/005`, `LEG-001/007`, `MON-001` (pkg C) | 1.7d | 1 AS | Found the same restore bug in a second file |
+| `ENG-006/011/012/013/014` (pkg D) | 1.0d | 1 AS | Found the `#Preview` assumption in the brief to be wrong |
+| Merge verification | — | orchestrator, ~0.2d | 88/88 + Release build + bundle audit |
+
+**Observed:** ~6.6 ideal days of estimated engineering closed in 4 parallel agent-sessions plus
+roughly 0.5d of orchestration. The parallelism was only possible because the packages had
+**disjoint file ownership**, which had to be designed deliberately — two of the four agents
+still hit transient build failures from other agents' partial writes, and one had to verify
+against a copy of the tree because a file it did not own was mid-edit.
 
 ### 10.1 Planning misses (feeds §1.5 "blocker discovery timing")
 
@@ -578,9 +622,31 @@ Populated as tasks complete; feeds the §1.5 metrics at each retro.
 | **PM-01** | Apple featuring nomination was scheduled implicitly late; it needs 3 weeks minimum, 2–3 months preferred | Research, before execution | `AURA-MKT-006` moved to W2 |
 | **PM-02** | Two compliance tasks were entirely absent from the first draft: the 2026 age-rating schema (new tiers, Sept 2026 social-media questions, wellness-topic question) and reviewer test instructions | Research, before execution | Added `AURA-LEG-005` (rescoped), `AURA-LEG-008` |
 | **PM-03** | The measurement decision was left open with a vague default; App Store Connect's free analytics are substantially better than assumed, making the backend question moot | Research, before execution | §2.4 decided; `AURA-OPS-006` de-risked |
+| **PM-04** | **The estimation basis does not match the execution model.** §1.3 estimates in "ideal developer days," but Phase 0 was executed by four parallel agents in one sitting. Wall-clock and ideal-days are not convertible, so the §1.5 estimate-accuracy metric currently has no honest denominator | Execution | See below — basis changed rather than faking actuals |
+| **PM-05** | Four tasks were only discovered by *doing the work*, not by planning it: `AURA-ENG-037` (a call site `AURA-ENG-007` didn't own), `AURA-DATA-008` (thresholds tuned on synthetic data), the `AURA-ENG-035` priority raise, and the `SeedData` refresh problem — existing installs would have kept stale challenge copy forever because seeding was insert-only | Execution | All four filed |
 
-All three were caught in planning rather than execution, which is the intended behaviour —
-the §1.5 target is >70% of blockers found before work starts.
+**On PM-04.** Estimates stay in ideal days because that is the unit a human plans in and the
+unit Jira/Notion expect. But actuals will be recorded as **agent-sessions + orchestrator review
+time**, and the two are tracked in separate columns rather than pretending they're the same
+number. The §1.5 estimate-accuracy target is suspended until Phase 1, when a full phase will
+have been executed under a consistent model. Fabricating a day-count to fill the column would
+defeat the point of measuring at all.
+
+**On PM-05.** Four of roughly twenty Phase 0 tasks were discovered during execution, not
+planning — about 80% found in planning, just above the §1.5 target of 70%. Worth noting the
+*kind* that escaped: all four are the sort only visible with the file open (an unowned call
+site, a threshold's real-world validity, an insert-only seeding path). That is the expected
+residue; a plan that caught these would have required doing the work first.
+
+| # | Miss | Found by | Correction |
+|---|---|---|---|
+| **PM-06** | **A factual error in the task brief itself.** The Package D brief asserted that SwiftUI `#Preview` blocks are excluded from Release builds. They are not, in this project — gating `AppEnvironment.preview()` broke the Release build across seven files, and `ENABLE_PREVIEWS=NO` did not strip them either | Execution, by the agent contradicting its instructions | `preview()` given a Release stub; full removal needs all seven `#Preview` blocks wrapped. The agent was right to deviate and say so |
+| **PM-07** | Parallel agents need **disjoint file ownership designed up front**, and even then partial writes cause transient build failures in sibling agents. Two of four hit this; one had to verify against a copied tree | Execution | Ownership lists worked and there were zero merge conflicts, but *verification* must be re-run centrally on the merged tree — a per-package green result proves nothing on its own |
+
+**On PM-06 specifically:** the brief was wrong and the agent proved it wrong rather than
+working around it silently. That is the behaviour the process should reward — an instruction
+being confidently stated does not make it true, and a plan is only as good as its willingness
+to be corrected by contact with the code.
 
 ---
 
@@ -613,4 +679,5 @@ server-scale only and violates the charter.
 |---|---|
 | 2026-07-28 | Created as an engineering-only phase plan. |
 | 2026-07-28 | **CR-004:** expanded to a full program plan — planning method, board schema, CR process, planning-quality metrics, QA/DATA/DES/LEG/OPS/MKT/UA/MON/PM workstreams, milestones, risk register, variance log. |
+| 2026-07-28 | Phase 0 engineering executed: 16 tasks closed across 4 parallel agents, 88/88 tests, Release bundle audited. Variance log and planning misses PM-04..PM-07 recorded. |
 | 2026-07-28 | Market and tooling research folded in: §6.9 market intelligence, ASO decisions, UA channel ranking, monetization benchmarks. Corrected three planning misses (§10.1); added `AURA-LEG-007/008`, `AURA-R12/R13`; decided §2.4 measurement and `AURA-OPS-003` release automation. |
