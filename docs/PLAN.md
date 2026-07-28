@@ -268,6 +268,48 @@ Verified on the merged tree, not per-package:
 The audit's original top finding is unchanged: **the loop has never run end to end on real
 hardware.** Every engineering fix above is verified by unit tests and inspection only.
 
+### 4.7 Execution queue — the next 20 tasks
+
+Ordered by dependency and hard date. **Owner** column: `agent` = executable now without the
+owner present; `owner` = needs Priyansh (device in hand, App Store Connect access, or a hosting
+decision). The two tracks are deliberately parallel — they use different resources.
+
+| # | Key | Task | Owner | Est | Depends on |
+|---|---|---|---|---|---|
+| 1 | `ENG-038` | Remove MobileCLIP: delete the two resource files, fix the 4 canary tests, confirm the heuristic path and `PhotoCoach` degrade cleanly | agent | 0.5d | `DEC-004` |
+| 2 | `QA-001` | DEBUG-gated Vision stub so the UI smoke test runs deterministically | agent | 1d | — |
+| 3 | `OPS-001` | CI green on main | agent | 0.3d | 2 |
+| 4 | `ENG-035` | Launch-time orphan sweep for staged originals | agent | 0.5d | — |
+| 5 | `ENG-037` | `FitResultView` full-resolution main-thread decode | agent | 0.3d | — |
+| 6 | — | Signed Release build installed on the iPhone | agent | 0.2d | 1–5 |
+| 7 | **`QA-002`** | **Physical-device QA matrix (§5.2) — THE GATE** | **owner** | 0.5d | 6 |
+| 8 | — | Triage and fix whatever QA-002 finds | agent | **unknown** | 7 |
+| 9 | `MKT-006` | **Apple featuring nomination — DUE AUG 10** | **owner** | 0.5d | 11 (light) |
+| 10 | `MKT-004` | Landing page live — unblocks the hosted privacy-policy URL | owner | 1d | 11 |
+| 11 | `MKT-001` | Positioning one-pager: one sentence, three proof points, named audience | agent draft | 0.5d | — |
+| 12 | `MKT-002` | ASO title / subtitle / keyword field (§6.9.2 decisions) | agent draft | 1d | 11 |
+| 13 | `DES-002` | App Store screenshots + app preview video (live coach leads) | owner | 1.5d | 7 |
+| 14 | `LEG-008` | Reviewer test instructions + supplied test image | agent draft | 0.3d | — |
+| 15 | `LEG-005` | Age-rating questionnaire, 2026 schema (wellness question needs care) | owner | 0.5d | — |
+| 16 | `LEG-004` | Privacy nutrition labels — "Data Not Collected" | owner | 0.3d | — |
+| 17 | `LEG-003` | Terms of service (Apple standard EULA or custom) | agent draft | 0.3d | — |
+| 18 | `OPS-002` | App Store Connect API key + CI signing | owner | 0.5d | — |
+| 19 | `QA-006` | TestFlight internal build + smoke pass | agent | 0.5d | 8, 18 |
+| 20 | `QA-007` | TestFlight external, 15–30 recruited testers (Beta App Review) | owner | 1d | 19 |
+
+**Notes on the queue**
+
+- **Task 8 is deliberately unestimated.** The loop has never run on hardware; pretending to
+  know the fix cost would be fake precision. It is the largest schedule risk in Phase 0 and the
+  reason QA-002 is sequenced before the store assets rather than after.
+- **Task 9 has the only hard external date.** Featuring nominations need 3 weeks' lead minimum.
+  It does *not* depend on the app being finished — file it with what exists.
+- **`ENG-003` (Git LFS for the 22MB model) is cancelled** — removing MobileCLIP removes the
+  binary that raised the question.
+- **`DES-001` (onboarding rewrite) is already done**, absorbed into Package C's copy work.
+- Tasks 11, 12, 14, 17 are drafts an agent can produce; they still need owner review before
+  they go near App Store Connect.
+
 ---
 
 ## 5. Quality assurance — `QA`
