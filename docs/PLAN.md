@@ -425,7 +425,7 @@ Manual, on a real iPhone. Results recorded in `docs/TEST_PLAN.md`. Minimum matri
 | `AURA-MKT-001` | Positioning + messaging one-pager | 0 | 0.5d | One sentence, three proof points, named audience |
 | `AURA-MKT-002` | ASO: title, subtitle, keyword field | 0 | 1d | See §6.9.2. Never duplicate a term across fields — Apple counts it once |
 | `AURA-MKT-003` | Store description + What's New template | 0 | 0.5d | Leads with benefit; no unverifiable AI claims (consistent with `AURA-ENG-004`) |
-| `AURA-MKT-004` | Landing page | 0 | 1d | Hosted; privacy policy and support links live (**unblocks `AURA-LEG-001`'s hosted URL**) |
+| `AURA-MKT-004` | Landing page | 0 | 1d | Hosted; privacy policy and support links live (**unblocks `AURA-LEG-001`'s hosted URL**). **Host decided 2026-07-29: OpenAI Sites** (Codex-deployed, owner action — not deployable from this repo's CI). GitHub Pages was built and reverted first; see `AURA-R14` for the two checks that must pass before this URL goes in App Store Connect |
 | `AURA-MKT-005` | Launch content set: demo clips of the live coach | 0 | 1.5d | 5–8 short vertical videos ready before M4 |
 | `AURA-MKT-006` | **Apple featuring nomination** | 0 | 0.5d | **Due W2 (Aug 10)** — App Store Connect → Featuring → Nominations, type "App Launch". Minimum 3 weeks' lead, 2–3 months preferred. Attach supplemental URLs (TestFlight link + demo video) and complete "Helpful Details". Lead with *runs entirely on-device, no account, no upload* |
 | `AURA-MKT-007` | Press/launch-site outreach list | 0 | 0.5d | 20 named targets with angles |
@@ -607,6 +607,7 @@ Extends `docs/RISKS.md`. P = probability, I = impact.
 | `AURA-R11` | Category is crowded; organic discovery fails | med | med | Claim the unclaimed "look good in photos" phrase (§6.9.2); live coach as a content engine | open |
 | `AURA-R12` | Reviewer cannot exercise on-device photo analysis and rejects | med | med | `AURA-LEG-008` reviewer notes + test image — identified as the single most likely rejection vector | open |
 | `AURA-R13` | A free on-device live-coach competitor undercuts the wedge | med | med | Compete on the combination (style + craft + coaching + privacy), not on the coach alone; §6.9.1 | open |
+| `AURA-R14` | The hosted privacy-policy URL is not publicly reachable, or does not outlive the app | med | high | Host is OpenAI Sites (`AURA-MKT-004`), a preview product whose sharing model is workspace-oriented. **Two gates before the URL enters App Store Connect:** (1) open it in a logged-out private window — a login redirect disqualifies it, since App Review and users must reach it with no account; (2) have a fallback host ready, because a policy URL must stay live for the life of the app | open |
 
 ---
 
