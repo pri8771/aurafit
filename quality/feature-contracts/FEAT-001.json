@@ -1,0 +1,53 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pri8771/iOS_app_factory_rules/main/schemas/feature-contract.schema.json",
+  "id": "FEAT-001",
+  "name": "Scan or import to fit result",
+  "status": "verification_pending",
+  "userOutcome": "A user can capture or select one full-body photo, receive honest on-device analysis, and reach a durable result without losing the photo on a recoverable failure.",
+  "entryPoints": [
+    "Scan tab",
+    "Home scan action"
+  ],
+  "productionDataSource": "Live AVFoundation camera capture or a user-selected PhotosPicker item, analyzed by Vision, Core Image, deterministic local heuristics, and ScoreEngine.",
+  "states": [
+    "idle",
+    "permission_primer",
+    "permission_denied",
+    "capturing",
+    "loading_import",
+    "analyzing",
+    "cancelled",
+    "rejected_low_confidence",
+    "persistence_failed",
+    "result"
+  ],
+  "errorBehavior": "Camera denial offers Settings and library fallback. Import, analysis, and persistence failures show a retryable message. Cancellation is silent and distinct from failure. A staged original is removed when no session is created.",
+  "duplicateProtectionRequired": true,
+  "persistenceRequired": true,
+  "layoutScenarios": [
+    "small supported iPhone",
+    "large supported iPhone",
+    "Dynamic Type accessibility sizes",
+    "long localized error copy"
+  ],
+  "accessibilityRequirements": [
+    "Camera and import actions have meaningful labels",
+    "Progress and cancellation remain reachable with VoiceOver",
+    "Permission recovery choices are announced distinctly"
+  ],
+  "prohibitedBehavior": [
+    "Do not activate deterministic Vision stubs in Release",
+    "Do not present heuristic style estimates as learned-model facts",
+    "Do not show or persist a score when the deterministic photo-quality gate rejects the input",
+    "Do not allow borderline photo quality to inherit an implausibly high outfit score",
+    "Do not spend a daily scan or persist a session after cancellation",
+    "Do not start overlapping analyses"
+  ],
+  "acceptanceTests": [
+    "ScanCoreLoopUITests.testLaunchOnboardingScanImportReachesFitScore",
+    "AnalysisPipelineTests cancellation and cancelled-persistence tests",
+    "ScoreEngineTests unusable-photo and borderline-photo ceiling tests",
+    "CoachAndPhotoTipsTests deterministic rejection-detail test",
+    "Physical-device camera, Photos picker, denial, interruption, and low-confidence matrix"
+  ]
+}

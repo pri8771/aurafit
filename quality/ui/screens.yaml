@@ -1,0 +1,152 @@
+schemaVersion: 1
+product: aurafit
+screens:
+  - id: SCREEN-ONBOARDING
+    name: Onboarding
+    rootIdentifier: aurafit.onboarding.root.container
+    fixtures: [first-launch, long-text]
+    requiredElements:
+      - identifier: aurafit.onboarding.continue.button
+        role: button
+        states: [enabled]
+      - identifier: aurafit.onboarding.skip.button
+        role: button
+        states: [enabled]
+    navigation:
+      enterFrom: [app-launch]
+      exits:
+        - action: aurafit.onboarding.skip.button
+          destination: SCREEN-HOME
+    prohibitedActions: []
+
+  - id: SCREEN-HOME
+    name: Home
+    rootIdentifier: aurafit.home.root.container
+    fixtures: [empty, one-record, many-records, long-text]
+    requiredElements:
+      - identifier: aurafit.home.scan.button
+        role: button
+        states: [enabled]
+    navigation:
+      enterFrom: [SCREEN-ONBOARDING, app-launch-completed]
+      exits:
+        - action: aurafit.home.scan.button
+          destination: SCREEN-SCAN
+    prohibitedActions: []
+
+  - id: SCREEN-SCAN
+    name: Scan
+    rootIdentifier: aurafit.scan.root.container
+    fixtures: [free-quota, pro, quota-exhausted]
+    requiredElements:
+      - identifier: aurafit.scan.camera.button
+        role: button
+        states: [enabled]
+      - identifier: aurafit.scan.import.button
+        role: button
+        states: [enabled]
+    navigation:
+      enterFrom: [aurafit.tab.scan.button, SCREEN-HOME]
+      exits:
+        - action: aurafit.scan.camera.button
+          destination: SCREEN-PERMISSION-PRIMER
+    prohibitedActions:
+      - purchases
+      - automatic sharing
+
+  - id: SCREEN-PERMISSION-PRIMER
+    name: Camera permission primer
+    rootIdentifier: aurafit.permission-primer.root.container
+    fixtures: [camera-not-determined]
+    requiredElements:
+      - identifier: permissionPrimer.enableCameraButton
+        role: button
+        states: [enabled]
+      - identifier: permissionPrimer.importFromLibraryButton
+        role: button
+        states: [enabled]
+    navigation:
+      enterFrom: [SCREEN-SCAN]
+      exits:
+        - action: permissionPrimer.importFromLibraryButton
+          destination: system-photo-picker
+    prohibitedActions:
+      - grant-permission-without-explicit-journey
+
+  - id: SCREEN-ANALYSIS
+    name: Analysis progress
+    rootIdentifier: aurafit.analysis.root.container
+    fixtures: [deterministic-vision-stub]
+    requiredElements:
+      - identifier: analysisProgressView.cancelButton
+        role: button
+        states: [enabled]
+    navigation:
+      enterFrom: [system-photo-picker, camera-capture]
+      exits:
+        - action: analysisProgressView.cancelButton
+          destination: SCREEN-SCAN
+    prohibitedActions:
+      - background-purchase
+
+  - id: SCREEN-RESULT
+    name: Fit result
+    rootIdentifier: aurafit.result.root.container
+    fixtures: [one-record, long-tips]
+    requiredElements:
+      - identifier: aurafit.result.breakdown.heading
+        role: heading
+        states: [visible]
+    navigation:
+      enterFrom: [SCREEN-ANALYSIS, SCREEN-HISTORY]
+      exits: []
+    prohibitedActions:
+      - automatic-sharing
+      - automatic-purchase
+
+  - id: SCREEN-HISTORY
+    name: History
+    rootIdentifier: aurafit.history.root.container
+    fixtures: [empty, one-record, many-records]
+    requiredElements: []
+    navigation:
+      enterFrom: [aurafit.tab.history.button]
+      exits: []
+    prohibitedActions:
+      - delete-without-explicit-journey
+
+  - id: SCREEN-CHALLENGES
+    name: Challenges
+    rootIdentifier: aurafit.challenges.root.container
+    fixtures: [content]
+    requiredElements: []
+    navigation:
+      enterFrom: [aurafit.tab.challenges.button]
+      exits: []
+    prohibitedActions: []
+
+  - id: SCREEN-SETTINGS
+    name: Settings
+    rootIdentifier: aurafit.settings.root.container
+    fixtures: [free, pro]
+    requiredElements: []
+    navigation:
+      enterFrom: [aurafit.tab.settings.button]
+      exits:
+        - action: upgrade-to-pro
+          destination: SCREEN-PAYWALL
+    prohibitedActions:
+      - restore-without-explicit-journey
+      - delete-without-explicit-journey
+
+  - id: SCREEN-PAYWALL
+    name: Paywall
+    rootIdentifier: aurafit.paywall.root.container
+    fixtures: [products-loaded, products-unavailable]
+    requiredElements: []
+    navigation:
+      enterFrom: [SCREEN-SETTINGS, quota-exhausted, locked-feature]
+      exits: []
+    prohibitedActions:
+      - purchases
+      - restore

@@ -49,7 +49,7 @@ final class StoreKitService: PurchaseProviding {
     private(set) var purchasedProductIDs: Set<String> = []
     private(set) var loadState: LoadState = .idle
 
-    nonisolated(unsafe) private var updatesTask: Task<Void, Never>?
+    @ObservationIgnored private var updatesTask: Task<Void, Never>?
 
     init() {
         // Begin listening for transaction updates immediately (renewals, refunds, Ask-to-Buy).

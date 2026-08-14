@@ -55,6 +55,17 @@ struct PhotoCoach: Sendable {
 
     /// A specific, user-facing reason for refusing to score a photo, derived from CLIP's
     /// dominant issue. nil means "no specific story beyond the generic message".
+    func rejectionDetail(
+        signals: AnalysisSignals,
+        issues: CLIPZeroShotClassifier.PhotoIssueAssessment?
+    ) -> String? {
+        if let rejection = PhotoQualityGate().assess(signals).rejection {
+            return rejection.message
+        }
+        return rejectionDetail(issues: issues)
+    }
+
+    /// Model-derived fallback retained for callers that do not have the complete signal bundle.
     func rejectionDetail(issues: CLIPZeroShotClassifier.PhotoIssueAssessment?) -> String? {
         switch issues?.dominantIssue {
         case "no person":

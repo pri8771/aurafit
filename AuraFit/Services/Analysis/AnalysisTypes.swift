@@ -131,6 +131,112 @@ struct AnalysisSignals: Sendable, Equatable {
     var outfit: OutfitSignals
 }
 
+/// Decides whether the photo contains enough trustworthy visual signal to score.
+///
+/// This gate intentionally runs before product-facing scoring. Outfit/color heuristics can
+/// produce plausible-looking values for almost any image, so they must never turn an unusable
+/// photo into an 80+ result.
+struct PhotoQualityGate: Sendable {
+    struct Assessment: Sendable, Equatable {
+        enum Rejection: Sendable, Equatable {
+            case noReliablePerson
+            case croppedBody
+            case subjectTooSmall
+            case subjectTooLarge
+            case tooDark
+            case overexposed
+            case blurry
+            case lowDetail
+
+            var message: String {
+                switch self {
+                case .noReliablePerson:
+                    return "We couldn't get a reliable full-body read. Make sure one person is clearly visible from head to shoes."
+                case .croppedBody:
+                    return "Your full outfit isn't visible. Step back and keep your head and shoes inside the frame."
+                case .subjectTooSmall:
+                    return "You're too far from the camera for a reliable outfit score. Move closer while keeping your full body visible."
+                case .subjectTooLarge:
+                    return "You're too close to the camera for a reliable outfit score. Step back so your full silhouette fits."
+                case .tooDark:
+                    return "This photo is too dark to score reliably. Face a window or brighter light and try again."
+                case .overexposed:
+                    return "This photo is too washed out to score reliably. Move out of direct glare and try again."
+                case .blurry:
+                    return "This photo is too blurry to score reliably. Steady the phone or use a timer and retake it."
+                case .lowDetail:
+                    return "There isn't enough visible detail to score this photo reliably. Use clearer light and a less obstructed view."
+                }
+            }
+        }
+
+        var rejection: Rejection?
+        /// Borderline-but-usable photos can be scored, but cannot receive a misleadingly high
+        /// overall result. A hard rejection uses a ceiling as defense in depth.
+        var scoreCeiling: Int?
+
+        var isAcceptable: Bool { rejection == nil }
+    }
+
+    func assess(_ signals: AnalysisSignals) -> Assessment {
+        let pose = signals.pose
+        let segmentation = signals.segmentation
+        let quality = signals.quality
+
+        guard pose.detected, pose.confidence >= 0.35 else {
+            return Assessment(rejection: .noReliablePerson, scoreCeiling: 49)
+        }
+        guard pose.fullBodyVisible else {
+            return Assessment(rejection: .croppedBody, scoreCeiling: 49)
+        }
+        guard pose.verticalCoverage >= 0.34 else {
+            return Assessment(rejection: .subjectTooSmall, scoreCeiling: 49)
+        }
+        guard pose.verticalCoverage <= 0.94 else {
+            return Assessment(rejection: .subjectTooLarge, scoreCeiling: 49)
+        }
+
+        if segmentation.available {
+            guard segmentation.subjectFraction >= 0.14 else {
+                return Assessment(rejection: .subjectTooSmall, scoreCeiling: 49)
+            }
+            guard segmentation.subjectFraction <= 0.78 else {
+                return Assessment(rejection: .subjectTooLarge, scoreCeiling: 49)
+            }
+        }
+
+        if quality.brightness < 0.18 || (quality.exposureBalance < 0.30 && quality.brightness < 0.5) {
+            return Assessment(rejection: .tooDark, scoreCeiling: 49)
+        }
+        if quality.brightness > 0.82 || (quality.exposureBalance < 0.30 && quality.brightness >= 0.5) {
+            return Assessment(rejection: .overexposed, scoreCeiling: 49)
+        }
+        guard quality.sharpness >= 0.22 else {
+            return Assessment(rejection: .blurry, scoreCeiling: 49)
+        }
+        guard quality.contrast >= 0.12 else {
+            return Assessment(rejection: .lowDetail, scoreCeiling: 49)
+        }
+
+        var ceiling: Int?
+        if quality.sharpness < 0.38 || quality.exposureBalance < 0.50 || quality.contrast < 0.22 {
+            ceiling = 69
+        }
+        if pose.confidence < 0.55
+            || pose.verticalCoverage < 0.45
+            || pose.verticalCoverage > 0.86
+            || pose.horizontalCentering < 0.55 {
+            ceiling = min(ceiling ?? 74, 74)
+        }
+        if segmentation.available
+            && (segmentation.subjectFraction < 0.25 || segmentation.subjectFraction > 0.65) {
+            ceiling = min(ceiling ?? 74, 74)
+        }
+
+        return Assessment(rejection: nil, scoreCeiling: ceiling)
+    }
+}
+
 /// The final result returned by the pipeline, ready to persist & display.
 struct FitAnalysisResult: Sendable {
     var score: FitScore
@@ -149,9 +255,12 @@ struct FitAnalysisResult: Sendable {
         var poseDetected: Bool
         var segmentationAvailable: Bool
         var usedOutfitModel: Bool
+        var photoQualityPassed: Bool = true
 
-        /// True when neither pose detection nor segmentation found a subject in the photo,
-        /// meaning the resulting score has no real signal behind it and shouldn't be shown as-is.
-        var isLowConfidence: Bool { !poseDetected && !segmentationAvailable }
+        /// A score is untrustworthy when the subject cannot be found or the deterministic
+        /// photo-quality gate rejects the input.
+        var isLowConfidence: Bool {
+            !photoQualityPassed || (!poseDetected && !segmentationAvailable)
+        }
     }
 }

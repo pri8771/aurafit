@@ -45,7 +45,7 @@ final class ScanCoreLoopUITests: XCTestCase {
         // MARK: Onboarding
         // `OnboardingView` shows a "Skip" button on every page except the last; tapping it
         // completes onboarding immediately (see AuraFit/Features/Onboarding/OnboardingView.swift).
-        let skipButton = app.buttons["Skip"]
+        let skipButton = app.buttons["aurafit.onboarding.skip.button"]
         XCTAssertTrue(skipButton.waitForExistence(timeout: 10), "Onboarding did not appear on first launch.")
         skipButton.tap()
 
@@ -54,7 +54,7 @@ final class ScanCoreLoopUITests: XCTestCase {
         XCTAssertTrue(scanTab.waitForExistence(timeout: 10), "Main tab bar did not appear after onboarding.")
         scanTab.tap()
 
-        let openCameraButton = app.buttons["Open Camera"]
+        let openCameraButton = app.buttons["aurafit.scan.camera.button"]
         XCTAssertTrue(openCameraButton.waitForExistence(timeout: 10), "Scan start screen did not appear.")
         openCameraButton.tap()
 
@@ -117,11 +117,11 @@ final class ScanCoreLoopUITests: XCTestCase {
         // `FitAnalysisResult.Diagnostics.isLowConfidence` is true. The outfit classifier runs its
         // heuristic fallback because no `OutfitClassifier.mlmodelc` is bundled (confirmed absent;
         // see docs/BUGS.md and docs/ARCHITECTURE.md).
-        let resultTitle = app.navigationBars["Your Fit Score"]
-        XCTAssertTrue(resultTitle.waitForExistence(timeout: 60),
+        let resultScreen = app.otherElements["aurafit.result.root.container"]
+        XCTAssertTrue(resultScreen.waitForExistence(timeout: 60),
                       "Did not reach the Fit Score result screen after picking a photo.")
 
-        let breakdown = app.staticTexts["Breakdown"]
+        let breakdown = app.staticTexts["aurafit.result.breakdown.heading"]
         XCTAssertTrue(breakdown.waitForExistence(timeout: 10), "Result screen is missing the metric breakdown card.")
     }
 

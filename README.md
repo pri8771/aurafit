@@ -1,16 +1,16 @@
 # AuraFit
 
-AuraFit is a fully local, on-device AI outfit & camera coach for iOS. Take or import a full-body
-photo and AuraFit analyzes outfit quality, posture, color harmony, lighting, framing, and
+AuraFit is a fully local, on-device outfit and camera coach for iOS. Take or import a full-body
+photo and AuraFit analyzes outfit signals, posture, color harmony, lighting, framing, and
 "main character energy" — then generates a shareable **Fit Score** card and an optional 5-second
 reveal clip. **No backend. No cloud inference. No analytics. No network calls except StoreKit.**
 
-> Built with SwiftUI, SwiftData, Vision, Core ML, Core Image, AVFoundation, and StoreKit 2.
+> Built with SwiftUI, SwiftData, Vision, Core Image, AVFoundation, and StoreKit 2.
 > iOS 18+ · iPhone portrait-first · dark-first design.
 
 ## Getting started
 
-1. Open `AuraFit.xcodeproj` in Xcode 16 (current stable).
+1. Open `AuraFit.xcodeproj` in Xcode 26.6 or a newer Apple-supported upload toolchain.
 2. Select the **AuraFit** scheme and an iOS 18+ simulator or device.
 3. Press **⌘B** to build, **⌘R** to run, **⌘U** to run tests.
 
@@ -80,6 +80,14 @@ App Store purchase flow. Generated images/videos are written to the app's docume
 
 ## Tests
 
-`AuraFitTests` covers the score engine, color-harmony math, file storage, StoreKit entitlement
-logic (with mocks), the analysis scoring path (with mocked Vision signals), statistics, and the
-SwiftData models/repository.
+`AuraFitTests` contains 100 unit/integration checks covering the score engine, color-harmony
+math, file storage, StoreKit entitlement logic (with mocks), analysis scoring (with mocked
+Vision signals), release configuration, statistics, and SwiftData. `AuraFitUITests` adds a
+deterministic clean-install/import-to-result simulator smoke. Physical camera, StoreKit sandbox,
+accessibility, signing, and App Store Connect checks remain manual release gates.
+
+## TestFlight readiness
+
+Start with `docs/TESTFLIGHT_READINESS.md` for the canonical 26-task execution backlog and
+`docs/RELEASE_CHECKLIST.md` for sign-off. The repository is the source of truth; the Jira and
+Notion import copy is `docs/mirrors/TESTFLIGHT_BACKLOG.csv`.

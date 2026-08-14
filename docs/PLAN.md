@@ -1,6 +1,6 @@
 # AuraFit — Program Plan
 
-Owner: Priyansh Chordia · Created 2026-07-28 · Last updated 2026-07-28
+Owner: Priyansh Chordia · Created 2026-07-28 · Last updated 2026-07-29
 Status: **Phase 0 in progress** · Horizon: v1.0 → v2.0
 
 ---
@@ -240,75 +240,57 @@ loop verified on a physical iPhone · store submission prepared.
 
 **Phase 0 estimate: ~11 ideal days** (≈3 calendar weeks at the 1.6× factor).
 
-### 4.6 Phase 0 progress — as of 2026-07-28
+### 4.6 Phase 0 progress — as of 2026-07-29
 
-**Engineering is essentially complete.** 16 tasks closed in one orchestrated session across
-four parallel agents: `ENG-001/002/004/005/006/007/008/009/010/011/012/013/014`, `LEG-001`,
-`LEG-007`, `MON-001`.
+**The audited repository and simulator release candidate are code-complete; the release is
+`human_review_required`.** The repo is registered against App Factory 0.4.0 and passes its
+canonical project-registration verifier.
 
-Verified on the merged tree, not per-package:
+Verified on the current tree:
 
-- **88/88 unit tests pass** (was 50 at the audit, 67 before this session).
-- **Release build succeeds.**
-- **Release bundle audited:** `AuraFit.storekit` absent; `PrivacyInfo.xcprivacy`,
-  `MobileCLIPImageEncoder.mlmodelc`, `CLIPLabelEmbeddings.json` present;
-  `ITSAppUsesNonExemptEncryption = false`; zero `MockPurchaseProvider` symbols and no
-  `UITestInMemoryStore` string in the Release binary.
+- **97/97 unit and integration tests pass.**
+- **The deterministic import-to-result UI smoke passes** with DEBUG-only in-memory and
+  Vision stubs.
+- **Release build succeeds warning-free** for unsigned generic iOS device and Simulator destinations.
+- **Release bundle audited:** `AuraFit.storekit`, MobileCLIP/model assets, and DEBUG-only
+  test switches are absent; `PrivacyInfo.xcprivacy` declares the file-timestamp API reason;
+  `ITSAppUsesNonExemptEncryption = false`.
+- Product copy and privacy disclosures describe the shipping Vision/local-analysis stack
+  and deterministic style heuristic without presenting it as a learned image model.
 
-**What still gates the phase — none of it is code:**
+Remaining release gates require owner credentials, hardware, or external systems:
 
 | Key | Blocker | Needs |
 |---|---|---|
-| `AURA-ENG-038` | **MobileCLIP must be removed or replaced** — `DEC-004`. Top engineering item | An MIT/Apache encoder converted and palettized, or a decision to ship v1.0 heuristic-only |
-| `AURA-QA-001` | UI smoke test still fails; the simulator cannot run Vision pose or segmentation | The DEBUG-gated Vision stub |
-| `AURA-QA-002` | The core loop has still never been verified on a physical device | A person, a phone, the §5.2 matrix |
-| `AURA-LEG-002` | MobileCLIP commercial licence unresolved | A human reading Apple's model licence. **Blocks M3** |
-| `AURA-MKT-*`, `AURA-OPS-*`, `AURA-DES-*` | Store assets, landing page, release automation, featuring nomination | Owner time; the featuring nomination is due **Aug 10** |
+| `AURA-QA-002` | Physical-device matrix not executed | A real iPhone and the §5.2 evidence matrix |
+| `AURA-OPS-002/QA-006` | No signed archive or internal TestFlight build | Distribution signing and App Store Connect access |
+| `AURA-MON-*` | StoreKit sandbox behavior and product metadata not verified | Active App Store Connect products and sandbox account |
+| `AURA-LEG/MKT-*` | Hosted privacy/support URLs and store metadata not verified | Public URLs plus App Store Connect entries |
+| `AURA-QA-004` | Accessibility/layout review not complete | VoiceOver, Dynamic Type, appearance, and device-matrix review |
 
-The audit's original top finding is unchanged: **the loop has never run end to end on real
-hardware.** Every engineering fix above is verified by unit tests and inspection only.
+The previous MobileCLIP licensing blocker is resolved by removing the model from the shipping
+target. The simulator smoke proves navigation and persistence wiring, not camera/model quality
+on real hardware.
 
-### 4.7 Execution queue — the next 20 tasks
+### 4.7 TestFlight execution queue
 
-Ordered by dependency and hard date. **Owner** column: `agent` = executable now without the
-owner present; `owner` = needs Priyansh (device in hand, App Store Connect access, or a hosting
-decision). The two tracks are deliberately parallel — they use different resources.
+`TESTFLIGHT_READINESS.md` supersedes the former 20-item queue and is the canonical source for
+TestFlight task IDs, dependencies, statuses, lower-model implementation packets, acceptance
+criteria, stop conditions, and evidence paths. `RELEASE_CHECKLIST.md` is the sign-off view.
 
-| # | Key | Task | Owner | Est | Depends on |
-|---|---|---|---|---|---|
-| 1 | `ENG-038` | Remove MobileCLIP: delete the two resource files, fix the 4 canary tests, confirm the heuristic path and `PhotoCoach` degrade cleanly | agent | 0.5d | `DEC-004` |
-| 2 | `QA-001` | DEBUG-gated Vision stub so the UI smoke test runs deterministically | agent | 1d | — |
-| 3 | `OPS-001` | CI green on main | agent | 0.3d | 2 |
-| 4 | `ENG-035` | Launch-time orphan sweep for staged originals | agent | 0.5d | — |
-| 5 | `ENG-037` | `FitResultView` full-resolution main-thread decode | agent | 0.3d | — |
-| 6 | — | Signed Release build installed on the iPhone | agent | 0.2d | 1–5 |
-| 7 | **`QA-002`** | **Physical-device QA matrix (§5.2) — THE GATE** | **owner** | 0.5d | 6 |
-| 8 | — | Triage and fix whatever QA-002 finds | agent | **unknown** | 7 |
-| 9 | `MKT-006` | **Apple featuring nomination — DUE AUG 10** | **owner** | 0.5d | 11 (light) |
-| 10 | `MKT-004` | Landing page live — unblocks the hosted privacy-policy URL | owner | 1d | 11 |
-| 11 | `MKT-001` | Positioning one-pager: one sentence, three proof points, named audience | agent draft | 0.5d | — |
-| 12 | `MKT-002` | ASO title / subtitle / keyword field (§6.9.2 decisions) | agent draft | 1d | 11 |
-| 13 | `DES-002` | App Store screenshots + app preview video (live coach leads) | owner | 1.5d | 7 |
-| 14 | `LEG-008` | Reviewer test instructions + supplied test image | agent draft | 0.3d | — |
-| 15 | `LEG-005` | Age-rating questionnaire, 2026 schema (wellness question needs care) | owner | 0.5d | — |
-| 16 | `LEG-004` | Privacy nutrition labels — "Data Not Collected" | owner | 0.3d | — |
-| 17 | `LEG-003` | Terms of service (Apple standard EULA or custom) | agent draft | 0.3d | — |
-| 18 | `OPS-002` | App Store Connect API key + CI signing | owner | 0.5d | — |
-| 19 | `QA-006` | TestFlight internal build + smoke pass | agent | 0.5d | 8, 18 |
-| 20 | `QA-007` | TestFlight external, 15–30 recruited testers (Beta App Review) | owner | 1d | 19 |
+The execution waves are:
 
-**Notes on the queue**
+1. Account and identity: `AURA-OPS-009` → `010` → `011`.
+2. Local and signed-device gates: `AURA-OPS-005`/`012A`, then
+   `AURA-QA-002`/`004`/`005`.
+3. StoreKit and compliance in parallel: `AURA-MON-008`, `AURA-QA-010`,
+   `AURA-MKT-004`, `AURA-LEG-003`/`004`/`005`/`008`, and `AURA-OPS-014`.
+4. Final archive and upload: `AURA-OPS-012B` → `013`.
+5. Distribution: `AURA-QA-006` internal → `007` external → `008` feedback → `009` go/no-go.
+6. Automation and board copies: `AURA-OPS-003` and `007` after the manual path is proven.
 
-- **Task 8 is deliberately unestimated.** The loop has never run on hardware; pretending to
-  know the fix cost would be fake precision. It is the largest schedule risk in Phase 0 and the
-  reason QA-002 is sequenced before the store assets rather than after.
-- **Task 9 has the only hard external date.** Featuring nominations need 3 weeks' lead minimum.
-  It does *not* depend on the app being finished — file it with what exists.
-- **`ENG-003` (Git LFS for the 22MB model) is cancelled** — removing MobileCLIP removes the
-  binary that raised the question.
-- **`DES-001` (onboarding rewrite) is already done**, absorbed into Package C's copy work.
-- Tasks 11, 12, 14, 17 are drafts an agent can produce; they still need owner review before
-  they go near App Store Connect.
+App Store screenshots, ASO, featuring, and launch content remain in the broader program but
+do not block the first internal TestFlight build.
 
 ---
 
@@ -321,7 +303,8 @@ decision). The two tracks are deliberately parallel — they use different resou
 | `AURA-QA-001` | Redesign the UI smoke test around a Vision stub | 0 | 1d | `#if DEBUG` launch-argument-gated stub; CI green; impossible to activate in Release |
 | `AURA-QA-003` | Regression suite definition | 0 | 0.5d | Named suite run before every submission |
 | `AURA-QA-004` | Accessibility pass — VoiceOver + Dynamic Type XL | 0 | 1d | Scan, Result, History fully operable |
-| `AURA-QA-005` | Performance budget | 1 | 0.5d | Cold launch < 1.5s; analysis < 4s; 60fps history scroll; documented and re-measured per release |
+| `AURA-QA-005` | Performance, interruption, storage, and thermal smoke | 0 | 0.5d | Budgets measured on device; interruptions recover; no blocking thermal/storage defect |
+| `AURA-QA-010` | StoreKit sandbox/TestFlight matrix | 0 | 1d | Purchase, restore, expiry/refund/revoke, offline entitlement, and price display verified |
 
 > **Why `AURA-QA-001` matters:** the simulator *cannot* validate this app's core loop.
 > `VNDetectHumanBodyPoseRequest` and person segmentation do not run there — observed
@@ -409,14 +392,21 @@ Manual, on a real iPhone. Results recorded in `docs/TEST_PLAN.md`. Minimum matri
 
 | Key | Task | Phase | Est | Acceptance |
 |---|---|---|---|---|
-| `AURA-OPS-001` | Fix CI (currently red — see `AURA-QA-001`) | 0 | 0.3d | Green on main |
+| `AURA-OPS-001` | Verify CI on the exact release commit | 0 | 0.3d | 101/101 on the GitHub-hosted environment; result bundle retained |
 | `AURA-OPS-002` | App Store Connect API key + CI signing | 0 | 0.5d | CI can upload to TestFlight unattended |
-| `AURA-OPS-003` | Automated TestFlight upload on tag | 0 | 1d | Tag → build → signed → uploaded, no manual Xcode step. **Use Xcode Cloud** — 25 compute hours/month are included with the existing $99/yr membership (≈100–300 runs at this app's size) and it manages signing entirely, removing the whole class of certificate pitfalls. Keep GitHub Actions for PR build+test |
+| `AURA-OPS-003` | Automate archive/upload after the manual path passes | Post-beta | 1d | Reproducible automated upload without weakening signing or release gates |
 | `AURA-OPS-004` | Local MetricKit diagnostics + Organizer review habit | 0 | 0.5d | `MXMetricManager` subscriber writing a capped local ring buffer; Settings → Diagnostics share sheet; nothing auto-transmitted. Xcode Organizer Crashes/Metrics reviewed each release. dSYMs uploaded (never stripped) |
 | `AURA-OPS-005` | Release checklist automation | 0 | 0.5d | `docs/RELEASE_CHECKLIST.md` machine-checkable where possible |
 | `AURA-OPS-006` | **Decide the measurement approach** (§2.4) | 0 | 0.5d | `DECISIONS.md` entry + implementation. **Blocks M4.** |
-| `AURA-OPS-007` | Jira + Notion board setup mirroring §1.2 | 0 | 1d | Schema created; this plan imported as CSV (Jira: System → External System Import; only `Summary` is strictly required). Carry each task key in an **External issue ID** column so re-imports update instead of duplicating. Notion imports the same CSV. **One-way sync only** — this file stays the source of truth; regenerate the mirrors, never merge back |
+| `AURA-OPS-007` | Jira + Notion one-way mirrors | 0 | 1d | Import `docs/mirrors/TESTFLIGHT_BACKLOG.csv`; repo task definitions remain authoritative |
 | `AURA-OPS-008` | Support inbox + review-response workflow | 0 | 0.3d | Address live before launch |
+| `AURA-OPS-009` | Account, agreements, roles, banking, and tax verification | 0 | 0.5d | All Apple-account prerequisites recorded without secrets |
+| `AURA-OPS-010` | Explicit App ID and App Store Connect record | 0 | 0.5d | Exact bundle ID and app record verified |
+| `AURA-OPS-011` | Release identity freeze | 0 | 0.2d | Version and unique build number recorded before archive |
+| `AURA-OPS-012A` | Signed Release install on physical device | 0 | 0.3d | Release configuration installs and launches |
+| `AURA-OPS-012B` | Final signed archive validation | 0 | 0.5d | Archive validates and immutable identifiers are recorded |
+| `AURA-OPS-013` | Upload and processing clearance | 0 | 0.3d + Apple wait | Build finishes App Store Connect processing |
+| `AURA-OPS-014` | Export-compliance determination | 0 | 0.3d | Human-reviewed answer matches binary and App Store Connect |
 
 ### 6.5 Marketing — `MKT`
 
@@ -465,6 +455,7 @@ Manual, on a real iPhone. Results recorded in `docs/TEST_PLAN.md`. Minimum matri
 | `AURA-MON-005` | Intro offer / free trial decision | 1 | 0.5d | Configured in App Store Connect if adopted |
 | `AURA-MON-006` | Conversion review | 1 | 0.5d | Reviewed against App Store Connect subscription metrics |
 | `AURA-MON-007` | Premium repositioned around the coaching programme | 2 | 1d | Subscription sells lessons + personalized feedback + history |
+| `AURA-MON-008` | Production App Store Connect StoreKit catalog | 0 | 1d | Exact product IDs, subscription group, metadata, prices, availability, and review assets verified |
 
 > **Charter constraint:** `docs/HANDOFF.md` — *do not expand monetization before the core loop
 > is verified.* `AURA-MON-007` is therefore blocked on `AURA-QA-002`, not merely on Phase 1.
@@ -726,3 +717,7 @@ server-scale only and violates the charter.
 | 2026-07-28 | **CR-004:** expanded to a full program plan — planning method, board schema, CR process, planning-quality metrics, QA/DATA/DES/LEG/OPS/MKT/UA/MON/PM workstreams, milestones, risk register, variance log. |
 | 2026-07-28 | Phase 0 engineering executed: 16 tasks closed across 4 parallel agents, 88/88 tests, Release bundle audited. Variance log and planning misses PM-04..PM-07 recorded. |
 | 2026-07-28 | Market and tooling research folded in: §6.9 market intelligence, ASO decisions, UA channel ranking, monetization benchmarks. Corrected three planning misses (§10.1); added `AURA-LEG-007/008`, `AURA-R12/R13`; decided §2.4 measurement and `AURA-OPS-003` release automation. |
+| 2026-07-29 | TestFlight/App Factory audit: upgraded registration to standard 0.4.0, corrected privacy/claim/release configuration, added release regressions and UI manifests, and verified 98/98 tests plus a warning-clean unsigned Release simulator build. Status remains `human_review_required` for device, signing, StoreKit, accessibility, URLs, and App Store Connect gates. |
+| 2026-07-29 | Replaced the stale release queue with `TESTFLIGHT_READINESS.md`: 26 dependency-ordered tasks with lower-model packets, Apple-source gates, evidence paths, reviewer drafts, and one-way Jira/Notion CSV. |
+| 2026-07-29 | Expanded the TestFlight queue into 26 focused canonical task files with 179 stable, executable subtasks; added a shared execution contract, structural validator, and canonical-path mirror metadata. |
+| 2026-07-29 | Executed the repository-side TestFlight preparation with lower agents: implemented the shared release gate and CI integration, reviewer/support drafts, Apple-compliance and StoreKit preflights, and one honest evidence/runbook pack for every task. External Apple, device, hosting, tester, and mirror actions remain blocked until owner inputs/access exist. |

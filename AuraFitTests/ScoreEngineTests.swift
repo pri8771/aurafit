@@ -79,6 +79,38 @@ final class ScoreEngineTests: XCTestCase {
         let score = engine.score(from: signals(poseDetected: false))
         let pose = score.metric(.posePosture)?.value ?? 0
         XCTAssertEqual(pose, 52)
+        XCTAssertLessThanOrEqual(score.overall, 49)
+    }
+
+    func testUnusablePhotoCannotReceiveAHighScoreFromStrongOutfitSignals() {
+        let unusable = signals(
+            cohesion: 0.99,
+            harmony: 0.99,
+            posture: 0.95,
+            fullBody: false,
+            coverage: 0.95,
+            brightness: 0.08,
+            contrast: 0.05,
+            sharpness: 0.05,
+            exposure: 0.1,
+            bgComplexity: 0.05
+        )
+
+        XCTAssertLessThanOrEqual(engine.score(from: unusable).overall, 49)
+    }
+
+    func testBorderlinePhotoIsCappedBelowSeventy() {
+        let borderline = signals(
+            cohesion: 0.99,
+            harmony: 0.99,
+            posture: 0.95,
+            contrast: 0.20,
+            sharpness: 0.34,
+            exposure: 0.46,
+            bgComplexity: 0.05
+        )
+
+        XCTAssertLessThanOrEqual(engine.score(from: borderline).overall, 69)
     }
 
     func testLabelMatchesScore() {

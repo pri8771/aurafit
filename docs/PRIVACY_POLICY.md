@@ -1,8 +1,8 @@
 # AuraFit Privacy Policy
 
-**App:** AuraFit AI (`com.pchordia.aurafit`)
-**Effective:** 2026-07-28
-**Last updated:** 2026-07-28
+**App:** AuraFit (`com.pchordia.aurafit`)
+**Effective:** 2026-07-29
+**Last updated:** 2026-07-29
 
 > **Keep in sync.** This document and the in-app policy screen
 > (`AuraFit/Features/Settings/PrivacyPolicyView.swift`) are the same policy in two places.
@@ -31,10 +31,10 @@ deletes all of it.
 
 ## How photos are analyzed
 
-Analysis runs entirely on your device using Apple frameworks and a model bundled inside the
-app: Apple's Vision framework for body pose and person segmentation, Core Image for color
-analysis, and a bundled MobileCLIP image encoder (Core ML) for the style match. Nothing is
-uploaded for processing. There is no cloud step and no offline queue waiting to sync.
+Analysis runs entirely on your device. Apple's Vision framework estimates body pose and person
+segmentation, Core Image measures image and color signals, and AuraFit uses a deterministic
+color-based heuristic for the closest style match. No learned outfit-classifier model is
+bundled in this release. Nothing is uploaded for processing.
 
 Scores are subjective guidance about an outfit and a photograph. They are not a measurement of
 any person, and the app does not identify, recognize, or profile anyone.
@@ -49,14 +49,15 @@ any person, and the app does not identify, recognize, or profile anyone.
 - We include no third-party libraries or code.
 
 The app's privacy manifest (`PrivacyInfo.xcprivacy`) declares no collected data types, no
-tracking, and no tracking domains, which matches the behaviour described here.
+tracking, and no tracking domains. It also declares the approved file-timestamp reason used to
+remove old, unreferenced media from AuraFit's own app container.
 
 ## Permissions the app asks for
 
 - **Camera** — only to capture the photo you are about to scan. Frames are analyzed on device
   and the camera is not used in the background.
-- **Photo Library (read)** — only when you choose to import an existing photo. AuraFit reads
-  the single image you pick.
+- **Import from Photos** — uses Apple's system photo picker. AuraFit receives only the image
+  you select and does not request broad Photo Library read access.
 - **Photo Library (add)** — only when you tap Save or turn on auto-save, so scorecards and
   reveal clips can be written to your library.
 
@@ -79,9 +80,9 @@ provides on device. Apple's handling of purchase data is governed by
 
 ## Links that leave the app
 
-Three buttons open Apple's own pages in your system browser: Manage Subscription, Terms of Use
-(Apple's standard EULA), and Apple's privacy policy where it is referenced above. Opening a
-link sends no AuraFit data along with it. These are the only outbound destinations in the app.
+Manage Subscription and Terms of Use open Apple's own pages in your system browser. Apple's
+privacy policy is linked from this document for the StoreKit explanation. Opening a link sends
+no AuraFit data along with it.
 
 ## Children
 
@@ -100,4 +101,7 @@ before the change ships, and the "Last updated" date will move.
 
 ## Contact
 
-Questions about this policy can be sent to the developer through the app's App Store listing.
+Questions about this policy can be sent to **support@priyanshchordia.com** or through the
+public support page at **https://priyanshchordia.com/apps/aurafit/support/**. The hosted
+policy copy lives at **https://priyanshchordia.com/apps/aurafit/privacy/** (published
+2026-08-13; owner line-by-line approval tracked by `AURA-MKT-004`).

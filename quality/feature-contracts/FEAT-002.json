@@ -1,0 +1,48 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pri8771/iOS_app_factory_rules/main/schemas/feature-contract.schema.json",
+  "id": "FEAT-002",
+  "name": "Explain and export a fit result",
+  "status": "verification_pending",
+  "userOutcome": "A user can understand the score's subjective provenance and create a scorecard or entitled reveal clip that opens in the system share or Photos flow.",
+  "entryPoints": [
+    "Fresh scan result",
+    "History detail"
+  ],
+  "productionDataSource": "Persisted FitSession values plus the locally stored original image, rendered by ScorecardRenderer or RevealVideoRenderer.",
+  "states": [
+    "content",
+    "image_unavailable",
+    "rendering_scorecard",
+    "rendering_video",
+    "permission_denied",
+    "share_presented",
+    "saved",
+    "failed",
+    "cancelled"
+  ],
+  "errorBehavior": "Rendering and Photos-save failures do not report success and leave the saved session intact. A missing original uses an explicit visual placeholder and never fabricates a user photo.",
+  "duplicateProtectionRequired": true,
+  "persistenceRequired": true,
+  "layoutScenarios": [
+    "small supported iPhone",
+    "large supported iPhone",
+    "Dynamic Type accessibility sizes",
+    "long tips and style labels"
+  ],
+  "accessibilityRequirements": [
+    "Metric values and style-lock state are announced",
+    "Share, Save, and Reveal controls have distinct labels and disabled state",
+    "Score meaning is available without relying on color"
+  ],
+  "prohibitedBehavior": [
+    "Do not report saved or shared before the system operation succeeds",
+    "Do not call a heuristic result a model confidence",
+    "Do not remove watermarks or unlock reveal clips without entitlement"
+  ],
+  "acceptanceTests": [
+    "ScoreEngineTests",
+    "CoachAndPhotoTipsTests",
+    "Manual open-and-inspect of scorecard PNG and reveal video on device",
+    "Manual Photos add-permission grant, deny, and revoke checks"
+  ]
+}

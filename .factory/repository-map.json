@@ -1,0 +1,100 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pri8771/iOS_app_factory_rules/main/schemas/repository-map.schema.json",
+  "schemaVersion": "1.0.0",
+  "repositoryType": "product",
+  "entryPoints": [
+    "AGENTS.md",
+    ".factory/repository-map.json",
+    ".factory/project-context.json",
+    "docs/README.md"
+  ],
+  "canonicalDocuments": {
+    "projectIdentity": ".factory/project-context.json",
+    "standardsLock": ".factory/standard-lock.json",
+    "libraryCatalog": ".factory/library-catalog.json",
+    "documentationIndex": "docs/README.md",
+    "currentStatus": "docs/STATUS.md",
+    "currentArchitecture": "docs/ARCHITECTURE.md",
+    "featureInventory": "docs/FEATURES.md",
+    "programPlan": "docs/PLAN.md",
+    "bugs": "docs/BUGS.md",
+    "decisions": "docs/DECISIONS.md",
+    "risks": "docs/RISKS.md",
+    "assumptions": "docs/ASSUMPTIONS.md",
+    "testPlan": "docs/TEST_PLAN.md",
+    "releaseReadiness": "docs/RELEASE_CHECKLIST.md",
+    "testFlightReadiness": "docs/TESTFLIGHT_READINESS.md",
+    "privacyPolicy": "docs/PRIVACY_POLICY.md",
+    "handoff": "docs/HANDOFF.md",
+    "reusableComponents": "docs/REUSABLE_COMPONENTS.md"
+  },
+  "locations": {
+    "sourceRoots": [
+      "AuraFit"
+    ],
+    "testRoots": [
+      "AuraFitTests",
+      "AuraFitUITests"
+    ],
+    "buildConfiguration": [
+      "AuraFit.xcodeproj/project.pbxproj",
+      "AuraFit.xcodeproj/xcshareddata/xcschemes/AuraFit.xcscheme"
+    ],
+    "ciConfiguration": [
+      ".github/workflows/ci.yml"
+    ],
+    "uiContracts": [
+      "quality/ui/screens.yaml",
+      "quality/ui/journeys.yaml"
+    ],
+    "featureContracts": "quality/feature-contracts",
+    "completionReports": "quality/completion-reports",
+    "qualityEvidence": "quality/evidence",
+    "testFlightTaskPlans": "docs/testflight/tasks",
+    "testFlightTaskMirror": "docs/mirrors/TESTFLIGHT_BACKLOG.csv",
+    "libraryCatalog": ".factory/library-catalog.json",
+    "reusableComponents": "docs/REUSABLE_COMPONENTS.md"
+  },
+  "taskRoutes": {
+    "onboarding": [
+      ".factory/project-context.json",
+      "docs/STATUS.md",
+      "docs/ARCHITECTURE.md",
+      "docs/FEATURES.md"
+    ],
+    "featureWork": [
+      "docs/STATUS.md",
+      "docs/ARCHITECTURE.md",
+      "quality/feature-contracts"
+    ],
+    "bugFix": [
+      "docs/BUGS.md",
+      "docs/ARCHITECTURE.md",
+      "docs/TEST_PLAN.md"
+    ],
+    "reusableInfrastructure": [
+      ".factory/library-catalog.json",
+      "docs/REUSABLE_COMPONENTS.md",
+      "docs/ARCHITECTURE.md"
+    ],
+    "release": [
+      "docs/STATUS.md",
+      "docs/TESTFLIGHT_READINESS.md",
+      "docs/TEST_PLAN.md",
+      "docs/RELEASE_CHECKLIST.md",
+      "docs/PRIVACY_POLICY.md",
+      "quality/evidence"
+    ]
+  },
+  "nonAuthoritative": [
+    "docs/PROJECT_DOCUMENTATION.md",
+    "quality/feature-contracts/EXAMPLE.json",
+    "quality/completion-reports/EXAMPLE.json"
+  ],
+  "notes": [
+    "docs/PLAN.md owns approved program planning but not current verification status.",
+    "docs/TESTFLIGHT_READINESS.md is the canonical TestFlight index; linked files in docs/testflight/tasks own each task definition, subtask procedure, acceptance criteria, and evidence contract.",
+    "Jira and Notion are non-authoritative one-way mirrors of repository task data.",
+    "Code and generated build products remain authoritative for implemented release behavior."
+  ]
+}

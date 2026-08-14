@@ -25,9 +25,10 @@ specific coaching plus a result worth saving or sharing.
 
 | ID | Feature | Status | Contract |
 |---|---|---|---|
-| AURA-CORE-001 | Scan/import to result | verification_pending | Worker detail pending |
-| AURA-CORE-002 | Result explanation and credibility | verification_pending | Worker detail pending |
-| AURA-EXPORT-001 | Save/share image and reveal media | verification_pending | Worker detail pending |
-| AURA-DATA-001 | History, persistence, deletion | verification_pending | Worker detail pending |
-| AURA-STORE-001 | Free limits and Pro entitlement | verification_pending | Worker detail pending |
-| AURA-PRIV-001 | Privacy release artifacts | planned | Worker detail pending |
+| AURA-CORE-001 | Scan/import to result | verification_pending | `quality/feature-contracts/FEAT-001.json` |
+| AURA-CORE-002 | Result explanation and credibility | verification_pending | `quality/feature-contracts/FEAT-002.json` |
+| AURA-EXPORT-001 | Save/share image and reveal media | verification_pending | `quality/feature-contracts/FEAT-002.json` |
+| AURA-DATA-001 | History, persistence, deletion | verification_pending | `quality/feature-contracts/FEAT-003.json` |
+| AURA-STORE-001 | Free limits and Pro entitlement | verification_pending | `quality/feature-contracts/FEAT-004.json` |
+| AURA-PRIV-001 | Privacy release artifacts | human_review_required | `quality/feature-contracts/FEAT-005.json` |
+| AURA-REL-001 | TestFlight beta distribution | human_review_required | `quality/feature-contracts/FEAT-006.json` |

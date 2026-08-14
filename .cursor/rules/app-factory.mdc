@@ -1,15 +1,19 @@
 ---
-description: App Factory project registration and quality rules
+description: App Factory project registration, quality, reuse-first, and LLM navigation rules
 globs:
 alwaysApply: true
 ---
 
-Before editing this repository, read:
+Use this context path before editing:
 
-- `.factory/project-context.json`
-- `.factory/standard-lock.json`
-- `.factory/AGENTS.factory.md`
-- `quality/quality-manifest.json`
-- relevant project docs and feature contracts
+1. `.factory/repository-map.json`
+2. `.factory/project-context.json`
+3. `.factory/standard-lock.json`
+4. `docs/README.md`
+5. Only the task-relevant canonical documents and feature contracts
 
-The `projectType` field is authoritative. Do not re-scaffold an existing project. Do not use undisclosed fake production data, disconnected controls, or unverified completion claims. Report checks run and checks not run. `code_complete` is not `done`.
+Do not scan the entire repository by default. Use the repository map and documentation index to retrieve the smallest authoritative context set.
+
+The `projectType` field is authoritative. Do not re-scaffold an existing project. Search `.factory/library-catalog.json` before implementing cross-cutting infrastructure. Prefer released packages with thin product adapters; otherwise keep local generic modules extraction-ready and record them in `docs/REUSABLE_COMPONENTS.md`.
+
+Do not create duplicate documentation authorities, use undisclosed fake production data, add disconnected controls, or make unverified completion claims. Report checks run and checks not run. `code_complete` is not `done`.

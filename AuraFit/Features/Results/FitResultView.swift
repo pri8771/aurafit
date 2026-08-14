@@ -98,6 +98,7 @@ struct FitResultView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.top, AFSpacing.sm)
+        .accessibilityIdentifier("aurafit.result.root.container")
     }
 
     private var personaCard: some View {
@@ -157,6 +158,7 @@ struct FitResultView: View {
                 Text("Breakdown")
                     .font(AFTypography.title3(.bold))
                     .foregroundStyle(AFColors.textPrimary)
+                    .accessibilityIdentifier("aurafit.result.breakdown.heading")
                 ForEach(metrics) { metric in
                     AFMetricBar(label: metric.title, value: metric.value, systemImage: metric.systemImage)
                 }
@@ -170,7 +172,7 @@ struct FitResultView: View {
 
     /// Shown wherever a score is broken down, so the numbers read as craft feedback on the
     /// outfit and the photograph rather than as a measurement of the person in the frame.
-    static let scoreDisclaimer = "These scores rate the outfit and the photograph, not you. They're subjective styling and photography guidance from an on-device model, not a measurement of anything about a person."
+    static let scoreDisclaimer = "These scores rate the outfit and the photograph, not you. They're subjective styling and photography guidance from on-device analysis, not a measurement of anything about a person."
 
     private var tipsCard: some View {
         AFGlassCard {

@@ -101,6 +101,7 @@ struct RootView: View {
                     .tag(tab)
                     .tabItem {
                         Label(tab.title, systemImage: tab.systemImage)
+                            .accessibilityIdentifier("aurafit.tab.\(tab.title.lowercased()).button")
                     }
             }
         }

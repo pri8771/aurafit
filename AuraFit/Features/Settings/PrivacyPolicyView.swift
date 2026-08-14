@@ -15,7 +15,7 @@ struct PrivacyPolicyView: View {
                 ForEach(Self.sections) { section in
                     PolicySectionView(section: section)
                 }
-                Text("Effective \(Self.effectiveDate). AuraFit AI, bundle ID com.pchordia.aurafit.")
+                Text("Effective \(Self.effectiveDate). AuraFit, bundle ID com.pchordia.aurafit.")
                     .font(AFTypography.caption())
                     .foregroundStyle(AFColors.textTertiary)
             }
@@ -52,7 +52,7 @@ struct PrivacyPolicyView: View {
 
     // MARK: - Content
 
-    static let effectiveDate = "28 July 2026"
+    static let effectiveDate = "29 July 2026"
 
     struct PolicySection: Identifiable {
         let title: String
@@ -75,7 +75,7 @@ struct PrivacyPolicyView: View {
         PolicySection(
             title: "How photos are analyzed",
             body: [
-                "Analysis runs entirely on your device using Apple frameworks and a model bundled inside the app: the Vision framework for body pose and person segmentation, Core Image for color analysis, and a MobileCLIP image encoder running on Core ML for the style match. Nothing is uploaded for processing. There is no cloud step and no offline queue waiting to sync.",
+                "Analysis runs entirely on your device. Apple's Vision framework estimates body pose and person segmentation, Core Image measures image and color signals, and AuraFit uses a deterministic color-based heuristic for the closest style match. No learned outfit-classifier model is bundled in this release. Nothing is uploaded for processing.",
                 "Scores are subjective guidance about an outfit and a photograph. They are not a measurement of any person, and the app does not identify, recognize, or profile anyone."
             ]
         ),
@@ -93,7 +93,7 @@ struct PrivacyPolicyView: View {
             title: "Permissions the app asks for",
             bullets: [
                 "Camera, only to capture the photo you are about to scan. The camera is not used in the background.",
-                "Photo Library read access, only when you choose to import an existing photo. AuraFit reads the single image you pick.",
+                "Import uses Apple's system photo picker. AuraFit receives only the image you select and does not request broad Photo Library read access.",
                 "Photo Library add access, only when you tap Save or turn on auto-save, so scorecards and reveal clips can be written to your library."
             ]
         ),

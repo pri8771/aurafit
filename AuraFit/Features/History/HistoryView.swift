@@ -40,6 +40,7 @@ struct HistoryView: View {
             .afScreenBackground()
             .toolbarBackground(.hidden, for: .navigationBar)
         }
+        .accessibilityIdentifier("aurafit.history.root.container")
     }
 
     private var content: some View {

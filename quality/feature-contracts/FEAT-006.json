@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pri8771/iOS_app_factory_rules/main/schemas/feature-contract.schema.json",
+  "id": "FEAT-006",
+  "name": "TestFlight beta distribution",
+  "status": "human_review_required",
+  "userOutcome": "An authorized beta tester can install the processed AuraFit build from TestFlight, complete the core loop, exercise sandbox purchases, and submit useful feedback.",
+  "entryPoints": [
+    "TestFlight > AuraFit > Install",
+    "AuraFit launch",
+    "TestFlight feedback"
+  ],
+  "productionDataSource": "The signed Release archive, App Store Connect app and StoreKit records, TestFlight processing/review state, and repository evidence under quality/evidence/testflight.",
+  "states": [
+    "upload_eligible",
+    "processing",
+    "internal_testing",
+    "external_beta_review",
+    "external_testing",
+    "expired_or_replaced"
+  ],
+  "errorBehavior": "A failed gate remains blocked or verification_pending with exact evidence. No task is marked done by substituting simulator/local StoreKit evidence for signing, physical-device, sandbox, upload, or TestFlight behavior.",
+  "duplicateProtectionRequired": true,
+  "persistenceRequired": true,
+  "layoutScenarios": [
+    "oldest available supported iPhone",
+    "current supported iPhone",
+    "small supported display",
+    "Dynamic Type accessibility sizes"
+  ],
+  "accessibilityRequirements": [
+    "Core beta path is operable with VoiceOver",
+    "Core screens remain usable at accessibility text sizes",
+    "Permission and purchase recovery instructions are announced and actionable"
+  ],
+  "prohibitedBehavior": [
+    "Do not upload an archive built from a commit that has not passed the release gate",
+    "Do not reuse an App Store Connect build number",
+    "Do not commit Apple credentials, signing material, receipts, or tester personal data",
+    "Do not treat Jira or Notion as authoritative over repository task definitions",
+    "Do not invite external testers before required beta information and review gates are complete"
+  ],
+  "acceptanceTests": [
+    "All TF-G1 checklist items have task-scoped evidence",
+    "An internal tester installs the processed build from TestFlight and passes the release smoke",
+    "Production StoreKit products display and pass purchase restore expiry revoke and offline tests",
+    "Public privacy and support URLs work signed out and metadata matches the binary",
+    "For external distribution the build passes TestFlight App Review and an external tester installs it",
+    "Beta feedback is triaged and an explicit go or no-go decision is recorded"
+  ]
+}

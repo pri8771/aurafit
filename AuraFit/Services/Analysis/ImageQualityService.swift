@@ -81,11 +81,11 @@ struct ImageQualityService: @unchecked Sendable {
         mm.inputImage = grayImage
         mm.extent = extent
         guard let output = mm.outputImage else { _ = filter; return 0.5 }
-        var bitmap = [UInt8](repeating: 0, count: 8) // 2 pixels: min row, max row
+        var bitmap = [UInt8](repeating: 0, count: 8) // 2 pixels: min, max
         context.render(output,
                        toBitmap: &bitmap,
                        rowBytes: 8,
-                       bounds: CGRect(x: 0, y: 0, width: 1, height: 2),
+                       bounds: CGRect(x: 0, y: 0, width: 2, height: 1),
                        format: .RGBA8,
                        colorSpace: CGColorSpaceCreateDeviceRGB())
         let minV = Double(bitmap[0]) / 255

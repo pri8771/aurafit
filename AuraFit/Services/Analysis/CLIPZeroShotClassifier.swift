@@ -4,14 +4,13 @@ import Foundation
 import UIKit
 #endif
 
-/// Zero-shot outfit classification using a bundled MobileCLIP-S0 image encoder
-/// (Apple, `apple/coreml-mobileclip`) and precomputed text-label embeddings.
+/// Optional zero-shot outfit classification for a future, separately licensed
+/// MobileCLIP-S0 image encoder and matching precomputed text-label embeddings.
 ///
-/// The image is embedded on device; persona and garment labels were embedded
-/// offline with the matching MobileCLIP-S0 text encoder and ship as
-/// `CLIPLabelEmbeddings.json`. Classification is cosine similarity in the shared
-/// embedding space, so confidences are real model outputs — unlike the heuristic
-/// fallback, which cannot see garments at all.
+/// AuraFit does not currently ship these assets. If compatible resources are added
+/// later, classification remains local and uses cosine similarity in their shared
+/// embedding space. Without them, initialization fails safely and callers use the
+/// deterministic heuristic.
 struct CLIPZeroShotClassifier {
 
     static let modelResourceName = "MobileCLIPImageEncoder"

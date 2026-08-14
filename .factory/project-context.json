@@ -21,6 +21,12 @@
     "backendAllowed": false,
     "thirdPartyDependenciesAllowed": false
   },
+  "libraryDiscovery": {
+    "policy": "reuse_first",
+    "localCatalog": ".factory/library-catalog.json",
+    "centralCatalog": "pri8771/iOS_app_factory_rules/registry/libraries.json",
+    "reusableComponentsDocument": "docs/REUSABLE_COMPONENTS.md"
+  },
   "agentEntryPoints": {
     "generic": "AGENTS.md",
     "claudeCode": "CLAUDE.md",
@@ -31,11 +37,13 @@
   },
   "requiredReading": [
     "AGENTS.md",
+    ".factory/repository-map.json",
+    ".factory/project-context.json",
+    ".factory/standard-lock.json",
     ".factory/AGENTS.factory.md",
+    ".factory/library-catalog.json",
+    "docs/README.md",
     "quality/quality-manifest.json",
-    "docs/STATUS.md",
-    "docs/ARCHITECTURE.md",
-    "docs/BUGS.md",
-    "docs/DECISIONS.md"
+    "quality/feature-contracts"
   ]
 }

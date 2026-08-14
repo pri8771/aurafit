@@ -61,7 +61,10 @@ struct PaywallView: View {
                 if entitlements.products.isEmpty { await entitlements.loadProducts() }
                 selectedProductID = subscriptions.first?.id ?? ProductCatalog.proYearly
             }
-            .alert("Purchase Error", isPresented: .constant(errorMessage != nil)) {
+            .alert("Purchase Error", isPresented: Binding(
+                get: { errorMessage != nil },
+                set: { if !$0 { errorMessage = nil } }
+            )) {
                 Button("OK") { errorMessage = nil }
             } message: {
                 Text(errorMessage ?? "")
@@ -78,6 +81,7 @@ struct PaywallView: View {
                 if isPro { dismiss() }
             }
         }
+        .accessibilityIdentifier("aurafit.paywall.root.container")
     }
 
     // MARK: - Sections

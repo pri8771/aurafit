@@ -10,7 +10,9 @@ struct ScoreEngine: Sendable {
 
     func score(from signals: AnalysisSignals) -> FitScore {
         let metrics = metricValues(from: signals)
-        let overall = weightedOverall(metrics)
+        let rawOverall = weightedOverall(metrics)
+        let assessment = PhotoQualityGate().assess(signals)
+        let overall = min(rawOverall, assessment.scoreCeiling ?? 100)
         return FitScore(overall: overall, metrics: metrics)
     }
 

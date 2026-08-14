@@ -116,6 +116,7 @@ actor AnalysisPipeline {
             color: colorSignals,
             outfit: outfitSignals
         )
+        let qualityAssessment = PhotoQualityGate().assess(signals)
         let score = scoreEngine.score(from: signals)
         let tips = tipsGenerator.tips(for: score, signals: signals, persona: outfitSignals.persona)
 
@@ -124,7 +125,7 @@ actor AnalysisPipeline {
             .zeroShotClassifier?
             .assessPhotoIssues(image: working)
         let photoTips = photoCoach.tips(signals: signals, issues: issues)
-        let rejectionDetail = photoCoach.rejectionDetail(issues: issues)
+        let rejectionDetail = photoCoach.rejectionDetail(signals: signals, issues: issues)
 
         // (Build scorecard step — actual rendering happens later in the Results layer)
         try await emit(.buildingScorecard, onStep, delay: stepDelay)
@@ -140,7 +141,8 @@ actor AnalysisPipeline {
             diagnostics: .init(
                 poseDetected: poseSignals.detected,
                 segmentationAvailable: segmentationSignals.available,
-                usedOutfitModel: outfitSignals.usedModel
+                usedOutfitModel: outfitSignals.usedModel,
+                photoQualityPassed: qualityAssessment.isAcceptable
             )
         )
     }
@@ -148,6 +150,7 @@ actor AnalysisPipeline {
 
     /// Analyze raw signals only (used by tests / advanced callers).
     func score(for signals: AnalysisSignals) -> FitAnalysisResult {
+        let qualityAssessment = PhotoQualityGate().assess(signals)
         let score = scoreEngine.score(from: signals)
         let tips = tipsGenerator.tips(for: score, signals: signals, persona: signals.outfit.persona)
         return FitAnalysisResult(
@@ -156,10 +159,12 @@ actor AnalysisPipeline {
             tips: tips,
             outfitTags: signals.outfit.tags,
             palette: signals.color.palette,
+            rejectionDetail: photoCoach.rejectionDetail(signals: signals, issues: nil),
             diagnostics: .init(
                 poseDetected: signals.pose.detected,
                 segmentationAvailable: signals.segmentation.available,
-                usedOutfitModel: signals.outfit.usedModel
+                usedOutfitModel: signals.outfit.usedModel,
+                photoQualityPassed: qualityAssessment.isAcceptable
             )
         )
     }

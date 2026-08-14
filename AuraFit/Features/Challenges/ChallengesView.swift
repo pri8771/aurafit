@@ -26,6 +26,7 @@ struct ChallengesView: View {
             .afScreenBackground()
             .toolbarBackground(.hidden, for: .navigationBar)
         }
+        .accessibilityIdentifier("aurafit.challenges.root.container")
     }
 
     private var list: some View {

@@ -15,7 +15,7 @@ protocol OutfitClassifying {
 }
 
 /// Default classifier. Tries, in order:
-/// 1. The bundled MobileCLIP zero-shot classifier (`CLIPZeroShotClassifier`).
+/// 1. Optional, separately licensed MobileCLIP resources, if a future build bundles them.
 /// 2. An optional dedicated Core ML model named `OutfitClassifier`, if ever bundled.
 /// 3. A deterministic heuristic based on color & pose signals, so the app always runs.
 struct OutfitClassifierService: OutfitClassifying {

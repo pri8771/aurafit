@@ -36,6 +36,7 @@ struct AnalysisProgressView: View {
                     .font(AFTypography.footnote())
                     .foregroundStyle(AFColors.textTertiary)
                     .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier("aurafit.analysis.root.container")
                     .accessibilityLabel("Analyzing your fit. Current step: \(currentStep.title)")
 
                 if let onCancel {

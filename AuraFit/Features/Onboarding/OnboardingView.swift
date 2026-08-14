@@ -14,8 +14,8 @@ struct OnboardingView: View {
               title: "Scan Your Fit",
               message: "Snap or import a full-body photo. Everything is analyzed right on your device — nothing ever leaves your phone."),
         .init(systemImage: "wand.and.stars",
-              title: "On-Device AI Coach",
-              message: "An image model reads your outfit and Apple's Vision framework reads your pose, both on your iPhone. You get notes on the clothes and on the photograph: color, lighting, framing, and background."),
+              title: "On-Device Photo Coach",
+              message: "Apple's Vision framework reads your pose while local image analysis estimates color, lighting, framing, background, and a closest style match. Nothing is uploaded."),
         .init(systemImage: "square.and.arrow.up",
               title: "Share Your Score",
               message: "Get a Fit Score card and an optional 5-second reveal clip to share anywhere. Scores rate the outfit and the shot, never the person in it.")
@@ -31,6 +31,7 @@ struct OnboardingView: View {
                 TabView(selection: $page) {
                     ForEach(Array(pages.enumerated()), id: \.offset) { index, item in
                         OnboardingPageView(page: item)
+                            .accessibilityIdentifier("aurafit.onboarding.root.container")
                             .tag(index)
                             .padding(.horizontal, AFSpacing.lg)
                     }
@@ -49,10 +50,12 @@ struct OnboardingView: View {
                     ) {
                         advance()
                     }
+                    .accessibilityIdentifier("aurafit.onboarding.continue.button")
                     if page < pages.count - 1 {
                         Button("Skip") { complete() }
                             .font(AFTypography.subheadline(.medium))
                             .foregroundStyle(AFColors.textSecondary)
+                            .accessibilityIdentifier("aurafit.onboarding.skip.button")
                     }
                 }
                 .padding(.horizontal, AFSpacing.lg)

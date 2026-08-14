@@ -52,6 +52,7 @@ struct HomeView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("aurafit.home.root.container")
     }
 
     private var scanCTA: some View {
@@ -80,6 +81,7 @@ struct HomeView: View {
             .shadow(color: AFColors.accent.opacity(0.4), radius: 18, y: 10)
         }
         .buttonStyle(AFPressStyle())
+        .accessibilityIdentifier("aurafit.home.scan.button")
         .accessibilityHint("Opens the scan flow")
     }
 

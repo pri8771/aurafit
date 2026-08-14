@@ -20,5 +20,5 @@
     "integration",
     "ui-smoke"
   ],
-  "qualityStandardVersion": "0.2.0"
+  "qualityStandardVersion": "0.4.0"
 }

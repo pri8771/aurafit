@@ -1,0 +1,27 @@
+External issue ID,Summary,Type,Priority,Status,Gate,Depends on,Owner boundary,Labels,Canonical source,Subtask count
+AURA-OPS-001,Verify CI on the current branch and main,Task,P0,blocked_external,TF-G1,,Agent + GitHub access,"testflight,operations,ci",docs/testflight/tasks/AURA-OPS-001.md,6
+AURA-OPS-009,Verify account agreements roles banking and tax,Task,P0,blocked_external,TF-G1,,Owner,"testflight,operations,apple-account",docs/testflight/tasks/AURA-OPS-009.md,7
+AURA-OPS-010,Verify App ID and App Store Connect record,Task,P0,blocked_external,TF-G1,AURA-OPS-009,Owner + agent,"testflight,operations,app-store-connect",docs/testflight/tasks/AURA-OPS-010.md,7
+AURA-OPS-011,Freeze version build identity and beta scope,Task,P0,planned,TF-G1,AURA-OPS-010,Owner + agent,"testflight,operations,release",docs/testflight/tasks/AURA-OPS-011.md,6
+AURA-OPS-005,Implement machine-checkable release-candidate gate,Task,P0,verification_pending,TF-G1,AURA-OPS-011,Agent,"testflight,operations,automation",docs/testflight/tasks/AURA-OPS-005.md,8
+AURA-OPS-012A,Configure signing and install Release build on device,Task,P0,blocked_external,TF-G1,"AURA-OPS-010,AURA-OPS-011",Owner + agent + iPhone,"testflight,operations,signing",docs/testflight/tasks/AURA-OPS-012A.md,5
+AURA-QA-002,Execute physical-device core-loop and persistence matrix,Task,P0,blocked_external,TF-G1,AURA-OPS-012A,Owner + agent + iPhone,"testflight,qa,device",docs/testflight/tasks/AURA-QA-002.md,12
+AURA-QA-004,Execute accessibility and supported-layout matrix,Task,P0,blocked_external,TF-G1,AURA-OPS-012A,Human reviewer + iPhone,"testflight,qa,accessibility",docs/testflight/tasks/AURA-QA-004.md,7
+AURA-QA-005,Execute performance interruption storage and thermal smoke,Task,P0,blocked_external,TF-G1,AURA-OPS-012A,Human reviewer + iPhone,"testflight,qa,performance",docs/testflight/tasks/AURA-QA-005.md,7
+AURA-MON-002,Approve initial prices and offer policy,Task,P0,human_review_required,TF-G2,,Owner + agent research,"testflight,monetization,pricing",docs/testflight/tasks/AURA-MON-002.md,7
+AURA-MON-008,Configure production StoreKit catalog,Task,P0,blocked_external,TF-G2,"AURA-OPS-009,AURA-OPS-010,AURA-MON-002",Owner,"testflight,monetization,storekit",docs/testflight/tasks/AURA-MON-008.md,9
+AURA-QA-010,Execute StoreKit sandbox and TestFlight matrix,Task,P0,blocked_external,TF-G2,"AURA-MON-008,AURA-OPS-012A",Owner + agent + sandbox account,"testflight,qa,storekit",docs/testflight/tasks/AURA-QA-010.md,9
+AURA-MKT-004,Publish durable privacy and support pages,Task,P0,blocked_external,TF-G3,,Owner + hosting access,"testflight,marketing,hosting",docs/testflight/tasks/AURA-MKT-004.md,7
+AURA-LEG-003,Confirm Terms or EULA and subscription legal links,Task,P0,human_review_required,TF-G3,AURA-MKT-004,Owner + human review,"testflight,legal,eula",docs/testflight/tasks/AURA-LEG-003.md,5
+AURA-LEG-004,Publish App Store privacy answers,Task,P0,blocked_external,TF-G3,AURA-MKT-004,Owner,"testflight,legal,privacy",docs/testflight/tasks/AURA-LEG-004.md,6
+AURA-LEG-005,Complete age rating and content-rights review,Task,P0,blocked_external,TF-G3,AURA-OPS-010,Owner,"testflight,legal,age-rating",docs/testflight/tasks/AURA-LEG-005.md,7
+AURA-OPS-014,Confirm export compliance,Task,P0,human_review_required,TF-G1,AURA-OPS-010,Owner + human legal determination,"testflight,operations,export-compliance",docs/testflight/tasks/AURA-OPS-014.md,6
+AURA-LEG-008,Prepare TestFlight and reviewer information packet,Task,P0,human_review_required,TF-G3,"AURA-MKT-004,AURA-MON-008",Agent draft + owner contact details,"testflight,legal,review",docs/testflight/tasks/AURA-LEG-008.md,6
+AURA-OPS-012B,Create and validate final signed archive,Task,P0,blocked_external,TF-G1,"AURA-OPS-005,AURA-QA-002,AURA-QA-004,AURA-QA-005,AURA-QA-010,AURA-OPS-014",Owner + agent,"testflight,operations,archive",docs/testflight/tasks/AURA-OPS-012B.md,7
+AURA-OPS-013,Upload and clear App Store Connect processing,Task,P0,blocked_external,TF-G1,AURA-OPS-012B,Owner or App Manager or Developer,"testflight,operations,upload",docs/testflight/tasks/AURA-OPS-013.md,6
+AURA-QA-006,Internal TestFlight distribution and smoke,Task,P0,blocked_external,TF-G2,AURA-OPS-013,Owner + internal tester,"testflight,qa,internal",docs/testflight/tasks/AURA-QA-006.md,7
+AURA-QA-007,External group and TestFlight App Review,Task,P0,blocked_external,TF-G3,"AURA-QA-006,AURA-LEG-003,AURA-LEG-004,AURA-LEG-005,AURA-LEG-008",Owner or App Manager,"testflight,qa,external",docs/testflight/tasks/AURA-QA-007.md,9
+AURA-QA-008,Run structured beta feedback loop,Task,P1,planned,TF-G3,AURA-QA-007,Owner,"testflight,qa,feedback",docs/testflight/tasks/AURA-QA-008.md,5
+AURA-QA-009,Triage beta findings and make go-no-go decision,Task,P0,planned,TF-G3,"AURA-QA-006,AURA-QA-008",Owner + agent,"testflight,qa,triage",docs/testflight/tasks/AURA-QA-009.md,5
+AURA-OPS-003,Automate archive and upload after manual path works,Task,P2,planned,Post-TF-G2,AURA-QA-006,Agent + owner,"testflight,operations,automation",docs/testflight/tasks/AURA-OPS-003.md,7
+AURA-OPS-007,Refresh Jira and Notion mirrors from repo CSV,Task,P2,planned,Non-blocking,DOC-TESTFLIGHT-READINESS approved,Owner or PM,"testflight,operations,mirror",docs/testflight/tasks/AURA-OPS-007.md,6

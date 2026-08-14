@@ -1,0 +1,47 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pri8771/iOS_app_factory_rules/main/schemas/feature-contract.schema.json",
+  "id": "FEAT-003",
+  "name": "History, persistence, and deletion",
+  "status": "verification_pending",
+  "userOutcome": "A user can reopen saved fits, see their images, favorite or delete them, and remove all local fit data with explicit confirmation.",
+  "entryPoints": [
+    "History tab",
+    "Settings > Delete All Fits"
+  ],
+  "productionDataSource": "SwiftData FitSession records and media files in AuraFit's private Documents directory.",
+  "states": [
+    "loading",
+    "empty",
+    "content",
+    "many_records",
+    "image_missing",
+    "deleting",
+    "failed",
+    "storage_fallback"
+  ],
+  "errorBehavior": "Persistent-container fallback is disclosed. Save failures prevent navigation to a falsely durable result. Deletion removes the record and all referenced local assets; orphan reconciliation removes only old unreferenced managed files.",
+  "duplicateProtectionRequired": true,
+  "persistenceRequired": true,
+  "layoutScenarios": [
+    "empty history",
+    "one record",
+    "50 records",
+    "small supported iPhone",
+    "Dynamic Type accessibility sizes"
+  ],
+  "accessibilityRequirements": [
+    "Fit cards expose score, date, favorite status, and navigation role",
+    "Destructive actions announce their consequences",
+    "Empty and storage-fallback states are readable with VoiceOver"
+  ],
+  "prohibitedBehavior": [
+    "Do not silently fall back to temporary storage",
+    "Do not delete files outside AuraFit's managed media folders",
+    "Do not use preview sessions in production history"
+  ],
+  "acceptanceTests": [
+    "ModelTests SwiftData insert, repository create/delete, and seed idempotence tests",
+    "ImageFileStoreTests including thumbnail caching and orphan reconciliation",
+    "Physical-device relaunch, favorite, single-delete, delete-all, and image-render checks"
+  ]
+}

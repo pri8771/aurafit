@@ -1,0 +1,44 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pri8771/iOS_app_factory_rules/main/schemas/feature-contract.schema.json",
+  "id": "FEAT-005",
+  "name": "Privacy and release disclosures",
+  "status": "human_review_required",
+  "userOutcome": "A user and App Review receive accurate descriptions of permissions, local processing, collected data, required-reason APIs, purchases, and deletion.",
+  "entryPoints": [
+    "Settings > Privacy Policy",
+    "Paywall > Privacy",
+    "App Store Connect privacy metadata"
+  ],
+  "productionDataSource": "Shipping app behavior, Release bundle Info.plist, PrivacyInfo.xcprivacy, in-app policy, and the hosted policy submitted to App Store Connect.",
+  "states": [
+    "policy_available_in_app",
+    "hosted_policy_available",
+    "permission_not_determined",
+    "permission_denied",
+    "permission_authorized"
+  ],
+  "errorBehavior": "The in-app policy remains available without a network connection. Permission denial does not claim data was saved. External policy/support links must be public and reachable without authentication.",
+  "duplicateProtectionRequired": false,
+  "persistenceRequired": false,
+  "layoutScenarios": [
+    "small supported iPhone",
+    "Dynamic Type accessibility sizes",
+    "long policy copy"
+  ],
+  "accessibilityRequirements": [
+    "Policy headings and links have meaningful labels",
+    "Privacy copy remains scrollable at accessibility text sizes"
+  ],
+  "prohibitedBehavior": [
+    "Do not claim a learned classifier is bundled when it is absent",
+    "Do not omit required-reason API declarations used by shipping code",
+    "Do not request broad Photo Library read access for system-picker import",
+    "Do not submit a private or login-gated privacy-policy URL"
+  ],
+  "acceptanceTests": [
+    "plutil validation of PrivacyInfo.xcprivacy",
+    "Release bundle contains PrivacyInfo.xcprivacy at the app root",
+    "Release Info.plist matches camera and add-only Photos behavior",
+    "Human comparison of App Store privacy answers, in-app policy, hosted policy, and shipping code"
+  ]
+}

@@ -93,7 +93,10 @@ struct ScanView: View {
             guard let newItem else { return }
             Task { await loadLibraryImage(newItem) }
         }
-        .alert("Something went wrong", isPresented: .constant(errorMessage != nil)) {
+        .alert("Something went wrong", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
             Button("OK") { errorMessage = nil }
         } message: {
             Text(errorMessage ?? "")
@@ -113,6 +116,7 @@ struct ScanView: View {
                     Text("Capture your fit")
                         .font(AFTypography.title(.bold))
                         .foregroundStyle(AFColors.textPrimary)
+                        .accessibilityIdentifier("aurafit.scan.root.container")
                     Text("Stand full-body in good light. We'll handle the rest — all on your device.")
                         .font(AFTypography.subheadline())
                         .foregroundStyle(AFColors.textSecondary)
@@ -127,10 +131,11 @@ struct ScanView: View {
                     AFPrimaryButton(title: "Open Camera", systemImage: "camera.fill") {
                         beginCameraFlow()
                     }
+                    .accessibilityIdentifier("aurafit.scan.camera.button")
                     AFSecondaryButton(title: "Import from Library", systemImage: "photo.on.rectangle") {
                         beginLibraryFlow()
                     }
-                    .accessibilityIdentifier("scanView.importFromLibraryButton")
+                    .accessibilityIdentifier("aurafit.scan.import.button")
                 }
                 .padding(.horizontal)
 
@@ -320,6 +325,14 @@ struct ScanView: View {
             return
         }
         entitlements.registerScan()
+        do {
+            try modelContext.save()
+        } catch {
+            // The session itself was already saved successfully. Keep the result available and
+            // disclose the accounting failure in diagnostics rather than showing a false scan
+            // failure after the user's durable result exists.
+            AppLog.persistence.error("Daily scan count save failed: \(error.localizedDescription)")
+        }
 
         // Honor the "Save originals to Photos" setting by copying the captured photo to the library.
         if let originalPath, entitlements.settings?.saveOriginalsToPhotos == true {

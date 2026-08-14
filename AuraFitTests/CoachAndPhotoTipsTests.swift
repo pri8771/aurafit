@@ -107,6 +107,16 @@ final class CoachAndPhotoTipsTests: XCTestCase {
         XCTAssertNil(coach.rejectionDetail(issues: fine))
     }
 
+    func testDeterministicQualityGateExplainsBadPhotoWithoutClipModel() {
+        let detail = PhotoCoach().rejectionDetail(
+            signals: signals(brightness: 0.08, sharpness: 0.1),
+            issues: nil
+        )
+
+        XCTAssertNotNil(detail)
+        XCTAssertTrue(detail?.contains("dark") == true)
+    }
+
     // MARK: - Person crop
 
     func testPersonCropShrinksToBox() throws {

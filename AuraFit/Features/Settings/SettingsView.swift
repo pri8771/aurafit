@@ -45,6 +45,7 @@ struct SettingsView: View {
                 Text(restoreResultMessage ?? "")
             }
         }
+        .accessibilityIdentifier("aurafit.settings.root.container")
     }
 
     // MARK: - Sections

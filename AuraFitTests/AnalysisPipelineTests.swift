@@ -48,6 +48,9 @@ final class AnalysisPipelineTests: XCTestCase {
         let strong = await pipeline.score(for: strongSignals())
         let weakResult = await pipeline.score(for: weak)
         XCTAssertLessThan(weakResult.score.overall, strong.score.overall)
+        XCTAssertTrue(weakResult.diagnostics.isLowConfidence)
+        XCTAssertNotNil(weakResult.rejectionDetail)
+        XCTAssertLessThanOrEqual(weakResult.score.overall, 49)
     }
 
     func testHeuristicClassifierInfersPersona() {

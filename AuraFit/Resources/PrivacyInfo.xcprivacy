@@ -7,7 +7,7 @@
 	and no networking calls beyond opening Apple's own web pages (Terms/Privacy links,
 	App Store subscription management) via `Link`/`UIApplication.open`, which do not
 	transmit user data. Camera and Photos images are processed on-device (Vision/Core
-	Image/Core ML with a heuristic fallback) and persisted only in the app's local
+	Image analysis with a heuristic style estimate) and persisted only in the app's local
 	sandbox (SwiftData + local files); nothing is uploaded or shared with the developer
 	or any third party. See docs/ARCHITECTURE.md and docs/DECISIONS.md (DEC-003) for
 	the on-device analysis architecture this manifest reflects.
@@ -31,22 +31,28 @@
 	<array/>
 
 	<!--
-	Required-reason API declarations: the app's own code was audited (2026-07-27) for
+	Required-reason API declarations: the app's own code was audited (2026-07-29) for
 	calls into Apple's required-reason API categories (User Defaults, File Timestamp,
-	System Boot Time, Disk Space, Active Keyboard). None of these APIs are used:
+	System Boot Time, Disk Space, Active Keyboard).
 	- No `UserDefaults`/`@AppStorage` anywhere in the app target.
-	- No file/attribute timestamp APIs (`creationDate`, `contentModificationDate`,
-	  `fileModificationDate`, `attributesOfItem`, `getattrlist`, `stat`/`fstat`, etc.).
-	  `ImageFileStore` (AuraFit/Data/Persistence/ImageFileStore.swift) only calls
-	  `fileExists`, `createDirectory`, `write(to:)`, `moveItem`, and `removeItem`, none
-	  of which require a reason declaration.
+	- `ImageFileStore.reconcileOrphans` reads creation/modification timestamps for files
+	  inside AuraFit's own app container so it can retain newly staged captures while
+	  removing old unreferenced files. Reason C617.1 covers this app-container metadata use.
 	- No disk-space APIs (`volumeAvailableCapacity`, `NSFileSystemFreeSize`, `statfs`).
 	- No `ProcessInfo.systemUptime`/boot-time APIs.
-	Consequently this array is intentionally empty. If a future change introduces one
-	of these APIs (directly or via a new dependency), this manifest must be updated
-	alongside it.
+	If a future change introduces another covered API (directly or through a dependency),
+	this manifest must be updated alongside it.
 	-->
 	<key>NSPrivacyAccessedAPITypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>C617.1</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

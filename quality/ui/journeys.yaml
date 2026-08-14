@@ -1,0 +1,20 @@
+schemaVersion: 1
+product: aurafit
+journeys:
+  - id: JOURNEY-LAUNCH-NAVIGATION
+    name: First launch to main navigation
+    fixture: first-launch
+    launchArguments:
+      - -UITestInMemoryStore
+    steps:
+      - launchApp: true
+      - assertVisible: aurafit.onboarding.root.container
+      - tapOn: aurafit.onboarding.skip.button
+      - assertVisible: aurafit.home.root.container
+      - tapOn: aurafit.home.scan.button
+      - assertVisible: aurafit.scan.root.container
+      - tapOn: aurafit.scan.camera.button
+      - assertVisible: aurafit.permission-primer.root.container
+    persistenceCheck: false
+    destructive: false
+    externalAction: false

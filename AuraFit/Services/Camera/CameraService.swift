@@ -1,4 +1,4 @@
-import AVFoundation
+@preconcurrency import AVFoundation
 import SwiftUI
 #if canImport(UIKit)
 import UIKit
@@ -27,14 +27,14 @@ final class CameraService: NSObject {
     private(set) var coachHint: CoachHint?
 
     /// The underlying session, exposed for the preview layer.
-    let session = AVCaptureSession()
+    nonisolated(unsafe) let session = AVCaptureSession()
 
     private let sessionQueue = DispatchQueue(label: "com.aurafit.camera.session")
-    private let photoOutput = AVCapturePhotoOutput()
-    private let videoOutput = AVCaptureVideoDataOutput()
+    nonisolated(unsafe) private let photoOutput = AVCapturePhotoOutput()
+    nonisolated(unsafe) private let videoOutput = AVCaptureVideoDataOutput()
     private let videoQueue = DispatchQueue(label: "com.aurafit.camera.frames", qos: .utility)
     /// Touched only on `videoQueue`.
-    private let frameAnalyzer = LiveFrameAnalyzer()
+    nonisolated(unsafe) private let frameAnalyzer = LiveFrameAnalyzer()
     private var photoContinuation: CheckedContinuation<UIImage, Error>?
     private var isConfigured = false
 

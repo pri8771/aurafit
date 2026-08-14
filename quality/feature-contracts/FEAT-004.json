@@ -1,0 +1,52 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pri8771/iOS_app_factory_rules/main/schemas/feature-contract.schema.json",
+  "id": "FEAT-004",
+  "name": "Free limits and StoreKit entitlements",
+  "status": "verification_pending",
+  "userOutcome": "A free user sees the real daily limit, while an eligible user can purchase or restore products and receive only verified entitlements.",
+  "entryPoints": [
+    "Quota banner",
+    "Paywall",
+    "Settings membership section"
+  ],
+  "productionDataSource": "StoreKit 2 Product and verified Transaction entitlements, plus the persisted AppSettings daily scan counter.",
+  "states": [
+    "idle",
+    "loading_products",
+    "products_available",
+    "products_unavailable",
+    "purchasing",
+    "pending",
+    "cancelled",
+    "purchased",
+    "restoring",
+    "restore_empty",
+    "restore_failed",
+    "offline_entitled"
+  ],
+  "errorBehavior": "Store failures show specific retryable messages. Cancellation shows no error. Pending purchases are not reported as active. Missing settings fail the free quota closed until a persisted row binds.",
+  "duplicateProtectionRequired": true,
+  "persistenceRequired": true,
+  "layoutScenarios": [
+    "localized product names and prices",
+    "small supported iPhone",
+    "Dynamic Type accessibility sizes",
+    "offline products-unavailable copy"
+  ],
+  "accessibilityRequirements": [
+    "Selected subscription and locked template state are announced",
+    "Busy purchase and restore controls are disabled",
+    "Price, renewal, restore, terms, and privacy information remain reachable"
+  ],
+  "prohibitedBehavior": [
+    "Do not grant entitlement from an unverified transaction",
+    "Do not compile mock purchases or force-Pro flags into Release",
+    "Do not report restore success when AppStore.sync fails",
+    "Do not start duplicate purchases"
+  ],
+  "acceptanceTests": [
+    "EntitlementManagerTests",
+    "Release-binary audit for debug purchase symbols and launch arguments",
+    "StoreKit sandbox purchase, pending, cancel, restore, template-only restore, refund, and offline checks"
+  ]
+}

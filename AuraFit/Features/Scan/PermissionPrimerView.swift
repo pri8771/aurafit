@@ -20,6 +20,7 @@ struct PermissionPrimerView: View {
             Text("100% On-Device")
                 .font(AFTypography.title())
                 .foregroundStyle(AFColors.textPrimary)
+                .accessibilityIdentifier("aurafit.permission-primer.root.container")
 
             Text("AuraFit analyzes your fit photo entirely on your iPhone. Your photos are never uploaded, shared, or sent to any server.")
                 .font(AFTypography.body())
@@ -29,7 +30,7 @@ struct PermissionPrimerView: View {
 
             VStack(alignment: .leading, spacing: AFSpacing.sm) {
                 PrimerBullet(icon: "camera.fill", text: "Capture a quick full-body photo")
-                PrimerBullet(icon: "cpu", text: "On-device models score the outfit and the shot")
+                PrimerBullet(icon: "cpu", text: "On-device analysis scores the outfit and the shot")
                 PrimerBullet(icon: "hand.raised.fill", text: "Nothing ever leaves your device")
             }
             .padding(.vertical, AFSpacing.sm)
