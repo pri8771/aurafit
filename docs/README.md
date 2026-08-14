@@ -2,7 +2,7 @@
 id: DOC-INDEX
 canonicalFor: documentation-navigation
 status: active
-lastVerified: 2026-07-29
+lastVerified: 2026-08-13
 readWhen:
   - onboarding
   - locating authoritative project information
@@ -85,6 +85,9 @@ For Jira or Notion, regenerate `mirrors/TESTFLIGHT_BACKLOG.csv` from
 
 - Physical-device camera, permission, export, StoreKit sandbox, accessibility, relaunch,
   performance, interruption, storage, and thermal evidence is still required.
-- Public privacy/support URLs, Apple-account state, App Store Connect metadata, signed archive,
-  upload, and TestFlight install evidence remain externally blocked. See the task statuses in
-  `TESTFLIGHT_READINESS.md`; these are known execution gaps, not undocumented work.
+- A signed archive of `1.0 (1)` was produced and uploaded to App Store Connect on 2026-08-13
+  (`quality/evidence/testflight/AURA-OPS-012A/UPLOAD-2026-08-13.md`); Apple processing
+  completion, TestFlight availability, and TestFlight install evidence remain outstanding, and
+  public privacy/support URL and App Store Connect metadata confirmation are still externally
+  blocked. See the task statuses in `TESTFLIGHT_READINESS.md`; these are known execution gaps,
+  not undocumented work.

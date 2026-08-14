@@ -2,7 +2,7 @@
 id: DOC-TESTFLIGHT-READINESS
 canonicalFor: testflight-readiness-execution
 status: active
-lastVerified: 2026-07-29
+lastVerified: 2026-08-13
 readWhen:
   - preparing a signed beta
   - working on App Store Connect
@@ -131,23 +131,29 @@ OPS-003 occurs only after QA-006. OPS-007 is non-blocking mirror work.
 
 ## 6. Current critical path
 
-The first owner action is OPS-009, immediately followed by OPS-010. Repository-side work for
-OPS-005, LEG-008, MKT-004, compliance, StoreKit preflight, and every execution/evidence pack is
-prepared. OPS-001 now needs working GitHub access; OPS-005 needs a canonical rules checkout and
-one clean CI or local gate run.
+On 2026-08-13 a signed Release archive of `1.0 (1)` was produced and uploaded to App Store
+Connect (evidence: `quality/evidence/testflight/AURA-OPS-012A/UPLOAD-2026-08-13.md`), which is
+functional-proof for OPS-009 (account/agreements), OPS-010 (app record), and the archive half
+of OPS-012A — all three now carry `human_review_required` pending owner sign-off, not
+`blocked_external`. Apple's processing completion and TestFlight availability of that build are
+still unconfirmed, and OPS-012A's on-device install/launch/signing-inspection subtasks have not
+run. Build number 1 is now consumed, so OPS-011 must select build `2` before any future
+re-archive. Repository-side work for OPS-005, LEG-008, MKT-004, compliance, StoreKit preflight,
+and every execution/evidence pack remains prepared. OPS-001 still needs working GitHub access;
+OPS-005 still needs a canonical rules checkout and one clean CI or local gate run.
 
-The shortest internal-beta path is:
+The shortest internal-beta path from here is:
 
-1. OPS-009 account readiness.
-2. OPS-010 app identity.
-3. OPS-011 version/build.
-4. OPS-012A signed Release install.
-5. QA-002/004/005 and MON-002/MON-008/QA-010.
-6. OPS-005 release gate.
-7. OPS-014 export determination.
-8. OPS-012B final archive.
-9. OPS-013 upload/processing.
-10. QA-006 internal TestFlight smoke.
+1. Owner review of the OPS-009/OPS-010/OPS-012A evidence now on file, and confirmation of Apple
+   processing/TestFlight availability for `1.0 (1)`.
+2. OPS-012A on-device install/launch/signing inspection (the archive/upload half is done).
+3. QA-002/004/005 and MON-002/MON-008/QA-010.
+4. OPS-005 release gate.
+5. OPS-014 export determination.
+6. OPS-011 freeze of the next candidate (build `2`) and OPS-012B final archive, if a new build
+   is required.
+7. OPS-013 upload/processing.
+8. QA-006 internal TestFlight smoke.
 
 External beta adds MKT-004, LEG-003/004/005/008, QA-007, QA-008, and QA-009.
 
