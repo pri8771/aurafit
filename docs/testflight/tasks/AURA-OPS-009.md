@@ -2,11 +2,11 @@
 id: AURA-OPS-009
 title: Verify account, agreements, roles, banking, and tax
 gate: TF-G1
-status: blocked_external
+status: human_review_required
 ownerBoundary: Owner
 dependsOn: []
 evidence: quality/evidence/testflight/AURA-OPS-009/README.md
-lastVerified: 2026-07-29
+lastVerified: 2026-08-13
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

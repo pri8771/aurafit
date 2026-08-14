@@ -2,11 +2,11 @@
 id: AURA-OPS-012A
 title: Configure signing and install a Release build on a physical device
 gate: TF-G1
-status: blocked_external
+status: human_review_required
 ownerBoundary: Owner + agent + iPhone
 dependsOn: [AURA-OPS-010, AURA-OPS-011]
 evidence: quality/evidence/testflight/AURA-OPS-012A/README.md
-lastVerified: 2026-07-29
+lastVerified: 2026-08-13
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

@@ -103,11 +103,11 @@ OPS-003 occurs only after QA-006. OPS-007 is non-blocking mirror work.
 | Order | Task plan | Gate | Owner boundary | Status | Depends on |
 |---:|---|---|---|---|---|
 | 1 | [`AURA-OPS-001`](testflight/tasks/AURA-OPS-001.md) Verify CI | `TF-G1` | Agent + GitHub access | `blocked_external` | — |
-| 2 | [`AURA-OPS-009`](testflight/tasks/AURA-OPS-009.md) Verify Apple account readiness | `TF-G1` | Owner | `blocked_external` | — |
-| 3 | [`AURA-OPS-010`](testflight/tasks/AURA-OPS-010.md) Verify App ID and app record | `TF-G1` | Owner + agent | `blocked_external` | OPS-009 |
+| 2 | [`AURA-OPS-009`](testflight/tasks/AURA-OPS-009.md) Verify Apple account readiness | `TF-G1` | Owner | `human_review_required` | — |
+| 3 | [`AURA-OPS-010`](testflight/tasks/AURA-OPS-010.md) Verify App ID and app record | `TF-G1` | Owner + agent | `human_review_required` | OPS-009 |
 | 4 | [`AURA-OPS-011`](testflight/tasks/AURA-OPS-011.md) Freeze release identity and scope | `TF-G1` | Owner + agent | `planned` | OPS-010 |
 | 5 | [`AURA-OPS-005`](testflight/tasks/AURA-OPS-005.md) Implement release-candidate gate | `TF-G1` | Agent | `verification_pending` | OPS-011 |
-| 6 | [`AURA-OPS-012A`](testflight/tasks/AURA-OPS-012A.md) Install signed Release on device | `TF-G1` | Owner + agent + iPhone | `blocked_external` | OPS-010, OPS-011 |
+| 6 | [`AURA-OPS-012A`](testflight/tasks/AURA-OPS-012A.md) Install signed Release on device | `TF-G1` | Owner + agent + iPhone | `human_review_required` | OPS-010, OPS-011 |
 | 7 | [`AURA-QA-002`](testflight/tasks/AURA-QA-002.md) Run core-loop device matrix | `TF-G1` | Owner + agent + iPhone | `blocked_external` | OPS-012A |
 | 8 | [`AURA-QA-004`](testflight/tasks/AURA-QA-004.md) Run accessibility/layout matrix | `TF-G1` | Human reviewer + iPhone | `blocked_external` | OPS-012A |
 | 9 | [`AURA-QA-005`](testflight/tasks/AURA-QA-005.md) Run performance/stability smoke | `TF-G1` | Human reviewer + iPhone | `blocked_external` | OPS-012A |
