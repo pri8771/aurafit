@@ -236,7 +236,7 @@ struct FitResultView: View {
                                 VStack(spacing: AFSpacing.xxs) {
                                     AFPaletteChip(color: rgb.color, size: 40)
                                     Text("#\(hex)")
-                                        .font(.system(size: 9, weight: .medium, design: .monospaced))
+                                        .font(.system(.caption2, design: .monospaced, weight: .medium))
                                         .foregroundStyle(AFColors.textTertiary)
                                 }
                             }

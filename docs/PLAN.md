@@ -567,6 +567,39 @@ earlier if Phase 2's curriculum writing stalls.
 **Exit:** on an under-exposed photo the top suggestion measurably raises the lighting metric
 and the stated reason matches the actual change.
 
+### Phase 4 — Cloud-Pro tier (direction only, not yet scoped)
+
+Discussed 2026-08-14. **First app in the portfolio slated for this** — not started, no task
+IDs or estimates yet; this is a captured direction, not a committed phase like 1–3 above.
+
+**What cloud unlocks that on-device cannot:**
+- A real vision-language model for critique instead of the on-device CLIP-style heuristic —
+  materially better, more specific feedback (every "rate my outfit" competitor already made
+  this trade; see `docs/PLAN.md` §6.9.1).
+- Photo-based virtual try-on via a diffusion-class garment-transfer model. Live handheld AR
+  try-on was evaluated and rejected as the interaction model: full-body framing needs the
+  camera several feet away, which handheld selfie distance cannot provide, and ARKit's
+  full-body tracking is built around the rear camera watching a subject, not self-facing
+  capture. **Capture-then-render (take a photo, overlay the garment afterward) is the
+  realistic flow** — it also reuses the app's existing take-photo-then-score interaction.
+  Quality ceiling: convincing for a single garment on a clean, front-facing pose; degrades on
+  patterned fabric, complex poses, and layered outfits.
+- "Shop the look" product matching (needs cloud visual search; no garment catalog exists
+  today).
+
+**Charter conflict this must resolve, not route around:** every clause in this document
+assumes "no backend, no cloud inference" (§0, §6.9.1's privacy-moat argument). A cloud-Pro
+tier must keep the free tier's current on-device-only behavior and privacy label completely
+unchanged, add an explicit, disclosed opt-in for the paid cloud path only, and update the
+App Store privacy nutrition label accordingly for that tier — not the whole app.
+
+**Shared infra direction (portfolio-wide, not aurafit-specific):** PostHog (multi-project,
+self-hostable) for cross-app analytics with per-app filtering; Supabase (Postgres + Auth +
+Edge Functions) as the shared backend powering cloud-Pro calls across apps, namespaced by
+app ID. See the equivalent note in each other app's docs.
+
+---
+
 ### 7.1 Engineering debt — `ENG`, Ongoing
 
 | Key | Task | Due by | Why |

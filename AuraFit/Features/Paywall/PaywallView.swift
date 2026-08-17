@@ -311,7 +311,7 @@ private struct SubscriptionOption: View {
                         .foregroundStyle(AFColors.textPrimary)
                     if isBestValue {
                         Text("BEST VALUE")
-                            .font(.system(size: 9, weight: .bold, design: .rounded))
+                            .font(AFTypography.caption(.bold))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 6).padding(.vertical, 2)
                             .background(AFColors.brandGradient, in: Capsule())
