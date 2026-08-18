@@ -52,3 +52,12 @@
   MobileCLIP-S0's image encoder is 22MB; ViT-B-32 is ~175MB at fp16 and needs palettization to
   land near 45–65MB. `tools/clip/README.md`'s licence warning was correct and is now resolved
   against us.
+
+## DEC-005 — VoiceOver deferred across the portfolio, not descoped
+
+- **Status:** accepted
+- **Date:** 2026-08-17
+- **Context:** `AURA-QA-004`'s manual VoiceOver device pass has sat unexecuted (`blocked_external`). The owner made a portfolio-wide call to defer VoiceOver work across every app for now, to focus effort on the free/local-only real-world testing pass first.
+- **Decision:** VoiceOver manual review is deferred, not descoped — this is a "come back to it later" call, not a permanent product decision to exclude VoiceOver support. Discrete, already-identified VoiceOver gaps found during code review (e.g. the two fixed-size fonts corrected 2026-08-17) are still fixed as found — this defers the *systematic device pass* (`AURA-QA-004`), not opportunistic fixes. Dynamic Type remains in scope and is not deferred.
+- **Consequences:** `AURA-QA-004` is not launch-blocking until this is revisited. Do not claim VoiceOver support is verified or complete in any release notes, App Store copy, or accessibility nutrition labels while this stands.
+- **Related Files:** `docs/testflight/tasks/AURA-QA-004.md`, `quality/evidence/testflight/AURA-QA-004/README.md`, `docs/BUGS.md`
