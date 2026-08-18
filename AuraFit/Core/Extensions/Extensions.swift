@@ -7,11 +7,6 @@ import UIKit
 // MARK: - Date
 
 extension Date {
-    /// Whether this date falls on the same calendar day as `other`.
-    func isSameDay(as other: Date, calendar: Calendar = .current) -> Bool {
-        calendar.isDate(self, inSameDayAs: other)
-    }
-
     var relativeShortString: String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated

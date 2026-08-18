@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// AuraFit's own privacy policy, rendered in-app so the Settings and paywall links resolve to
-/// a policy for *this* app rather than Apple's corporate one (App Review Guideline 5.1.1(i)).
+/// AuraFit's own privacy policy, rendered in-app so the Settings link resolves to a policy for
+/// *this* app rather than Apple's corporate one (App Review Guideline 5.1.1(i)).
 ///
 /// The text mirrors `docs/PRIVACY_POLICY.md`; the two are the same policy in two places and
 /// must be edited together. A hosted copy at a public URL is still required for App Store
@@ -40,7 +40,7 @@ struct PrivacyPolicyView: View {
                     Text("The short version")
                         .font(AFTypography.headline())
                         .foregroundStyle(AFColors.textPrimary)
-                    Text("AuraFit does not collect your data. There is no account, no server, and no analytics. Every photo you scan is analyzed on your iPhone and stored only on your iPhone. The app has no networking code of its own, so there is nowhere for your photos or scores to go.")
+                    Text("AuraFit does not collect your data. There is no account, no server, no analytics, and nothing to buy — every feature is free. Every photo you scan is analyzed on your iPhone and stored only on your iPhone. The app has no networking code of its own, so there is nowhere for your photos or scores to go.")
                         .font(AFTypography.subheadline())
                         .foregroundStyle(AFColors.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -52,7 +52,7 @@ struct PrivacyPolicyView: View {
 
     // MARK: - Content
 
-    static let effectiveDate = "29 July 2026"
+    static let effectiveDate = "29 July 2026, updated 18 August 2026"
 
     struct PolicySection: Identifiable {
         let title: String
@@ -86,6 +86,7 @@ struct PrivacyPolicyView: View {
                 "We do not use analytics, advertising, attribution, or crash-reporting SDKs.",
                 "We do not track you across apps or websites.",
                 "We do not create accounts, and we never ask for your name, email, or phone number.",
+                "We do not sell anything inside the app. There is nothing to buy, so the app holds no payment information of any kind.",
                 "We include no third-party libraries or code."
             ]
         ),
@@ -102,12 +103,8 @@ struct PrivacyPolicyView: View {
             body: ["Scorecards and reveal clips are shared only when you tap Share or Save and pick a destination in the iOS share sheet. Whatever you send then travels under the privacy policy of the app or service you sent it to, not this one."]
         ),
         PolicySection(
-            title: "Purchases",
-            body: ["AuraFit Pro subscriptions and one-time template unlocks are processed by Apple through StoreKit. Apple handles the payment and tells the app which products you own. AuraFit never sees your payment details and keeps no purchase records of its own beyond what StoreKit provides on device."]
-        ),
-        PolicySection(
             title: "Links that leave the app",
-            body: ["Manage Subscription and Terms of Use open Apple's own pages in your system browser. Opening a link sends no AuraFit data along with it. These are the only outbound destinations in the app."]
+            body: ["Terms of Use opens Apple's standard licence page in your system browser. Opening a link sends no AuraFit data along with it. It is the only outbound destination in the app."]
         ),
         PolicySection(
             title: "Children",

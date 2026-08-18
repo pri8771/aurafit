@@ -21,7 +21,6 @@ struct FitResultView: View {
     }
 
     @Environment(AppEnvironment.self) private var environment
-    @Environment(AppRouter.self) private var router
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
@@ -38,7 +37,6 @@ struct FitResultView: View {
         var isBusy: Bool { self != .idle }
     }
 
-    private var entitlements: EntitlementManager { environment.entitlements }
     private var metrics: [FitMetric] { session.metrics }
 
     var body: some View {
@@ -251,17 +249,9 @@ struct FitResultView: View {
     private var styleCard: some View {
         AFGlassCard {
             VStack(alignment: .leading, spacing: AFSpacing.sm) {
-                HStack(spacing: AFSpacing.xs) {
-                    Text("Scorecard Style")
-                        .font(AFTypography.title3(.bold))
-                        .foregroundStyle(AFColors.textPrimary)
-                    Spacer()
-                    if !entitlements.isPro {
-                        Text("Pro unlocks all")
-                            .font(AFTypography.caption())
-                            .foregroundStyle(AFColors.textTertiary)
-                    }
-                }
+                Text("Scorecard Style")
+                    .font(AFTypography.title3(.bold))
+                    .foregroundStyle(AFColors.textPrimary)
                 HStack(spacing: AFSpacing.sm) {
                     ForEach(ScorecardTheme.allCases) { theme in
                         styleChip(theme)
@@ -274,28 +264,22 @@ struct FitResultView: View {
 
     private func styleChip(_ theme: ScorecardTheme) -> some View {
         let isSelected = selectedTheme == theme
-        let unlocked = isThemeUnlocked(theme)
         return Button {
             selectTheme(theme)
         } label: {
-            HStack(spacing: 4) {
-                if !unlocked {
-                    Image(systemName: "lock.fill").font(.system(size: 9, weight: .bold))
-                }
-                Text(theme.displayName)
-                    .font(AFTypography.caption(.semibold))
-            }
-            .padding(.horizontal, AFSpacing.sm)
-            .padding(.vertical, AFSpacing.xs)
-            .background(isSelected ? AFColors.accent.opacity(0.22) : AFColors.surfaceElevated,
-                        in: Capsule())
-            .overlay(
-                Capsule().strokeBorder(isSelected ? AFColors.accent : AFColors.stroke, lineWidth: 1)
-            )
-            .foregroundStyle(isSelected ? AFColors.textPrimary : AFColors.textSecondary)
+            Text(theme.displayName)
+                .font(AFTypography.caption(.semibold))
+                .padding(.horizontal, AFSpacing.sm)
+                .padding(.vertical, AFSpacing.xs)
+                .background(isSelected ? AFColors.accent.opacity(0.22) : AFColors.surfaceElevated,
+                            in: Capsule())
+                .overlay(
+                    Capsule().strokeBorder(isSelected ? AFColors.accent : AFColors.stroke, lineWidth: 1)
+                )
+                .foregroundStyle(isSelected ? AFColors.textPrimary : AFColors.textSecondary)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(theme.displayName) style\(unlocked ? "" : ", locked")")
+        .accessibilityLabel("\(theme.displayName) style")
     }
 
     private var actionButtons: some View {
@@ -312,10 +296,7 @@ struct FitResultView: View {
                 AFSecondaryButton(title: "Save", systemImage: "square.and.arrow.down") {
                     Task { await saveScorecardToPhotos() }
                 }
-                AFSecondaryButton(
-                    title: entitlements.canGenerateRevealVideo ? "Reveal Clip" : "Reveal Clip · Pro",
-                    systemImage: entitlements.canGenerateRevealVideo ? "play.rectangle.fill" : "lock.fill"
-                ) {
+                AFSecondaryButton(title: "Reveal Clip", systemImage: "play.rectangle.fill") {
                     Task { await generateReveal() }
                 }
             }
@@ -369,7 +350,6 @@ struct FitResultView: View {
             persona: session.stylePersona,
             paletteHex: session.paletteHex,
             dateString: session.createdAt.shortDateString,
-            includeWatermark: entitlements.exportsWatermarked,
             theme: selectedTheme
         )
         model.photo = fitImage
@@ -378,10 +358,9 @@ struct FitResultView: View {
 
     /// Renders (and caches) the scorecard image, returning a file URL.
     private func renderScorecardURL() async -> URL? {
-        // Re-render when watermark or theme changed since the last render, or no cached card exists.
+        // Re-render when the theme changed since the last render, or no cached card exists.
         if let path = session.scorecardImagePath,
            environment.imageStore.fileExists(relativePath: path),
-           !needsWatermarkRerender(path: path),
            renderedTheme == selectedTheme {
             return environment.imageStore.absoluteURL(for: path)
         }
@@ -393,7 +372,7 @@ struct FitResultView: View {
                                                    store: environment.imageStore,
                                                    name: session.id.uuidString)
             let repo = SessionRepository(context: modelContext, imageStore: environment.imageStore)
-            repo.attachScorecard(path, includesWatermark: entitlements.exportsWatermarked, to: session)
+            repo.attachScorecard(path, to: session)
             renderedTheme = selectedTheme
             return environment.imageStore.absoluteURL(for: path)
         } catch {
@@ -403,27 +382,11 @@ struct FitResultView: View {
         }
     }
 
-    /// Re-render only when the cached card's watermark state no longer matches the user's entitlement.
-    private func needsWatermarkRerender(path: String) -> Bool {
-        session.scorecardIncludesWatermark != entitlements.exportsWatermarked
-    }
+    // MARK: - Scorecard theme
 
-    // MARK: - Scorecard theme (template packs)
-
-    private func isThemeUnlocked(_ theme: ScorecardTheme) -> Bool {
-        guard let productID = theme.requiredProductID else { return true }
-        return entitlements.isTemplateUnlocked(productID)
-    }
-
-    /// Selects an unlocked theme, or routes a locked one to the matching paywall.
     private func selectTheme(_ theme: ScorecardTheme) {
-        if isThemeUnlocked(theme) {
-            selectedTheme = theme
-            HapticsManager.shared.selection()
-        } else if let persona = theme.paywallPersona {
-            HapticsManager.shared.impact(.light)
-            router.presentPaywall(.template(persona))
-        }
+        selectedTheme = theme
+        HapticsManager.shared.selection()
     }
 
     private func shareScorecard() async {
@@ -440,10 +403,6 @@ struct FitResultView: View {
     }
 
     private func generateReveal() async {
-        guard entitlements.canGenerateRevealVideo else {
-            router.presentPaywall(.revealVideo)
-            return
-        }
         exportState = .renderingVideo
         defer { exportState = .idle }
         do {

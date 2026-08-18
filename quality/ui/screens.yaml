@@ -37,7 +37,7 @@ screens:
   - id: SCREEN-SCAN
     name: Scan
     rootIdentifier: aurafit.scan.root.container
-    fixtures: [free-quota, pro, quota-exhausted]
+    fixtures: [default]
     requiredElements:
       - identifier: aurafit.scan.camera.button
         role: button
@@ -128,25 +128,10 @@ screens:
   - id: SCREEN-SETTINGS
     name: Settings
     rootIdentifier: aurafit.settings.root.container
-    fixtures: [free, pro]
+    fixtures: [default]
     requiredElements: []
     navigation:
       enterFrom: [aurafit.tab.settings.button]
-      exits:
-        - action: upgrade-to-pro
-          destination: SCREEN-PAYWALL
-    prohibitedActions:
-      - restore-without-explicit-journey
-      - delete-without-explicit-journey
-
-  - id: SCREEN-PAYWALL
-    name: Paywall
-    rootIdentifier: aurafit.paywall.root.container
-    fixtures: [products-loaded, products-unavailable]
-    requiredElements: []
-    navigation:
-      enterFrom: [SCREEN-SETTINGS, quota-exhausted, locked-feature]
       exits: []
     prohibitedActions:
-      - purchases
-      - restore
+      - delete-without-explicit-journey

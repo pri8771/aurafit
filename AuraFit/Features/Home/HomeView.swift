@@ -173,7 +173,7 @@ struct HomeView: View {
             AFEmptyState(
                 systemImage: "sparkles",
                 title: "No fits yet",
-                message: "Scan your first fit to unlock your score, stats, and style persona.",
+                message: "Scan your first fit to see your score, stats, and style persona.",
                 actionTitle: "Scan a Fit"
             ) {
                 router.startScan()
@@ -193,11 +193,7 @@ struct HomeView: View {
         }
     }
 
-    private var scanSubtitle: String {
-        if environment.entitlements.isPro { return "Unlimited scans • Pro" }
-        let remaining = environment.entitlements.remainingFreeScansToday
-        return "\(remaining) free scan\(remaining == 1 ? "" : "s") left today"
-    }
+    private var scanSubtitle: String { "Analyzed privately on your iPhone" }
 }
 
 /// Small stat tile used in the Home stats row.

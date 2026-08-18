@@ -30,7 +30,6 @@ None. AuraFit has no third-party runtime dependencies.
 | Module | Capability | Why local for now | Genericity evidence | Promotion trigger |
 |---|---|---|---|---|
 | `ImageFileStore` / `ImageThumbnailCache` | Managed media storage and downsampling | Product-specific paths and cleanup semantics | Unit-tested independently of views | A second product needs the same lifecycle |
-| `StoreKitService` / `EntitlementManager` | StoreKit 2 loading, restore, and entitlement state | Product IDs and quota rules are AuraFit-specific | Purchase provider protocol supports deterministic tests | Common product adapter boundary is proven |
 | `ScorecardRenderer` / `RevealVideoRenderer` | Local image and video export | Output is branded and model-specific | Rendering is service-oriented | A second app shares the same export contract |
 | `PermissionManager` | Camera and add-only Photos permission mapping | Small wrapper with AuraFit-specific supported permissions | System state is isolated from views | More products require the same API surface |
 

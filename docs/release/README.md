@@ -10,8 +10,8 @@ data, tester personal data, or Apple session material to this directory.
 
 Before external TestFlight submission, verify that:
 
-1. every product ID, localized name, price, duration, and benefit matches the production App
-   Store Connect catalog;
+1. the build offers no in-app purchases (AuraFit 1.0 is one full, free product — DEC-006), so
+   App Store Connect must not list any products for it;
 2. every test step works in the exact uploaded build;
 3. privacy and support URLs are public without authentication;
 4. contact fields reach a monitored person;

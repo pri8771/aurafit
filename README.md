@@ -3,9 +3,10 @@
 AuraFit is a fully local, on-device outfit and camera coach for iOS. Take or import a full-body
 photo and AuraFit analyzes outfit signals, posture, color harmony, lighting, framing, and
 "main character energy" — then generates a shareable **Fit Score** card and an optional 5-second
-reveal clip. **No backend. No cloud inference. No analytics. No network calls except StoreKit.**
+reveal clip. **No backend. No cloud inference. No analytics. No network calls. Nothing to buy —
+every feature is free (DEC-006).**
 
-> Built with SwiftUI, SwiftData, Vision, Core Image, AVFoundation, and StoreKit 2.
+> Built with SwiftUI, SwiftData, Vision, Core Image, and AVFoundation.
 > iOS 18+ · iPhone portrait-first · dark-first design.
 
 ## Getting started
@@ -16,9 +17,6 @@ reveal clip. **No backend. No cloud inference. No analytics. No network calls ex
 
 The project uses Xcode's file-system–synchronized groups, so new files dropped into the
 `AuraFit/` folder are picked up automatically — no `.pbxproj` edits required.
-
-StoreKit testing is pre-wired: the scheme references `AuraFit/Resources/AuraFit.storekit`, so
-purchases work in the simulator without an App Store Connect setup.
 
 ## Architecture
 
@@ -36,8 +34,7 @@ AuraFit/
 │   ├── Camera/       AVFoundation capture, preview, photo picker
 │   ├── Analysis/     Vision/Core Image/Core ML pipeline + scoring engine
 │   ├── Export/       1080×1920 scorecard renderer, AVFoundation reveal video
-│   └── Store/        StoreKit 2 service, entitlements, product catalog
-└── Features/         Onboarding, Home, Scan, Results, History, Challenges, Paywall, Settings
+└── Features/         Onboarding, Home, Scan, Results, History, Challenges, Settings
 ```
 
 ### Analysis pipeline
@@ -63,27 +60,25 @@ Add a compiled `OutfitClassifier.mlmodelc` to the app bundle. `OutfitClassifierS
 automatically via `VNCoreMLModel` and maps its labels to `StylePersona`; until then it uses the
 deterministic heuristic. No other code changes required.
 
-## Monetization
+## Pricing
 
-- **Free:** 3 scans/day, watermarked exports.
-- **Pro** (`com.aurafit.pro.monthly` / `com.aurafit.pro.yearly`): unlimited scans, no watermark,
-  reveal videos, all templates.
-- **Template packs** (`com.aurafit.template.streetwear` / `...softluxury`): one-time unlocks.
-
-Entitlements are derived from `Transaction.currentEntitlements` (StoreKit 2) via
-`EntitlementManager`, which also enforces the daily free-scan gate against persisted `AppSettings`.
+AuraFit 1.0 is one full, free product: unlimited scans, all three scorecard styles, reveal
+clips, and clean exports for everyone. There is no paywall, no StoreKit code, and no scan
+quota; `FullFreeProductTests` and `scripts/release_candidate_check.sh` fail if any of that
+vocabulary reappears in the app target. Monetization is deferred to a future version
+(`docs/DECISIONS.md`, DEC-006).
 
 ## Privacy
 
-All photos and analysis stay on-device. The app makes no network calls other than the StoreKit /
-App Store purchase flow. Generated images/videos are written to the app's documents directory.
+All photos and analysis stay on-device. The app makes no network calls of its own. Generated
+images/videos are written to the app's documents directory.
 
 ## Tests
 
-`AuraFitTests` contains 100 unit/integration checks covering the score engine, color-harmony
-math, file storage, StoreKit entitlement logic (with mocks), analysis scoring (with mocked
-Vision signals), release configuration, statistics, and SwiftData. `AuraFitUITests` adds a
-deterministic clean-install/import-to-result simulator smoke. Physical camera, StoreKit sandbox,
+`AuraFitTests` contains 93 unit/integration checks covering the score engine, color-harmony
+math, file storage, analysis scoring (with mocked Vision signals), release configuration, the
+full-free-product guard, statistics, and SwiftData. `AuraFitUITests` adds a deterministic
+clean-install/import-to-result simulator smoke (94 tests total). Physical camera,
 accessibility, signing, and App Store Connect checks remain manual release gates.
 
 ## TestFlight readiness

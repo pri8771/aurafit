@@ -7,7 +7,6 @@ import UIKit
 /// chooser → (permission primer / camera) or library → analysis progress → result.
 struct ScanView: View {
     @Environment(AppEnvironment.self) private var environment
-    @Environment(AppRouter.self) private var router
     @Environment(\.modelContext) private var modelContext
 
     private enum Sheet: Identifiable {
@@ -27,8 +26,6 @@ struct ScanView: View {
     @State private var errorMessage: String?
     /// The in-flight analysis, retained so the Cancel button can stop it.
     @State private var analysisTask: Task<Void, Never>?
-
-    private var entitlements: EntitlementManager { environment.entitlements }
 
     var body: some View {
         NavigationStack {
@@ -125,8 +122,6 @@ struct ScanView: View {
                 }
                 .padding(.horizontal)
 
-                quotaBanner
-
                 VStack(spacing: AFSpacing.sm) {
                     AFPrimaryButton(title: "Open Camera", systemImage: "camera.fill") {
                         beginCameraFlow()
@@ -163,29 +158,6 @@ struct ScanView: View {
         .accessibilityHidden(true)
     }
 
-    @ViewBuilder
-    private var quotaBanner: some View {
-        if !entitlements.isPro {
-            let remaining = entitlements.remainingFreeScansToday
-            HStack(spacing: AFSpacing.sm) {
-                Image(systemName: remaining > 0 ? "bolt.fill" : "lock.fill")
-                    .foregroundStyle(remaining > 0 ? AFColors.accent : AFColors.warning)
-                Text(remaining > 0
-                     ? "\(remaining) free scan\(remaining == 1 ? "" : "s") left today"
-                     : "Daily free scans used — go Pro for unlimited")
-                    .font(AFTypography.footnote(.medium))
-                    .foregroundStyle(AFColors.textSecondary)
-                Spacer()
-                Button("Go Pro") { router.presentPaywall(.general) }
-                    .font(AFTypography.footnote(.semibold))
-                    .foregroundStyle(AFColors.accent)
-            }
-            .padding(AFSpacing.sm)
-            .background(AFColors.surface, in: RoundedRectangle(cornerRadius: AFRadius.md, style: .continuous))
-            .padding(.horizontal)
-        }
-    }
-
     private var tips: some View {
         AFGlassCard {
             VStack(alignment: .leading, spacing: AFSpacing.sm) {
@@ -211,7 +183,6 @@ struct ScanView: View {
     // MARK: - Flow
 
     private func beginCameraFlow() {
-        guard ensureCanScan() else { return }
         switch PermissionManager.cameraStatus {
         case .authorized: openCamera()
         case .notDetermined: cameraPermissionPrompt = .primer
@@ -220,19 +191,11 @@ struct ScanView: View {
     }
 
     private func beginLibraryFlow() {
-        guard ensureCanScan() else { return }
         showLibraryPickerFlag = true
     }
 
     private func openCamera() {
         activeSheet = .camera
-    }
-
-    /// Returns true if the user can scan; otherwise presents the paywall.
-    private func ensureCanScan() -> Bool {
-        if entitlements.canScan { return true }
-        router.presentPaywall(.dailyLimitReached)
-        return false
     }
 
     private func loadLibraryImage(_ item: PhotosPickerItem) async {
@@ -247,7 +210,6 @@ struct ScanView: View {
 
     private func handleImage(_ image: UIImage) {
         guard !isProcessingScan else { return }
-        guard ensureCanScan() else { return }
         isProcessingScan = true
         capturedImage = image
         activeSheet = .analyzing
@@ -290,7 +252,7 @@ struct ScanView: View {
         }
 
         // The task can be cancelled between the last checkpoint and here; honor it before any
-        // state is committed, so cancelling never persists a session or spends a scan.
+        // state is committed, so cancelling never persists a session.
         guard !Task.isCancelled else {
             discardStagedOriginal(originalPath)
             environment.analysisService.reset()
@@ -317,25 +279,16 @@ struct ScanView: View {
             session = try repository.createSession(result: result, originalImagePath: originalPath)
         } catch {
             // A silent failure here would show a result screen for a scan that disappears on
-            // relaunch. Tell the user instead, and don't charge them a scan for it.
+            // relaunch. Tell the user instead.
             discardStagedOriginal(originalPath)
             analysisResult = nil
             activeSheet = nil
             errorMessage = error.localizedDescription
             return
         }
-        entitlements.registerScan()
-        do {
-            try modelContext.save()
-        } catch {
-            // The session itself was already saved successfully. Keep the result available and
-            // disclose the accounting failure in diagnostics rather than showing a false scan
-            // failure after the user's durable result exists.
-            AppLog.persistence.error("Daily scan count save failed: \(error.localizedDescription)")
-        }
 
         // Honor the "Save originals to Photos" setting by copying the captured photo to the library.
-        if let originalPath, entitlements.settings?.saveOriginalsToPhotos == true {
+        if let originalPath, environment.settings?.saveOriginalsToPhotos == true {
             let url = environment.imageStore.absoluteURL(for: originalPath)
             Task { await ShareManager.saveImageToPhotos(url) }
         }

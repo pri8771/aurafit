@@ -227,13 +227,4 @@ final class ModelTests: XCTestCase {
         XCTAssertTrue(message.contains("couldn't be saved"))
         XCTAssertTrue(message.contains("Disk is full."))
     }
-
-    func testRolloverResetsCountOnNewDay() {
-        let settings = AppSettings()
-        settings.scanCountToday = 3
-        settings.scanCountDayStart = Calendar.current.date(byAdding: .day, value: -2, to: .now)!
-        let count = settings.rolloverIfNeeded()
-        XCTAssertEqual(count, 0)
-        XCTAssertEqual(settings.scanCountToday, 0)
-    }
 }

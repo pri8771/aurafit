@@ -72,10 +72,9 @@ struct SessionRepository {
         save()
     }
 
-    func attachScorecard(_ path: String, includesWatermark: Bool, to session: FitSession) {
+    func attachScorecard(_ path: String, to session: FitSession) {
         guard session.modelContext != nil else { return }
         session.scorecardImagePath = path
-        session.scorecardIncludesWatermark = includesWatermark
         save()
     }
 

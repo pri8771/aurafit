@@ -1,5 +1,8 @@
 # AURA-QA-010 evidence — StoreKit sandbox and TestFlight purchase matrix
 
+- Status: `not_applicable` — closed by DEC-006 (2026-08-18): AuraFit 1.0 has no in-app
+  purchases, so this task has no work product. Content below is retained for history.
+
 - Status: `blocked_external` — StoreKit source audit is recorded below; no Apple sandbox/TestFlight scenario has passed.
 - Canonical plan: [`docs/testflight/tasks/AURA-QA-010.md`](../../../../docs/testflight/tasks/AURA-QA-010.md)
 - Dependencies: `AURA-MON-008` production catalog evidence and `AURA-OPS-012A` signed physical Release build. ST-09 also requires `AURA-QA-006` processed TestFlight install.

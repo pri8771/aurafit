@@ -2,19 +2,19 @@
 
 **App:** AuraFit (`com.pchordia.aurafit`)
 **Effective:** 2026-07-29
-**Last updated:** 2026-07-29
+**Last updated:** 2026-08-18
 
 > **Keep in sync.** This document and the in-app policy screen
 > (`AuraFit/Features/Settings/PrivacyPolicyView.swift`) are the same policy in two places.
 > Change one, change the other. A hosted copy at a public URL is still required for App Store
-> Connect metadata (tracked as `AURA-MKT-004`); until it exists, the in-app screen is what
-> Settings and the paywall link to.
+> Connect metadata (tracked as `AURA-MKT-004`); the in-app screen is what Settings links to.
 
 ## The short version
 
-AuraFit does not collect your data. There is no account, no server, and no analytics. Every
-photo you scan is analyzed on your iPhone and stored only on your iPhone. The app has no
-networking code of its own, so there is nowhere for your photos or scores to go.
+AuraFit does not collect your data. There is no account, no server, no analytics, and nothing
+to buy — every feature is free. Every photo you scan is analyzed on your iPhone and stored only
+on your iPhone. The app has no networking code of its own, so there is nowhere for your photos
+or scores to go.
 
 ## What the app stores, and where
 
@@ -27,7 +27,6 @@ deletes all of it.
 | Scores, tips, style match, and color palette | Local SwiftData database | No |
 | Scorecard images and reveal clips you generate | App's Documents directory | Only if you share or save them yourself |
 | Your preferences (haptics, sound, auto-save) | Local SwiftData database | No |
-| Purchase status | Managed by Apple's on-device StoreKit | See "Purchases" |
 
 ## How photos are analyzed
 
@@ -46,6 +45,8 @@ any person, and the app does not identify, recognize, or profile anyone.
 - We do not track you across apps or websites. AuraFit does not use App Tracking Transparency
   because it has nothing to track.
 - We do not create accounts, and we never ask for your name, email, or phone number.
+- We do not sell anything inside the app. There is nothing to buy, so the app holds no payment
+  information of any kind.
 - We include no third-party libraries or code.
 
 The app's privacy manifest (`PrivacyInfo.xcprivacy`) declares no collected data types, no
@@ -70,19 +71,10 @@ Scorecards and reveal clips are shared only when you tap Share or Save and choos
 destination in the iOS share sheet. Whatever you send then travels under the privacy policy of
 the app or service you sent it to, not this one.
 
-## Purchases
-
-AuraFit Pro subscriptions and one-time template unlocks are processed by Apple through
-StoreKit. Apple handles the payment and tells the app which products you own; AuraFit never
-sees your payment details and stores no purchase records of its own beyond what StoreKit
-provides on device. Apple's handling of purchase data is governed by
-[Apple's Privacy Policy](https://www.apple.com/legal/privacy/).
-
 ## Links that leave the app
 
-Manage Subscription and Terms of Use open Apple's own pages in your system browser. Apple's
-privacy policy is linked from this document for the StoreKit explanation. Opening a link sends
-no AuraFit data along with it.
+Terms of Use opens Apple's standard licence page in your system browser. Opening a link sends
+no AuraFit data along with it. It is the only outbound destination in the app.
 
 ## Children
 

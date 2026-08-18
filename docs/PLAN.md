@@ -1,7 +1,13 @@
 # AuraFit — Program Plan
 
-Owner: Priyansh Chordia · Created 2026-07-28 · Last updated 2026-07-29
+Owner: Priyansh Chordia · Created 2026-07-28 · Last updated 2026-08-18
 Status: **Phase 0 in progress** · Horizon: v1.0 → v2.0
+
+> **Scope change 2026-08-18 (DEC-006).** v1.0 ships as one full, free product. Every
+> monetization, StoreKit, paywall, quota, and template-unlock item below (the `AURA-MON-*`
+> family, `AURA-QA-010`, and any Pro/premium wording) is **out of scope for v1.0** and is
+> retained here only as history for a future monetization decision. `docs/DECISIONS.md` and
+> `docs/STATUS.md` are authoritative where this plan still describes tiers.
 
 ---
 

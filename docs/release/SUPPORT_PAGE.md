@@ -1,16 +1,13 @@
 # AuraFit Support
 
 AuraFit is a local-first iPhone app for subjective outfit and photo guidance. It does not use
-an account or upload your selected photos for analysis.
+an account or upload your selected photos for analysis. Every feature is free: there is nothing
+to buy inside the app.
 
 ## Contact support
 
-`OWNER_REQUIRED_SUPPORT_CONTACT_METHOD`
-
-Expected response path: `OWNER_REQUIRED_SUPPORT_RESPONSE_PATH`
-
-Before publishing this page, replace both owner-required values with a monitored public route.
-Do not publish a placeholder email address or a form that requires a workspace login.
+Email **support@priyanshchordia.com**. Support requests are answered by the developer from that
+mailbox; there is no ticketing system or account to sign in to.
 
 ## Getting a result
 
@@ -44,26 +41,21 @@ undone. Deleting the app also removes its local app data.
 you choose that action and grant permission. Any shared item is handled by the destination you
 select.
 
-## Purchases and restore
+## Scorecard styles and reveal clips
 
-AuraFit Pro subscriptions and one-time template unlocks are handled by Apple through StoreKit.
-To restore eligible purchases, open **Settings** → **Membership** → **Restore Purchases**. If
-the app cannot contact the App Store, check your connection and try again. AuraFit does not
-receive your payment details.
+All three scorecard styles (Classic, Streetwear, Soft Luxury) and the reveal clip are available
+to everyone. Pick a style on the result screen; **Reveal Clip** renders a short video of the
+score animating in and opens the share sheet.
 
 ## Privacy and terms
 
-The public privacy-policy URL will be inserted here after publication:
-`OWNER_REQUIRED_PUBLIC_PRIVACY_URL`
-
-Before publishing, confirm the Terms of Use route with `AURA-LEG-003`. Do not add custom terms
-or replace the app’s current Apple standard-EULA link without the owner’s approved legal
-decision.
+The privacy policy is published at **https://priyanshchordia.com/apps/aurafit/privacy/** and is
+also readable inside the app under **Settings** → **Privacy Policy**. **Terms of Use** in
+Settings opens Apple’s standard licence agreement.
 
 ## What to include in a support request
 
 Do not send source photos, Apple IDs, receipts, payment details, or other sensitive data. For a
 technical issue, include the app version/build, iPhone model, iOS version, the exact steps,
 expected and actual result, and whether it repeats. Screenshots or recordings are optional and
-should not include private photos unless you deliberately choose to share them through the
-owner-approved support route.
+should not include private photos unless you deliberately choose to share them by email.

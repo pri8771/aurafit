@@ -85,7 +85,7 @@ jobs:
           AURAFIT_SIMULATOR_DESTINATION="id=${{ steps.create_sim.outputs.udid }}" \
           AURAFIT_DERIVED_DATA_PATH="/tmp/aurafit-release-candidate-${{ github.run_id }}-${{ github.run_attempt }}" \
           AURAFIT_EXPECTED_VERSION="1.0" \
-          AURAFIT_EXPECTED_BUILD="1" \
+          AURAFIT_EXPECTED_BUILD="3" \
           bash scripts/release_candidate_check.sh
 
       - name: Upload test results

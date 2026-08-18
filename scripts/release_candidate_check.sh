@@ -8,7 +8,7 @@
 #
 # Optional release identity overrides (update after AURA-OPS-011 freezes a new tuple):
 #   AURAFIT_EXPECTED_VERSION (default: 1.0)
-#   AURAFIT_EXPECTED_BUILD   (default: 1)
+#   AURAFIT_EXPECTED_BUILD   (default: 3)
 #
 # Output: release-candidate-{test,build}.log, AuraFit-tests.xcresult, test-summary.json,
 # and an unsigned Release AuraFit.app below AURAFIT_DERIVED_DATA_PATH.
@@ -24,8 +24,8 @@ readonly EXPECTED_CATEGORY="public.app-category.lifestyle"
 readonly EXPECTED_CAMERA_USAGE="AuraFit uses the camera to capture your full-body fit photo for on-device analysis. Photos never leave your device."
 readonly EXPECTED_PHOTOS_ADD_USAGE="AuraFit saves your generated scorecards and reveal clips to your photo library."
 readonly EXPECTED_VERSION="${AURAFIT_EXPECTED_VERSION:-1.0}"
-readonly EXPECTED_BUILD="${AURAFIT_EXPECTED_BUILD:-1}"
-readonly EXPECTED_TEST_COUNT=101
+readonly EXPECTED_BUILD="${AURAFIT_EXPECTED_BUILD:-3}"
+readonly EXPECTED_TEST_COUNT=94
 
 usage() {
   cat <<'USAGE'
@@ -41,7 +41,7 @@ directory must be an empty directory under /tmp; it is preserved on success and 
 
 Optional identity inputs:
   AURAFIT_EXPECTED_VERSION  frozen CFBundleShortVersionString (default: 1.0)
-  AURAFIT_EXPECTED_BUILD    frozen CFBundleVersion (default: 1)
+  AURAFIT_EXPECTED_BUILD    frozen CFBundleVersion (default: 3)
 
 Success marker: RELEASE_CANDIDATE_GATE=PASS
 Failure classes: source_failure, verification_pending, or configuration_failure.
@@ -196,6 +196,38 @@ find_single_release_app() {
   printf '%s\n' "${apps[0]}"
 }
 
+# DEC-006 (2026-08-18): AuraFit 1.0 is one full, free product. The app target may not carry
+# tier vocabulary or any StoreKit surface. Mirrors `FullFreeProductTests` so the gate fails
+# even when the test target is not the thing being edited.
+audit_no_tier_source() {
+  local -a forbidden_paths=(
+    "$REPO_ROOT/AuraFit/Features/Paywall"
+    "$REPO_ROOT/AuraFit/Services/Store"
+    "$REPO_ROOT/AuraFit/Resources/AuraFit.storekit"
+  )
+  local path
+  for path in "${forbidden_paths[@]}"; do
+    [[ ! -e "$path" ]] || die source_failure "Tier surface must not exist: $(relative_path "$path")"
+  done
+  if rg -q -i 'storekit' "$REPO_ROOT/AuraFit.xcodeproj/project.pbxproj" "$REPO_ROOT/AuraFit.xcodeproj/xcshareddata/xcschemes/AuraFit.xcscheme"; then
+    die source_failure "Xcode project or scheme still references StoreKit"
+  fi
+  local matches
+  matches="$(rg -n -i \
+    -e 'paywall' -e 'premium' -e 'upgrade' -e 'subscription' -e 'subscribe' -e 'purchase' \
+    -e 'entitlement' -e 'quota' -e 'storekit' -e 'freemium' -e 'watermark' -e 'free plan' \
+    -e 'free scan' -e 'in-app purchase' -e 'unlock all' -e 'go pro' -e 'restore purchases' \
+    --glob '*.swift' --glob '*.xcprivacy' --glob '*.json' --glob '*.plist' --glob '*.strings' --glob '*.xcstrings' \
+    "$REPO_ROOT/AuraFit" || true)"
+  local pro_matches
+  pro_matches="$(rg -n -w 'Pro' --glob '*.swift' --glob '*.xcprivacy' "$REPO_ROOT/AuraFit" || true)"
+  if [[ -n "$matches$pro_matches" ]]; then
+    printf 'FORBIDDEN_TIER_VOCABULARY:\n%s\n%s\n' "$matches" "$pro_matches" >&2
+    die source_failure "App target contains tier vocabulary (DEC-006)"
+  fi
+  printf 'NO_TIER_SOURCE=PASS\n'
+}
+
 audit_forbidden_bundle_content() {
   local app_path="$1"
   local -a forbidden_paths=()
@@ -214,12 +246,25 @@ audit_forbidden_bundle_content() {
   fi
 
   local debug_matches
-  debug_matches="$(rg -a -n -- '-UITestStubVision|MockPurchaseProvider|UITestVisionStub' "$app_path" || true)"
+  debug_matches="$(rg -a -n -- '-UITestStubVision|UITestVisionStub' "$app_path" || true)"
   if [[ -n "$debug_matches" ]]; then
     printf 'FORBIDDEN_DEBUG_CONTENT:\n%s\n' "$debug_matches" >&2
-    die source_failure "Release bundle contains DEBUG launch arguments or mock-provider strings"
+    die source_failure "Release bundle contains DEBUG launch arguments or stub strings"
   fi
-  printf 'BUNDLE_EXCLUSIONS=PASS\n'
+
+  # DEC-006: no StoreKit linkage and no tier symbols/strings may reach the shipped binary.
+  local binary="$app_path/AuraFit"
+  [[ -f "$binary" ]] || die source_failure "Release bundle has no main executable: $binary"
+  if otool -L "$binary" | rg -q -i 'StoreKit'; then
+    die source_failure "Release binary links StoreKit"
+  fi
+  local tier_matches
+  tier_matches="$(rg -a -n -i -- 'PaywallView|PaywallContext|EntitlementManager|StoreKitService|ProductCatalog|PurchaseProviding|com\.aurafit\.pro\.|com\.aurafit\.template\.|freeDailyScanLimit|AuraFit Pro|Upgrade to Pro|Restore Purchases' "$app_path" || true)"
+  if [[ -n "$tier_matches" ]]; then
+    printf 'FORBIDDEN_TIER_CONTENT:\n%s\n' "$tier_matches" >&2
+    die source_failure "Release bundle contains tier/StoreKit strings (DEC-006)"
+  fi
+  printf 'BUNDLE_EXCLUSIONS=PASS no_storekit_link=1 no_tier_strings=1\n'
 }
 
 classify_build_warnings() {
@@ -244,6 +289,10 @@ classify_build_warnings() {
     if [[ "$line" =~ (AuraFit|AuraFitTests|AuraFitUITests)/.*:[0-9]+:[0-9]+:.*warning: ]]; then
       printf '%s\n' "$line" >> "$source_file"
     elif [[ "$line" =~ CoreSimulatorService|simdiskimaged|DVT|ProvisioningProfile|xcodebuild.*(connection\ invalid|Simulator\ services\ will\ no\ longer\ be\ available) ]]; then
+      printf '%s\n' "$line" >> "$infrastructure_file"
+    elif [[ "$line" =~ appintentsmetadataprocessor.*No\ AppIntents\.framework\ dependency\ found ]]; then
+      # Xcode 26 toolchain notice emitted for every app that does not adopt App Intents; it is
+      # not a compiler diagnostic and does not originate from repository source.
       printf '%s\n' "$line" >> "$infrastructure_file"
     else
       printf '%s\n' "$line" >> "$unclassified_file"
@@ -282,6 +331,7 @@ validate_inputs() {
   fi
   mkdir -p "$AURAFIT_DERIVED_DATA_PATH"
   require_command find
+  require_command otool
   require_command plutil
   require_command python3
   require_command rg
@@ -313,6 +363,7 @@ main() {
 
   privacy_manifest="$(find_single_privacy_manifest)"
   audit_privacy_manifest "$privacy_manifest"
+  audit_no_tier_source
 
   test_log="$AURAFIT_DERIVED_DATA_PATH/release-candidate-test.log"
   result_path="$AURAFIT_DERIVED_DATA_PATH/AuraFit-tests.xcresult"

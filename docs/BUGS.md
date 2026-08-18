@@ -9,7 +9,7 @@
 
 AURA-B04 requires physical-device verification with the dark, bright, blurry, cropped,
 no-person, too-far, and too-close fixtures before it can be marked resolved. The other
-unexecuted device, signing, StoreKit, accessibility, and App Store Connect checks remain
+unexecuted device, signing, accessibility, and App Store Connect checks remain
 release risks and verification gaps, not confirmed bugs.
 
 Record observed behavior, reproduction steps, expected behavior, environment, and evidence. Do not convert assumptions into confirmed bugs.

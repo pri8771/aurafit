@@ -11,8 +11,7 @@
     "SwiftData",
     "Vision",
     "CoreML",
-    "AVFoundation",
-    "StoreKit"
+    "AVFoundation"
   ],
   "registeredAt": "2026-07-23",
   "existingCodeBaselineRequired": true,

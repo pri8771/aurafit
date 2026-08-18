@@ -172,11 +172,6 @@ struct ScorecardView: View {
                 .foregroundStyle(.white.opacity(0.7))
                 .lineLimit(2)
             Spacer()
-            if model.includeWatermark {
-                Text("Made with AuraFit")
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.5))
-            }
         }
     }
 }
@@ -187,8 +182,7 @@ struct ScorecardView: View {
             score: .placeholder,
             persona: .streetwear,
             paletteHex: ["1A1A1A", "8E73F5", "5BD5F5", "FB8B6B"],
-            dateString: "Jun 27, 2026",
-            includeWatermark: true
+            dateString: "Jun 27, 2026"
         )
     )
 }

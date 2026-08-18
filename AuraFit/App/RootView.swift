@@ -2,7 +2,6 @@ import SwiftUI
 import SwiftData
 
 /// Root container: shows onboarding until completed, then the main `TabView`.
-/// Also hosts the globally-presented paywall sheet.
 struct RootView: View {
     @Environment(AppEnvironment.self) private var environment
     @Environment(AppRouter.self) private var router
@@ -24,8 +23,6 @@ struct RootView: View {
     private var isUsingFallbackStorage: Bool { SwiftDataContainer.isUsingFallbackStorage }
 
     var body: some View {
-        @Bindable var router = router
-
         VStack(spacing: 0) {
             if isUsingFallbackStorage {
                 storageWarningBanner
@@ -41,21 +38,16 @@ struct RootView: View {
         }
         .task {
             presentStorageWarningIfNeeded()
-            await environment.bootstrap(settings: settings)
+            environment.bindSettings(settings)
             // Housekeeping runs last and off the main thread: sweeping stranded capture files
-            // must never delay first paint or the entitlement load (AURA-ENG-035).
+            // must never delay first paint (AURA-ENG-035).
             let repo = SessionRepository(context: modelContext, imageStore: environment.imageStore)
             await repo.reconcileOrphanedAssets()
         }
         // The `@Query` row can materialize after this view first appears. Re-bind whenever it
-        // changes so the free-scan quota is never left unenforced (AURA-ENG-011).
+        // changes so preferences are never left unbound.
         .onChange(of: settings?.persistentModelID) {
             environment.bindSettings(settings)
-        }
-        .sheet(item: $router.paywallContext) { context in
-            PaywallView(context: context)
-                .environment(environment)
-                .environment(router)
         }
         .alert("Storage Unavailable", isPresented: $isShowingStorageWarning) {
             Button("OK", role: .cancel) {}

@@ -10,8 +10,8 @@ Ask every external tester the same core questions. Free-text responses are optio
 4. Did Camera, photo-picker, or save-to-Photos permission behavior feel trustworthy and clear?
 5. Did **Share Scorecard**, **Save**, History, favorite, or delete behave as expected? Did the
    export feel useful?
-6. Was it clear what Pro and a one-time template unlock provide? Were the price, purchase, and
-   **Restore** paths clear?
+6. Did the three scorecard styles and **Reveal Clip** work, and did the exported card or clip
+   look the way you expected?
 7. Did you see a failure, crash, hang, unexpected result, or performance problem?
 8. Would you use AuraFit again, and for what situation? What one change would matter most?
 
@@ -27,4 +27,4 @@ For a defect, also collect:
 Do not request source photos, Apple IDs, receipts, payment details, or other sensitive data.
 Use this same question set without changing its meaning for every external cohort. Triage each
 response under `AURA-QA-009` as a reproducible defect, usability finding, content concern,
-StoreKit issue, performance issue, feature request, or no action.
+performance issue, feature request, or no action.

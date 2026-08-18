@@ -10,6 +10,10 @@ lastVerified: 2026-07-29
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 
+> **Not applicable — DEC-006 (2026-08-18).** AuraFit 1.0 ships as one full, free product with
+> no StoreKit code, products, prices, or purchase/restore paths. This task is retained for
+> history and for any future monetization decision; do not execute it for the 1.0 release.
+
 # AURA-QA-010 — StoreKit sandbox and TestFlight purchase matrix
 
 ## Task description

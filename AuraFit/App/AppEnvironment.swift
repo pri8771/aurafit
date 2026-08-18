@@ -2,25 +2,23 @@ import SwiftUI
 import SwiftData
 
 /// Container for app-wide services, injected through the SwiftUI environment.
-/// Constructed once at launch (or with mocks for previews/tests).
+/// Constructed once at launch (or with substitutes for previews/tests).
 @MainActor
 @Observable
 final class AppEnvironment {
-    let store: any PurchaseProviding
-    let entitlements: EntitlementManager
     let imageStore: ImageFileStore
     let analysisService: FitAnalysisService
 
+    /// The persisted settings row, bound by `RootView` once its `@Query` materializes it.
+    /// Read by flows that need a preference outside a view's own `@Query` (e.g. auto-save).
+    private(set) var settings: AppSettings?
+
     init(
-        store: (any PurchaseProviding)? = nil,
         imageStore: ImageFileStore? = nil,
         analysisService: FitAnalysisService? = nil
     ) {
-        let resolvedStore = store ?? StoreKitService()
-        self.store = resolvedStore
         self.imageStore = imageStore ?? ImageFileStore()
         self.analysisService = analysisService ?? AppEnvironment.makeAnalysisService()
-        self.entitlements = EntitlementManager(store: resolvedStore)
     }
 
     #if DEBUG
@@ -45,49 +43,24 @@ final class AppEnvironment {
 
     #endif
 
-    /// Loads products and entitlements; binds the persisted settings row.
-    func bootstrap(settings: AppSettings?) async {
-        bindSettings(settings)
-        await entitlements.loadProducts()
-    }
-
     /// Binds the persisted settings row to the services that depend on it.
     ///
     /// Safe to call repeatedly — `RootView` re-invokes it whenever its `@Query` result changes,
     /// so a row that materializes after first appearance still gets bound. A `nil` row is logged
-    /// and *ignored* rather than clearing an existing binding: without it the free-scan quota has
-    /// nothing to count against, and `EntitlementManager` deliberately fails closed (AURA-ENG-011).
+    /// and *ignored* rather than clearing an existing binding.
     func bindSettings(_ settings: AppSettings?) {
         guard let settings else {
-            AppLog.app.error("AppSettings row unavailable at bind time; daily scan quota fails closed until it materializes.")
+            AppLog.app.error("AppSettings row unavailable at bind time; preferences use defaults until it materializes.")
             return
         }
-        entitlements.settings = settings
+        self.settings = settings
         HapticsManager.shared.isEnabled = settings.hapticsEnabled
     }
 
-    #if DEBUG
-
-    /// A preview/test environment using a mock purchase provider.
-    static func preview(isPro: Bool = false) -> AppEnvironment {
-        let env = AppEnvironment(store: MockPurchaseProvider(isPro: isPro))
-        env.entitlements.settings = AppSettings()
+    /// A preview/test environment with an unsaved settings row bound.
+    static func preview() -> AppEnvironment {
+        let env = AppEnvironment()
+        env.bindSettings(AppSettings())
         return env
     }
-
-    #else
-
-    /// Release stub (AURA-ENG-014).
-    ///
-    /// `MockPurchaseProvider` is `#if DEBUG`-only so it is never linked into the shipped binary.
-    /// This entry point still has to exist in Release because `#Preview` macro bodies *are*
-    /// type-checked and compiled in Release builds — `ENABLE_PREVIEWS = NO` does not strip them —
-    /// and seven `#Preview` blocks across the Features layer call `AppEnvironment.preview()`.
-    /// Nothing invokes it at runtime: `PreviewRegistry` conformances are only ever driven by the
-    /// Xcode preview host, which runs a Debug build.
-    static func preview(isPro: Bool = false) -> AppEnvironment {
-        AppEnvironment()
-    }
-
-    #endif
 }

@@ -1,33 +1,21 @@
 import SwiftUI
 import SwiftData
 
-/// The Settings tab: subscription status, preferences, privacy info, and data management.
+/// The Settings tab: preferences, privacy info, data management, and about.
 struct SettingsView: View {
     @Environment(AppEnvironment.self) private var environment
-    @Environment(AppRouter.self) private var router
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.openURL) private var openURL
 
     @Query private var settingsRows: [AppSettings]
     @Query private var sessions: [FitSession]
 
     @State private var showResetConfirm = false
-    @State private var isRestoringPurchases = false
-    @State private var restoreResultMessage: String?
 
     private var settings: AppSettings? { settingsRows.first }
-    private var entitlements: EntitlementManager { environment.entitlements }
-
-    /// Whether any non-consumable template is owned. Only meaningful once Pro has been ruled
-    /// out, since `isTemplateUnlocked` reports true for everything while Pro is active.
-    private var hasUnlockedTemplates: Bool {
-        ProductCatalog.templateIDs.contains { entitlements.isTemplateUnlocked($0) }
-    }
 
     var body: some View {
         NavigationStack {
             Form {
-                membershipSection
                 preferencesSection
                 privacySection
                 dataSection
@@ -36,83 +24,11 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .afScreenBackground()
             .navigationTitle("Settings")
-            .alert("Restore Purchases", isPresented: Binding(
-                get: { restoreResultMessage != nil },
-                set: { if !$0 { restoreResultMessage = nil } }
-            )) {
-                Button("OK") { restoreResultMessage = nil }
-            } message: {
-                Text(restoreResultMessage ?? "")
-            }
         }
         .accessibilityIdentifier("aurafit.settings.root.container")
     }
 
     // MARK: - Sections
-
-    private var membershipSection: some View {
-        Section {
-            if entitlements.isPro {
-                HStack {
-                    Label("AuraFit Pro", systemImage: "sparkles")
-                        .foregroundStyle(AFColors.textPrimary)
-                    Spacer()
-                    Text("Active").foregroundStyle(AFColors.success).font(AFTypography.subheadline(.semibold))
-                }
-                Button {
-                    if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
-                        openURL(url)
-                    }
-                } label: {
-                    Label("Manage Subscription", systemImage: "creditcard")
-                }
-            } else {
-                Button {
-                    router.presentPaywall(.general)
-                } label: {
-                    HStack {
-                        Label("Upgrade to Pro", systemImage: "sparkles")
-                        Spacer()
-                        Image(systemName: "chevron.right").foregroundStyle(AFColors.textTertiary)
-                    }
-                }
-                .foregroundStyle(AFColors.accent)
-            }
-            Button {
-                Task {
-                    isRestoringPurchases = true
-                    let synced = await entitlements.restore()
-                    isRestoringPurchases = false
-                    if entitlements.isPro {
-                        restoreResultMessage = "Your Pro subscription has been restored."
-                    } else if !synced {
-                        restoreResultMessage = "Couldn't connect to the App Store. Check your connection and try again."
-                    } else if hasUnlockedTemplates {
-                        restoreResultMessage = "Your template packs have been restored."
-                    } else {
-                        restoreResultMessage = "No purchases found to restore."
-                    }
-                }
-            } label: {
-                HStack {
-                    Text("Restore Purchases")
-                    if isRestoringPurchases {
-                        Spacer()
-                        ProgressView()
-                    }
-                }
-            }
-            .foregroundStyle(AFColors.accent)
-            .disabled(isRestoringPurchases)
-        } header: {
-            Text("Membership")
-        } footer: {
-            if !entitlements.isPro {
-                Text("Free plan: \(ProductCatalog.freeDailyScanLimit) scans/day with watermarked exports.")
-            }
-        }
-        .listRowBackground(AFColors.surface)
-    }
 
     @ViewBuilder
     private var preferencesSection: some View {
@@ -158,7 +74,7 @@ struct SettingsView: View {
                     Text("Your data stays on-device")
                         .font(AFTypography.subheadline(.semibold))
                         .foregroundStyle(AFColors.textPrimary)
-                    Text("All analysis runs locally. AuraFit makes no network calls except to the App Store for purchases.")
+                    Text("All analysis runs locally. AuraFit makes no network calls of its own.")
                         .font(AFTypography.caption())
                         .foregroundStyle(AFColors.textSecondary)
                 }

@@ -1,5 +1,8 @@
 # AURA-MON-008 evidence
 
+- Status: `not_applicable` — closed by DEC-006 (2026-08-18): AuraFit 1.0 has no in-app
+  purchases, so this task has no work product. Content below is retained for history.
+
 - Status: `blocked_external` — the repository-side catalog preflight is complete, but the
   owner-controlled commercial policy, Apple account/app record, App Store Connect catalog,
   propagation, sandbox, and TestFlight observations have no evidence.

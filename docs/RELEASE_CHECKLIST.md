@@ -6,8 +6,8 @@ linked task evidence exists under `quality/evidence/testflight/<TASK-ID>/`.
 
 ## `TF-G1` — upload eligible
 
-- [ ] `AURA-OPS-001`: exact release commit is green in CI with 101/101 tests.
-- [ ] `AURA-OPS-009`: membership, agreements, roles, Paid Apps Agreement, banking, and tax are verified.
+- [ ] `AURA-OPS-001`: exact release commit is green in CI with 94/94 tests.
+- [ ] `AURA-OPS-009`: membership, agreements, and roles are verified (Paid Apps Agreement, banking, and tax are not required for a free app — DEC-006).
 - [ ] `AURA-OPS-010`: explicit App ID and App Store Connect record match `com.pchordia.aurafit`.
 - [ ] `AURA-OPS-011`: version/build identity and beta scope are frozen.
 - [ ] `AURA-OPS-005`: machine-checkable release-candidate script passes.
@@ -21,15 +21,15 @@ linked task evidence exists under `quality/evidence/testflight/<TASK-ID>/`.
 
 ## `TF-G2` — internal TestFlight ready
 
-- [ ] `AURA-MON-002`: initial prices, territories, trials/offers, and Family Sharing policy are owner-approved.
-- [ ] `AURA-MON-008`: production StoreKit products/subscription group are complete in App Store Connect.
-- [ ] `AURA-QA-010`: sandbox/TestFlight purchase, restore, expiry, refund/revoke, and offline paths pass.
+- [x] `AURA-MON-002`: N/A by decision — no prices, offers, or Family Sharing policy exist for a free app (DEC-006, 2026-08-18).
+- [x] `AURA-MON-008`: N/A by decision — no StoreKit products or subscription group are shipped (DEC-006, 2026-08-18).
+- [x] `AURA-QA-010`: N/A by decision — there is no purchase, restore, expiry, refund, or offline-entitlement path to test (DEC-006, 2026-08-18).
 - [ ] `AURA-QA-006`: an internal tester installs from TestFlight and passes the release-build smoke.
 
 ## `TF-G3` — external TestFlight ready
 
 - [ ] `AURA-MKT-004`: durable public privacy-policy and support URLs return correct content.
-- [ ] `AURA-LEG-003`: EULA/terms choice and subscription legal links are approved.
+- [ ] `AURA-LEG-003`: EULA/terms choice is approved (subscription legal links are N/A by decision — DEC-006).
 - [ ] `AURA-LEG-004`: App Privacy answers are published and match the binary.
 - [ ] `AURA-LEG-005`: age rating and content-rights answers are complete.
 - [ ] `AURA-LEG-008`: beta description, What to Test, feedback contact, and reviewer notes are approved.
@@ -42,6 +42,7 @@ linked task evidence exists under `quality/evidence/testflight/<TASK-ID>/`.
 - [x] Shipping analysis claims match bundled behavior.
 - [x] Privacy manifest and usage descriptions match implemented access.
 - [x] Unsigned Release builds are warning-free for generic device and Simulator.
-- [x] 98 required tests pass in the audited environment.
+- [x] The full suite passes in the audited environment (count recorded per candidate in `quality/evidence/`).
 - [x] Test-only controls/assets are excluded or protected from Release.
 - [x] Known limitations are documented.
+- [x] No tier: no StoreKit configuration, purchase surface, locked template, or scan quota in the app target (`FullFreeProductTests`, DEC-006).

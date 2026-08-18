@@ -13,7 +13,6 @@ final class FitSession {
     /// Relative paths within the documents directory (resolved by `ImageFileStore`).
     var originalImagePath: String?
     var scorecardImagePath: String?
-    var scorecardIncludesWatermark: Bool = false
     var revealVideoPath: String?
 
     var overallScore: Int
@@ -53,7 +52,6 @@ final class FitSession {
         paletteHex: [String] = [],
         originalImagePath: String? = nil,
         scorecardImagePath: String? = nil,
-        scorecardIncludesWatermark: Bool = false,
         revealVideoPath: String? = nil,
         notes: String = "",
         isFavorite: Bool = false,
@@ -72,7 +70,6 @@ final class FitSession {
         self.paletteHex = paletteHex
         self.originalImagePath = originalImagePath
         self.scorecardImagePath = scorecardImagePath
-        self.scorecardIncludesWatermark = scorecardIncludesWatermark
         self.revealVideoPath = revealVideoPath
         self.notes = notes
         self.isFavorite = isFavorite

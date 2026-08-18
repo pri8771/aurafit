@@ -1,52 +1,24 @@
 {
   "$schema": "https://raw.githubusercontent.com/pri8771/iOS_app_factory_rules/main/schemas/feature-contract.schema.json",
   "id": "FEAT-004",
-  "name": "Free limits and StoreKit entitlements",
-  "status": "verification_pending",
-  "userOutcome": "A free user sees the real daily limit, while an eligible user can purchase or restore products and receive only verified entitlements.",
-  "entryPoints": [
-    "Quota banner",
-    "Paywall",
-    "Settings membership section"
-  ],
-  "productionDataSource": "StoreKit 2 Product and verified Transaction entitlements, plus the persisted AppSettings daily scan counter.",
-  "states": [
-    "idle",
-    "loading_products",
-    "products_available",
-    "products_unavailable",
-    "purchasing",
-    "pending",
-    "cancelled",
-    "purchased",
-    "restoring",
-    "restore_empty",
-    "restore_failed",
-    "offline_entitled"
-  ],
-  "errorBehavior": "Store failures show specific retryable messages. Cancellation shows no error. Pending purchases are not reported as active. Missing settings fail the free quota closed until a persisted row binds.",
-  "duplicateProtectionRequired": true,
-  "persistenceRequired": true,
-  "layoutScenarios": [
-    "localized product names and prices",
-    "small supported iPhone",
-    "Dynamic Type accessibility sizes",
-    "offline products-unavailable copy"
-  ],
-  "accessibilityRequirements": [
-    "Selected subscription and locked template state are announced",
-    "Busy purchase and restore controls are disabled",
-    "Price, renewal, restore, terms, and privacy information remain reachable"
-  ],
+  "name": "Free limits and StoreKit entitlements (retired)",
+  "status": "retired",
+  "userOutcome": "Retired by DEC-006 (2026-08-18): AuraFit 1.0 is one full, free product. There is no free limit, paywall, purchase, restore, or entitlement; every capability is available to every user. Retained for history only.",
+  "entryPoints": [],
+  "productionDataSource": "None. StoreKit, EntitlementManager, ProductCatalog, the AuraFit.storekit configuration, and the AppSettings daily-scan counters were deleted.",
+  "states": [],
+  "errorBehavior": "Not applicable; no store or quota code remains.",
+  "duplicateProtectionRequired": false,
+  "persistenceRequired": false,
+  "layoutScenarios": [],
+  "accessibilityRequirements": [],
   "prohibitedBehavior": [
-    "Do not grant entitlement from an unverified transaction",
-    "Do not compile mock purchases or force-Pro flags into Release",
-    "Do not report restore success when AppStore.sync fails",
-    "Do not start duplicate purchases"
+    "Do not reintroduce a paywall, tier, quota, locked template, or StoreKit surface in 1.0 (DEC-006)",
+    "Do not show 'coming soon' monetization copy in the UI or metadata"
   ],
   "acceptanceTests": [
-    "EntitlementManagerTests",
-    "Release-binary audit for debug purchase symbols and launch arguments",
-    "StoreKit sandbox purchase, pending, cancel, restore, template-only restore, refund, and offline checks"
+    "FullFreeProductTests (source-level tier-vocabulary guard, every scorecard style renders, scans unlimited)",
+    "ReleaseConfigurationTests.testDevelopmentAndUnlicensedAssetsAreNotBundled",
+    "scripts/release_candidate_check.sh audit_no_tier_source and audit_forbidden_bundle_content"
   ]
 }

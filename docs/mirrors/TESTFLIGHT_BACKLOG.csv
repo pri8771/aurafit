@@ -8,9 +8,9 @@ AURA-OPS-012A,Configure signing and install Release build on device,Task,P0,bloc
 AURA-QA-002,Execute physical-device core-loop and persistence matrix,Task,P0,blocked_external,TF-G1,AURA-OPS-012A,Owner + agent + iPhone,"testflight,qa,device",docs/testflight/tasks/AURA-QA-002.md,12
 AURA-QA-004,Execute accessibility and supported-layout matrix,Task,P0,blocked_external,TF-G1,AURA-OPS-012A,Human reviewer + iPhone,"testflight,qa,accessibility",docs/testflight/tasks/AURA-QA-004.md,7
 AURA-QA-005,Execute performance interruption storage and thermal smoke,Task,P0,blocked_external,TF-G1,AURA-OPS-012A,Human reviewer + iPhone,"testflight,qa,performance",docs/testflight/tasks/AURA-QA-005.md,7
-AURA-MON-002,Approve initial prices and offer policy,Task,P0,human_review_required,TF-G2,,Owner + agent research,"testflight,monetization,pricing",docs/testflight/tasks/AURA-MON-002.md,7
-AURA-MON-008,Configure production StoreKit catalog,Task,P0,blocked_external,TF-G2,"AURA-OPS-009,AURA-OPS-010,AURA-MON-002",Owner,"testflight,monetization,storekit",docs/testflight/tasks/AURA-MON-008.md,9
-AURA-QA-010,Execute StoreKit sandbox and TestFlight matrix,Task,P0,blocked_external,TF-G2,"AURA-MON-008,AURA-OPS-012A",Owner + agent + sandbox account,"testflight,qa,storekit",docs/testflight/tasks/AURA-QA-010.md,9
+AURA-MON-002,Approve initial prices and offer policy,Task,P0,not_applicable,TF-G2,,Owner + agent research,"testflight,monetization,pricing",docs/testflight/tasks/AURA-MON-002.md,7
+AURA-MON-008,Configure production StoreKit catalog,Task,P0,not_applicable,TF-G2,"AURA-OPS-009,AURA-OPS-010,AURA-MON-002",Owner,"testflight,monetization,storekit",docs/testflight/tasks/AURA-MON-008.md,9
+AURA-QA-010,Execute StoreKit sandbox and TestFlight matrix,Task,P0,not_applicable,TF-G2,"AURA-MON-008,AURA-OPS-012A",Owner + agent + sandbox account,"testflight,qa,storekit",docs/testflight/tasks/AURA-QA-010.md,9
 AURA-MKT-004,Publish durable privacy and support pages,Task,P0,blocked_external,TF-G3,,Owner + hosting access,"testflight,marketing,hosting",docs/testflight/tasks/AURA-MKT-004.md,7
 AURA-LEG-003,Confirm Terms or EULA and subscription legal links,Task,P0,human_review_required,TF-G3,AURA-MKT-004,Owner + human review,"testflight,legal,eula",docs/testflight/tasks/AURA-LEG-003.md,5
 AURA-LEG-004,Publish App Store privacy answers,Task,P0,blocked_external,TF-G3,AURA-MKT-004,Owner,"testflight,legal,privacy",docs/testflight/tasks/AURA-LEG-004.md,6

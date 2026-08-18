@@ -1,5 +1,11 @@
 # AURA-OPS-012B evidence — final archive runbook
 
+- **2026-08-18 update:** a signed Release archive and App Store-method export of `1.0 (3)` were
+  produced locally (`destination: export`, **not uploaded**) after the release gate passed
+  94/94; IPA SHA-256 `d5300abd3b31a1b1d11692d0d55b072a28736625d052efef8445fbf02e606664`. Device
+  QA prerequisites (QA-002/004/005) are still open; QA-010 is N/A by DEC-006. Full record:
+  `quality/evidence/release/1.0-3-full-free/README.md`.
+
 - Status: `blocked_external`; do not begin until OPS-005, QA-002/004/005/010, and OPS-014 all pass with evidence and there are no open P0/P1 bugs.
 - Archive path format after OPS-011 freeze: `/tmp/AuraFit-<VERSION>-<BUILD>.xcarchive`; raw archive, profiles, certificates, entitlements, and logs remain outside Git.
 

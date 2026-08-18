@@ -4,12 +4,11 @@
 <dict>
 	<!--
 	AuraFit is a local-first, on-device app: no backend, no analytics/advertising SDKs,
-	and no networking calls beyond opening Apple's own web pages (Terms/Privacy links,
-	App Store subscription management) via `Link`/`UIApplication.open`, which do not
-	transmit user data. Camera and Photos images are processed on-device (Vision/Core
-	Image analysis with a heuristic style estimate) and persisted only in the app's local
-	sandbox (SwiftData + local files); nothing is uploaded or shared with the developer
-	or any third party. See docs/ARCHITECTURE.md and docs/DECISIONS.md (DEC-003) for
+	no in-app store or account, and no networking calls beyond opening Apple's standard
+	EULA page (Terms of Use link) via `Link`, which does not transmit user data. Camera
+	and Photos images are processed on-device (Vision/Core Image analysis with a heuristic
+	style estimate) and persisted only in the app's local sandbox (SwiftData + local
+	files); nothing is uploaded or shared with the developer or any third party. See docs/ARCHITECTURE.md and docs/DECISIONS.md (DEC-003) for
 	the on-device analysis architecture this manifest reflects.
 	-->
 
@@ -24,8 +23,7 @@
 	<!--
 	No user data is collected (i.e. transmitted off-device or linked to identity and
 	shared with the developer/third parties). Photos and camera captures are analyzed
-	and stored locally only; StoreKit purchase state is managed by Apple's own
-	on-device StoreKit APIs and is not collected by this app.
+	and stored locally only.
 	-->
 	<key>NSPrivacyCollectedDataTypes</key>
 	<array/>

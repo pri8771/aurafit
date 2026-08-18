@@ -2,7 +2,7 @@
 id: DOC-TESTFLIGHT-READINESS
 canonicalFor: testflight-readiness-execution
 status: active
-lastVerified: 2026-08-13
+lastVerified: 2026-08-18
 readWhen:
   - preparing a signed beta
   - working on App Store Connect
@@ -65,19 +65,17 @@ Allowed statuses are `planned`, `blocked_external`, `in_progress`, `verification
 | App name | AuraFit | Release `Info.plist` |
 | Bundle ID | `com.pchordia.aurafit` | Xcode project |
 | Development team | `796XH483R4` | Xcode project; Apple ownership still requires verification |
-| Version/build | `1.0 (1)` locally | Xcode project; build reuse must be checked in App Store Connect |
+| Version/build | `1.0 (3)` locally (builds 1 and 2 are consumed in App Store Connect) | Xcode project |
 | Minimum OS | iOS 18.0 | Xcode project |
 | Devices | iPhone only, portrait | Xcode project |
 | Category intent | Lifestyle | `LSApplicationCategoryType` |
 | Encryption flag | Non-exempt encryption is `false` | Release `Info.plist` |
-| Subscriptions | `com.aurafit.pro.monthly`, `com.aurafit.pro.yearly` | `ProductCatalog.swift` |
-| Non-consumables | `com.aurafit.template.streetwear`, `com.aurafit.template.softluxury` | `ProductCatalog.swift` |
-| Free limit | 3 scans/day | `ProductCatalog.swift` |
+| In-app purchases | None — one full, free product (DEC-006, 2026-08-18) | `FullFreeProductTests`, `scripts/release_candidate_check.sh` |
 | Backend | Prohibited | `.factory/project-context.json` |
 
 External unknowns include Apple membership/agreements/roles, App ID and app-record state,
-uploaded build numbers, signing health, public URLs/contacts, StoreKit commercial metadata,
-sandbox accounts, tester identities, and Apple processing/review state. The selected task file
+uploaded build numbers, signing health, public URLs/contacts, tester identities, and Apple
+processing/review state. The selected task file
 defines the exact owner request and stop behavior for each unknown.
 
 ## 4. Dependency order
@@ -85,14 +83,14 @@ defines the exact owner request and stop behavior for each unknown.
 ```text
 OPS-009 → OPS-010 → OPS-011 → OPS-012A
     │          │          │         ├→ QA-002 → QA-004 / QA-005
-    │          │          │         └→ MON-002 → MON-008 → QA-010
+    │          │          │         └→ (MON-002 → MON-008 → QA-010: N/A by DEC-006)
     │          │          └→ OPS-005
     │          └→ LEG-005 / OPS-014
-    └→ MON-008
+    └→ (MON-008: N/A by DEC-006)
 
 MKT-004 → LEG-003 / LEG-004 / LEG-008
 
-QA-002 + QA-004 + QA-005 + QA-010 + LEG-003/004/005/008 + OPS-014
+QA-002 + QA-004 + QA-005 + LEG-003/004/005/008 + OPS-014
     → OPS-012B → OPS-013 → QA-006 → QA-007 → QA-008 → QA-009
 
 OPS-003 occurs only after QA-006. OPS-007 is non-blocking mirror work.
@@ -111,16 +109,16 @@ OPS-003 occurs only after QA-006. OPS-007 is non-blocking mirror work.
 | 7 | [`AURA-QA-002`](testflight/tasks/AURA-QA-002.md) Run core-loop device matrix | `TF-G1` | Owner + agent + iPhone | `blocked_external` | OPS-012A |
 | 8 | [`AURA-QA-004`](testflight/tasks/AURA-QA-004.md) Run accessibility/layout matrix | `TF-G1` | Human reviewer + iPhone | `blocked_external` | OPS-012A |
 | 9 | [`AURA-QA-005`](testflight/tasks/AURA-QA-005.md) Run performance/stability smoke | `TF-G1` | Human reviewer + iPhone | `blocked_external` | OPS-012A |
-| 10 | [`AURA-MON-002`](testflight/tasks/AURA-MON-002.md) Approve prices and offers | `TF-G2` | Owner + agent research | `human_review_required` | — |
-| 11 | [`AURA-MON-008`](testflight/tasks/AURA-MON-008.md) Configure production StoreKit catalog | `TF-G2` | Owner | `blocked_external` | OPS-009, OPS-010, MON-002 |
-| 12 | [`AURA-QA-010`](testflight/tasks/AURA-QA-010.md) Run StoreKit sandbox/TestFlight matrix | `TF-G2` | Owner + agent + sandbox account | `blocked_external` | MON-008, OPS-012A |
+| 10 | [`AURA-MON-002`](testflight/tasks/AURA-MON-002.md) Approve prices and offers | `TF-G2` | — | `not_applicable` (DEC-006, 2026-08-18) | — |
+| 11 | [`AURA-MON-008`](testflight/tasks/AURA-MON-008.md) Configure production StoreKit catalog | `TF-G2` | — | `not_applicable` (DEC-006, 2026-08-18) | — |
+| 12 | [`AURA-QA-010`](testflight/tasks/AURA-QA-010.md) Run StoreKit sandbox/TestFlight matrix | `TF-G2` | — | `not_applicable` (DEC-006, 2026-08-18) | — |
 | 13 | [`AURA-MKT-004`](testflight/tasks/AURA-MKT-004.md) Publish privacy/support pages | `TF-G3` | Owner + hosting access | `human_review_required` | [evidence](../quality/evidence/testflight/AURA-MKT-004/README.md) |
 | 14 | [`AURA-LEG-003`](testflight/tasks/AURA-LEG-003.md) Confirm EULA/legal links | `TF-G3` | Owner + human review | `human_review_required` | MKT-004 |
 | 15 | [`AURA-LEG-004`](testflight/tasks/AURA-LEG-004.md) Publish App Privacy answers | `TF-G3` | Owner | `blocked_external` | MKT-004 |
 | 16 | [`AURA-LEG-005`](testflight/tasks/AURA-LEG-005.md) Complete age rating/content rights | `TF-G3` | Owner | `blocked_external` | OPS-010 |
 | 17 | [`AURA-OPS-014`](testflight/tasks/AURA-OPS-014.md) Confirm export compliance | `TF-G1` | Owner + human legal determination | `human_review_required` | OPS-010 |
-| 18 | [`AURA-LEG-008`](testflight/tasks/AURA-LEG-008.md) Prepare reviewer packet | `TF-G3` | Agent draft + owner contacts | `human_review_required` | MKT-004, MON-008 |
-| 19 | [`AURA-OPS-012B`](testflight/tasks/AURA-OPS-012B.md) Create/validate final archive | `TF-G1` | Owner + agent | `blocked_external` | OPS-005, QA-002, QA-004, QA-005, QA-010, OPS-014 |
+| 18 | [`AURA-LEG-008`](testflight/tasks/AURA-LEG-008.md) Prepare reviewer packet | `TF-G3` | Agent draft + owner contacts | `human_review_required` | MKT-004 |
+| 19 | [`AURA-OPS-012B`](testflight/tasks/AURA-OPS-012B.md) Create/validate final archive | `TF-G1` | Owner + agent | `verification_pending` (signed archive + local export of `1.0 (3)` on 2026-08-18, not uploaded) | OPS-005, QA-002, QA-004, QA-005, OPS-014 |
 | 20 | [`AURA-OPS-013`](testflight/tasks/AURA-OPS-013.md) Upload and clear processing | `TF-G1` | Owner/App Manager/Developer | `blocked_external` | OPS-012B |
 | 21 | [`AURA-QA-006`](testflight/tasks/AURA-QA-006.md) Run internal TestFlight smoke | `TF-G2` | Owner + internal tester | `blocked_external` | OPS-013 |
 | 22 | [`AURA-QA-007`](testflight/tasks/AURA-QA-007.md) Run external TestFlight review | `TF-G3` | Owner/App Manager | `blocked_external` | QA-006, LEG-003/004/005/008 |
@@ -130,6 +128,15 @@ OPS-003 occurs only after QA-006. OPS-007 is non-blocking mirror work.
 | 26 | [`AURA-OPS-007`](testflight/tasks/AURA-OPS-007.md) Refresh Jira/Notion mirrors | Non-blocking | Owner/PM | `planned` | Canonical plans approved |
 
 ## 6. Current critical path
+
+**2026-08-18 update (DEC-006).** The owner decided AuraFit 1.0 ships as one full, free product.
+Every StoreKit/paywall/quota surface was removed, `CURRENT_PROJECT_VERSION` was bumped to `3`
+(builds 1 and 2 are consumed in App Store Connect), the suite passes 94/94, the release gate
+passes, and a signed archive plus locally exported IPA of `1.0 (3)` exist — **not uploaded**
+(evidence: `quality/evidence/release/1.0-3-full-free/README.md`). MON-002, MON-008, and QA-010
+are `not_applicable`; the remaining path is owner upload of build 3, device QA, and the legal
+metadata items. The paragraph below describes the state as of 2026-08-13 and is retained for
+history.
 
 On 2026-08-13 a signed Release archive of `1.0 (1)` was produced and uploaded to App Store
 Connect (evidence: `quality/evidence/testflight/AURA-OPS-012A/UPLOAD-2026-08-13.md`), which is
@@ -147,7 +154,7 @@ The shortest internal-beta path from here is:
 1. Owner review of the OPS-009/OPS-010/OPS-012A evidence now on file, and confirmation of Apple
    processing/TestFlight availability for `1.0 (1)`.
 2. OPS-012A on-device install/launch/signing inspection (the archive/upload half is done).
-3. QA-002/004/005 and MON-002/MON-008/QA-010.
+3. QA-002/004/005 (MON-002/MON-008/QA-010 are N/A by DEC-006).
 4. OPS-005 release gate.
 5. OPS-014 export determination.
 6. OPS-011 freeze of the next candidate (build `2`) and OPS-012B final archive, if a new build

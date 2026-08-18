@@ -2,7 +2,7 @@
 id: DOC-INDEX
 canonicalFor: documentation-navigation
 status: active
-lastVerified: 2026-08-13
+lastVerified: 2026-08-18
 readWhen:
   - onboarding
   - locating authoritative project information
@@ -83,8 +83,10 @@ For Jira or Notion, regenerate `mirrors/TESTFLIGHT_BACKLOG.csv` from
 
 ## Documentation gaps
 
-- Physical-device camera, permission, export, StoreKit sandbox, accessibility, relaunch,
-  performance, interruption, storage, and thermal evidence is still required.
+- Physical-device camera, permission, export, accessibility, relaunch, performance,
+  interruption, storage, and thermal evidence is still required.
+- The `1.0 (3)` full-free candidate (DEC-006) has a signed archive and locally exported IPA
+  (`quality/evidence/release/1.0-3-full-free/README.md`) but has not been uploaded.
 - A signed archive of `1.0 (1)` was produced and uploaded to App Store Connect on 2026-08-13
   (`quality/evidence/testflight/AURA-OPS-012A/UPLOAD-2026-08-13.md`); Apple processing
   completion, TestFlight availability, and TestFlight install evidence remain outstanding, and

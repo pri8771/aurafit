@@ -10,8 +10,10 @@ photo, explains the result, and creates a shareable scorecard.
 The repository now conforms to the registered App Factory 0.4.0 structure and its
 audited source is `code_complete`. The canonical TestFlight backlog contains 26 task plans,
 179 stable subtasks, and 26 matching evidence/runbook packs. Release status remains
-`human_review_required`: GitHub CI, Apple access/signing, physical-device QA, StoreKit sandbox,
-public URLs, App Store Connect metadata, and the first TestFlight smoke are not yet evidenced.
+`human_review_required`: GitHub CI, physical-device QA, App Store Connect metadata, and the
+first TestFlight smoke are not yet evidenced. On 2026-08-18 (DEC-006) the product became one
+full, free app — no StoreKit, paywall, or quota — and a signed `1.0 (3)` archive/IPA was
+produced locally (not uploaded); see `quality/evidence/release/1.0-3-full-free/README.md`.
 
 ## Build and run
 

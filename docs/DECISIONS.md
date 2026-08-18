@@ -61,3 +61,45 @@
 - **Decision:** VoiceOver manual review is deferred, not descoped — this is a "come back to it later" call, not a permanent product decision to exclude VoiceOver support. Discrete, already-identified VoiceOver gaps found during code review (e.g. the two fixed-size fonts corrected 2026-08-17) are still fixed as found — this defers the *systematic device pass* (`AURA-QA-004`), not opportunistic fixes. Dynamic Type remains in scope and is not deferred.
 - **Consequences:** `AURA-QA-004` is not launch-blocking until this is revisited. Do not claim VoiceOver support is verified or complete in any release notes, App Store copy, or accessibility nutrition labels while this stands.
 - **Related Files:** `docs/testflight/tasks/AURA-QA-004.md`, `quality/evidence/testflight/AURA-QA-004/README.md`, `docs/BUGS.md`
+
+## DEC-006 — AuraFit 1.0 ships as one full, free product; monetization deferred
+
+- **Status:** accepted
+- **Date:** 2026-08-18
+- **Context:** Builds `1.0 (1)` and `1.0 (2)` carried a freemium model: a StoreKit 2 paywall
+  (`AuraFit Pro` monthly/yearly subscriptions plus two one-time scorecard-style unlocks), a
+  three-scans-per-day free quota, watermarked free exports, and Pro-only reveal clips. None of
+  the commercial prerequisites (`AURA-MON-002` prices/offers, `AURA-MON-008` production
+  catalog, `AURA-QA-010` sandbox matrix, `AURA-LEG-003` subscription legal links) had been
+  completed, and the owner judged that a first release should read as a complete free app,
+  not as the free version of a paid one.
+- **Decision:** AuraFit 1.0 is **one full, free product**. Every capability the app has is
+  available to everyone, always: unlimited scans, all three scorecard styles, reveal clips,
+  and clean exports. There is no paywall, no "Pro"/"premium"/"free plan" language, no locked
+  template, no scan quota, no StoreKit purchase surface, and no entitlement gating anywhere.
+  The tier machinery is **deleted, not flagged off** — a flag would still be a tier. Build
+  `1.0 (3)` is the first candidate under this decision.
+- **Monetization is deferred, not descoped.** Any future paid offering is a new product
+  decision for a later version and is not advertised in 1.0 ("coming soon" copy is not
+  permitted in the UI or metadata).
+- **Consequences:**
+  - Removed from the app target: `Features/Paywall`, `Services/Store` (`StoreKitService`,
+    `EntitlementManager`, `ProductCatalog`, `MockPurchaseProvider`), `Resources/AuraFit.storekit`
+    and its scheme reference, `PaywallContext`, `EntitlementTier`, the daily-scan counters on
+    `AppSettings`, the watermark flag on `ScorecardModel`/`FitSession`, and every
+    Pro/upgrade/restore/quota string. `StoreKit` is no longer imported, so it is no longer
+    linked.
+  - `EntitlementManagerTests` is deleted; `FullFreeProductTests` guards the decision at source
+    level (forbidden tier vocabulary in the app target fails the suite), proves every scorecard
+    style renders without an ownership check, and proves scans are unlimited.
+  - `AURA-MON-002`, `AURA-MON-008`, `AURA-QA-010`, and the subscription-link half of
+    `AURA-LEG-003` are **N/A by decision** in `RELEASE_CHECKLIST.md`; the Paid Apps Agreement,
+    banking, and tax sub-items of `AURA-OPS-009` are no longer required for this release.
+  - The privacy policy, in-app policy screen, support page, reviewer notes, beta description,
+    and App Store listing state plainly: no account, no purchases, all features free.
+  - `docs/RELEASE_CHECKLIST.md`, `docs/FEATURES.md`, `docs/STATUS.md`,
+    `docs/PRIVACY_POLICY.md`, `docs/release/*`, and `quality/feature-contracts/FEAT-004.json`
+    are updated in the same change.
+- **Related files:** `AuraFitTests/FullFreeProductTests.swift`,
+  `AuraFitTests/ReleaseConfigurationTests.swift`, `scripts/release_candidate_check.sh`,
+  `quality/evidence/release/1.0-3-full-free/README.md`

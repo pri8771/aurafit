@@ -119,8 +119,8 @@ final class AnalysisPipelineTests: XCTestCase {
         }
     }
 
-    /// The scan flow's contract: a cancelled analysis never reaches `createSession` (which is what
-    /// `ScanView` gates the scan-quota increment on), so the store is left exactly as it was.
+    /// The scan flow's contract: a cancelled analysis never reaches `createSession`, so the store
+    /// is left exactly as it was.
     @MainActor
     func testCancelledScanPersistsNoSession() async throws {
         let container = SwiftDataContainer.makeInMemory()

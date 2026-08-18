@@ -1,5 +1,8 @@
 # AURA-MON-002 evidence
 
+- Status: `not_applicable` — closed by DEC-006 (2026-08-18): AuraFit 1.0 has no in-app
+  purchases, so this task has no work product. Content below is retained for history.
+
 - Status: `human_review_required` — the decision pack and source-backed product scope are ready,
   but no owner has approved prices, storefronts, territories, offers, Family Sharing, or a
   product-removal decision.

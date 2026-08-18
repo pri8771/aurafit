@@ -54,7 +54,7 @@ enum FitMetricKind: String, Codable, CaseIterable, Identifiable, Sendable {
 
 // MARK: - Score Label
 
-/// Qualitative tier derived from the overall numeric score.
+/// Qualitative band derived from the overall numeric score.
 enum ScoreLabel: String, Codable, CaseIterable, Sendable {
     case mainCharacter = "Main Character"
     case sharp = "Sharp"
@@ -134,11 +134,4 @@ enum StylePersona: String, Codable, CaseIterable, Identifiable, Sendable {
         case .undetermined: return "A mix that's all your own."
         }
     }
-}
-
-// MARK: - Entitlement Tier
-
-enum EntitlementTier: String, Codable, Sendable {
-    case free
-    case pro
 }

@@ -1,5 +1,10 @@
 # AURA-OPS-011 evidence — release identity freeze runbook
 
+- **2026-08-18 update:** builds `1` and `2` are consumed in App Store Connect; the owner's
+  DEC-006 decision (one full, free product) fixed the next candidate at `1.0 (3)` and
+  `CURRENT_PROJECT_VERSION` was bumped to `3` in both configurations. Beta scope for build 3:
+  no in-app purchases. See `quality/evidence/release/1.0-3-full-free/README.md`.
+
 - Status: `blocked_external`; App Store Connect build history is required before a build can be frozen.
 - Current local, unapproved values: bundle `com.pchordia.aurafit`, marketing version `1.0`, build `1`, min OS `18.0`, iPhone family `1`; HEAD observed during runbook preparation: `0f48aa22ea1cea7d8a33ba5bceea0926c055e120` on `claude/phase0-production-readiness`. These facts are not a frozen candidate.
 - Owner input: `OWNER_REQUIRED_BETA_VERSION_CHANGE` only if version differs from 1.0; `OWNER_REQUIRED_RELEASE_BUILD` only if owner selects a different verified-unused integer.
