@@ -12,8 +12,12 @@ audited source is `code_complete`. The canonical TestFlight backlog contains 26 
 179 stable subtasks, and 26 matching evidence/runbook packs. Release status remains
 `human_review_required`: GitHub CI, physical-device QA, App Store Connect metadata, and the
 first TestFlight smoke are not yet evidenced. On 2026-08-18 (DEC-006) the product became one
-full, free app — no StoreKit, paywall, or quota — and a signed `1.0 (3)` archive/IPA was
-produced locally (not uploaded); see `quality/evidence/release/1.0-3-full-free/README.md`.
+full, free app — no StoreKit, paywall, or quota — and a signed `1.0 (3)` archive was produced,
+**uploaded (13:34:57 local), processed, and version 1.0 was submitted for App Review at ~13:41
+local ("Waiting for Review")**; physical-device QA was not run and was consciously waived by the
+owner for that submission (DEC-007). See
+`quality/evidence/release/1.0-3-full-free/{README.md,SUBMISSION-2026-08-18.md}` and
+`docs/STATUS.md`. Next action: watch for Apple's decision; any resubmission needs build `≥ 4`.
 
 ## Build and run
 

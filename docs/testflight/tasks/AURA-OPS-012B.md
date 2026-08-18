@@ -2,11 +2,11 @@
 id: AURA-OPS-012B
 title: Create and validate the final signed archive
 gate: TF-G1
-status: blocked_external
+status: done
 ownerBoundary: Owner + agent
 dependsOn: [AURA-OPS-005, AURA-QA-002, AURA-QA-004, AURA-QA-005, AURA-QA-010, AURA-OPS-014]
 evidence: quality/evidence/testflight/AURA-OPS-012B/README.md
-lastVerified: 2026-07-29
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

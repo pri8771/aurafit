@@ -6,7 +6,7 @@ status: blocked_external
 ownerBoundary: Owner + internal tester
 dependsOn: [AURA-OPS-013]
 evidence: quality/evidence/testflight/AURA-QA-006/README.md
-lastVerified: 2026-07-29
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

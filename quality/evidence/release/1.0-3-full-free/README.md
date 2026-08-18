@@ -1,8 +1,11 @@
 # Release candidate `1.0 (3)` — one full, free product (DEC-006) — 2026-08-18
 
 - Status: `verification_pending` — repository gate passed, signed archive and App Store-method
-  IPA produced and verified locally. **Not uploaded to App Store Connect.** Owner upload,
-  device QA, and App Store Connect metadata entry remain.
+  IPA produced and verified locally. ~~**Not uploaded to App Store Connect.**~~ **2026-08-18
+  update:** the same archive was uploaded (`Upload succeeded` 13:34:57 local), processed by
+  Apple, attached to version 1.0 with the listing entered, and **submitted for App Review at
+  ~13:41 local ("Waiting for Review")** — see `SUBMISSION-2026-08-18.md` in this directory.
+  Device QA was consciously waived by the owner for this submission (DEC-007), not run.
 - Decision implemented: `docs/DECISIONS.md` DEC-006 (2026-08-18).
 - Source: branch `release/1.0-3-full-free`, based on `claude/phase0-production-readiness @
   fada834`; the commit SHA of the change itself is recorded in the branch log (this file is
@@ -64,7 +67,7 @@ A first invocation stopped at `verification_pending` on the unclassified AppInte
 warning; the classifier was extended (`scripts/release_candidate_check.sh`) and the gate was
 re-run from an empty derived-data directory to the PASS above. ShellCheck: clean.
 
-## Signed archive and local export (NOT uploaded)
+## Signed archive and local export (uploaded later the same day — see `SUBMISSION-2026-08-18.md`)
 
 ```
 xcodebuild archive -project AuraFit.xcodeproj -scheme AuraFit -configuration Release \

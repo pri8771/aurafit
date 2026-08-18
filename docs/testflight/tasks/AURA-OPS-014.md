@@ -6,7 +6,7 @@ status: human_review_required
 ownerBoundary: Owner + human legal determination
 dependsOn: [AURA-OPS-010]
 evidence: quality/evidence/testflight/AURA-OPS-014/README.md
-lastVerified: 2026-07-29
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

@@ -1,5 +1,10 @@
 # AURA-OPS-009 evidence — account readiness runbook
 
+- **2026-08-18 update:** the owner's account session uploaded build `1.0 (3)` and submitted version
+  1.0 for App Review via the App Store Connect web UI, which is functional proof that membership,
+  agreements, and role were sufficient for a free app on that date. Record:
+  `quality/evidence/release/1.0-3-full-free/SUBMISSION-2026-08-18.md`.
+
 - Status: `blocked_external`; Account Holder evidence has not been supplied.
 - Operator: Account Holder only for Apple actions; agents record redacted statuses only.
 - Required input: `OWNER_REQUIRED_BETA_WINDOW_END`; target team: `796XH483R4`.

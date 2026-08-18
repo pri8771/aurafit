@@ -103,3 +103,30 @@
 - **Related files:** `AuraFitTests/FullFreeProductTests.swift`,
   `AuraFitTests/ReleaseConfigurationTests.swift`, `scripts/release_candidate_check.sh`,
   `quality/evidence/release/1.0-3-full-free/README.md`
+
+## DEC-007 — Submit 1.0 (3) to App Review without the physical-device QA gates; waived, not done
+
+- **Status:** accepted
+- **Date:** 2026-08-18
+- **Context:** Build `1.0 (3)` (DEC-006, one full free product) had passed the repository gate
+  (94/94, `RELEASE_CANDIDATE_GATE=PASS`), was archived, uploaded (`Upload succeeded`
+  2026-08-18 13:34:57 local), and processed by App Store Connect; the listing in
+  `docs/release/APP_STORE_LISTING.md` was ready. The `TF-G1` physical-iPhone gates
+  (`AURA-OPS-012A` on-device half, `AURA-QA-002`, `AURA-QA-004`, `AURA-QA-005`) and the
+  TestFlight internal smoke (`AURA-QA-006`) had not been run and no device pass was available
+  before the owner's chosen submission date. VoiceOver is already deferred by DEC-005.
+- **Decision:** The owner consciously waived those gates for the 2026-08-18 App Store submission
+  of 1.0 (3) only, and version 1.0 was submitted for App Review directly (no TestFlight beta
+  round) the same day at ~13:41 local; App Store Connect shows "Waiting for Review". The gates
+  are recorded as **waived**, not satisfied: their checklist boxes stay unchecked and their task
+  statuses are not `done`. Release status stays `human_review_required` until Apple's decision
+  and the automatic release.
+- **Consequences:**
+  - Waiver record: `quality/waivers/1.0-3-device-qa-owner-waiver-2026-08-18.md`; submission
+    record: `quality/evidence/release/1.0-3-full-free/SUBMISSION-2026-08-18.md`.
+  - Any later build (a resubmission after rejection, or a later version) must run the device
+    gates with dated evidence or obtain a new explicit waiver; build 3 is consumed and the next
+    build is `≥ 4`.
+  - Do not describe 1.0 as device-verified in any doc, release note, or store copy.
+- **Related files:** `docs/RELEASE_CHECKLIST.md`, `docs/STATUS.md`,
+  `docs/TESTFLIGHT_READINESS.md`, `quality/evidence/release/1.0-3-full-free/`

@@ -6,6 +6,14 @@ below is backed by the shipped code as of 2026-08-18 (branch `release/1.0-3-full
 delivery copy, not the authoring source. Field limits were checked mechanically
 (`docs/release/APP_STORE_LISTING.md` lengths verified 2026-08-18).
 
+> **Entered and submitted 2026-08-18.** These values were entered in App Store Connect on
+> 2026-08-18 (owner's assistant, owner-approved): App Privacy "Data Not Collected" published,
+> age rating computed 4+, Free in 175 territories, 8 iPhone 6.5" screenshots from
+> `quality/store-assets/1.0-3/iphone-6.5/`, build `1.0 (3)` attached, and version 1.0 was
+> **submitted for App Review at ~13:41 local ("Waiting for Review")**. Record:
+> `quality/evidence/release/1.0-3-full-free/SUBMISSION-2026-08-18.md`. Apple's decision is
+> pending; this document remains the authoring source for any later edit.
+
 ## Identity
 
 | Field | Value |

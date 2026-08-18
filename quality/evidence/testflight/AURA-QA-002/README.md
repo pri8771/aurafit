@@ -1,5 +1,9 @@
 # AURA-QA-002 evidence — physical-device core loop and persistence
 
+- **2026-08-18 update:** **not run**; consciously waived by the owner for the 1.0 (3) App Store
+  submission on 2026-08-18 (DEC-007, `quality/waivers/1.0-3-device-qa-owner-waiver-2026-08-18.md`).
+  Remains open, not done, for any later build.
+
 - Status: `blocked_external` — evidence pack prepared; no physical-device row is passed.
 - Canonical plan: [`docs/testflight/tasks/AURA-QA-002.md`](../../../../docs/testflight/tasks/AURA-QA-002.md)
 - Dependency: `AURA-OPS-012A` must provide a signed Release build installed on a supported iPhone.

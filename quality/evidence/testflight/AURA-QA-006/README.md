@@ -1,5 +1,8 @@
 # AURA-QA-006 evidence — internal TestFlight distribution and smoke
 
+- **2026-08-18 update:** **not run** for build 3; version 1.0 was submitted directly for App Review
+  on 2026-08-18 without an internal TestFlight round (DEC-007). Remains open, not done.
+
 - Status: `blocked_external` — no processed build, internal group, eligible tester, TestFlight installation, or telemetry result is evidenced.
 - Canonical plan: [`docs/testflight/tasks/AURA-QA-006.md`](../../../../docs/testflight/tasks/AURA-QA-006.md)
 - Dependencies: `AURA-OPS-013` must provide the exact processed, action-free candidate; `OWNER_REQUIRED_WHAT_TO_TEST_COPY` must be approved. Never record tester names/emails, invitation links, receipts, Apple IDs, or unredacted screenshots.

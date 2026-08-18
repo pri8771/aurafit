@@ -2,7 +2,7 @@
 id: AURA-MON-002
 title: Approve initial prices and offer policy
 gate: TF-G2
-status: human_review_required
+status: not_applicable
 ownerBoundary: Owner + agent research
 dependsOn: []
 evidence: quality/evidence/testflight/AURA-MON-002/README.md

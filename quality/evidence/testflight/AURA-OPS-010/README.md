@@ -1,5 +1,9 @@
 # AURA-OPS-010 evidence — Apple identity runbook
 
+- **2026-08-18 update:** build `1.0 (3)` (`com.pchordia.aurafit`) processed and was attached to
+  version 1.0 of the App Store Connect record, and the version was submitted for App Review.
+  Record: `quality/evidence/release/1.0-3-full-free/SUBMISSION-2026-08-18.md`.
+
 - Status: `blocked_external`; depends on completed OPS-009 and authorized Apple access.
 - Fixed repository facts for comparison: team `796XH483R4`; name `AuraFit`; bundle ID `com.pchordia.aurafit`; iOS; Release min OS `18.0`; iPhone family `1`; category intent `public.app-category.lifestyle`.
 - Creation inputs that must be supplied, never guessed: `OWNER_REQUIRED_PRIMARY_LANGUAGE`, `OWNER_REQUIRED_SKU`, `OWNER_REQUIRED_USER_ACCESS`.

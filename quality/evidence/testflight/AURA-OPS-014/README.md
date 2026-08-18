@@ -1,5 +1,10 @@
 # AURA-OPS-014 evidence — export compliance
 
+- **2026-08-18 update:** build `1.0 (3)` carries `ITSAppUsesNonExemptEncryption = NO`; the
+  2026-08-18 upload and the App Review submission raised no Missing Compliance prompt (see
+  `docs/release/APP_STORE_LISTING.md` "Export compliance"). A separately signed owner/legal
+  determination is still not on file, so this task stays `human_review_required`.
+
 - Status: `human_review_required` — a static technical audit supports the current project setting, but only an authorized owner can complete Apple’s build-specific compliance flow.
 - Canonical plan: [`docs/testflight/tasks/AURA-OPS-014.md`](../../../../docs/testflight/tasks/AURA-OPS-014.md)
 - Apple references checked 2026-07-29: [Overview of export compliance](https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance) requires an App Store Connect determination for apps that use/access/contain/implement/incorporate encryption. [Determine and upload documentation](https://developer.apple.com/help/app-store-connect/manage-app-information/determine-and-upload-app-encryption-documentation) directs Account Holder/Admin/App Manager to Apps → App Information → App Encryption Documentation or the missing-compliance build flow. These sources do not replace owner/legal determination.

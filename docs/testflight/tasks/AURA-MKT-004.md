@@ -2,11 +2,11 @@
 id: AURA-MKT-004
 title: Publish durable privacy and support pages
 gate: TF-G3
-status: human_review_required
+status: done
 ownerBoundary: Owner + hosting access
 dependsOn: []
 evidence: quality/evidence/testflight/AURA-MKT-004/README.md
-lastVerified: 2026-08-13
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

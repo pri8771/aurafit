@@ -1,5 +1,11 @@
 # AURA-OPS-012A evidence — physical Release install runbook
 
+- **2026-08-18 update:** the archive half is complete for `1.0 (3)` (the signed archive was uploaded,
+  processed, and submitted the same day). The **on-device install/launch/signing-inspection half
+  was not run and was consciously waived by the owner for the 1.0 submission on 2026-08-18**
+  (DEC-007, `quality/waivers/1.0-3-device-qa-owner-waiver-2026-08-18.md`). It remains open, not
+  done, for any later build.
+
 - Status: `blocked_external`; requires completed OPS-010/011, authorized signing, and a supported iPhone.
 - Expected identity: team `796XH483R4`; application identifier `796XH483R4.com.pchordia.aurafit`; frozen version/build from OPS-011. Never commit UDID, certificate, profile, raw entitlement, or raw inspection output.
 

@@ -6,7 +6,7 @@ status: human_review_required
 ownerBoundary: Owner + agent + iPhone
 dependsOn: [AURA-OPS-010, AURA-OPS-011]
 evidence: quality/evidence/testflight/AURA-OPS-012A/README.md
-lastVerified: 2026-08-13
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

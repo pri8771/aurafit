@@ -1,5 +1,11 @@
 # AURA-LEG-005 evidence — age rating and content rights
 
+- **2026-08-18 update:** the age-rating questionnaire was answered in App Store Connect per
+  `docs/release/APP_STORE_LISTING.md` and the computed rating is **4+**; content rights answered
+  "no third-party content" (owner's assistant, owner-approved). Version 1.0 was submitted for App
+  Review the same day. Record:
+  `quality/evidence/release/1.0-3-full-free/SUBMISSION-2026-08-18.md`.
+
 - Status: `blocked_external` — repository scope inventory is prepared; current App Store Connect questionnaire, rating, asset-rights records, and owner approval are absent.
 - Canonical plan: [`docs/testflight/tasks/AURA-LEG-005.md`](../../../../docs/testflight/tasks/AURA-LEG-005.md)
 - Apple references checked 2026-07-29: [Set an app age rating](https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating) requires current questionnaire answers and produces global/region ratings; an Unrated app cannot publish. [App information](https://developer.apple.com/help/app-store-connect/reference/app-information/app-information) requires rights for third-party content and says Made for Kids commits subsequent updates to Kids guidelines.

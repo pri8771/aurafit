@@ -2,11 +2,11 @@
 id: AURA-LEG-005
 title: Complete age rating and content-rights review
 gate: TF-G3
-status: blocked_external
+status: done
 ownerBoundary: Owner
 dependsOn: [AURA-OPS-010]
 evidence: quality/evidence/testflight/AURA-LEG-005/README.md
-lastVerified: 2026-07-29
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

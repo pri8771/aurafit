@@ -6,7 +6,7 @@ status: blocked_external
 ownerBoundary: Human reviewer + iPhone
 dependsOn: [AURA-OPS-012A]
 evidence: quality/evidence/testflight/AURA-QA-004/README.md
-lastVerified: 2026-07-29
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

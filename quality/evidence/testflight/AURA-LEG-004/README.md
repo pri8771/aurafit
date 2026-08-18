@@ -1,5 +1,12 @@
 # AURA-LEG-004 evidence — App Store privacy declaration
 
+- **2026-08-18 update:** the App Privacy declaration **"Data Not Collected"** was published in App
+  Store Connect on 2026-08-18 (owner's assistant, owner-approved) with the privacy-policy URL
+  `https://priyanshchordia.com/apps/aurafit/privacy/`. It matches `PrivacyInfo.xcprivacy` and the
+  build-3 IPA audit (`quality/evidence/release/1.0-3-full-free/README.md`). Version 1.0 was
+  submitted for App Review the same day. Record:
+  `quality/evidence/release/1.0-3-full-free/SUBMISSION-2026-08-18.md`.
+
 - Status: `blocked_external` — static source audit supports a provisional local-only conclusion; owner sign-off, public URL, and published App Store Connect declaration are absent.
 - Canonical plan: [`docs/testflight/tasks/AURA-LEG-004.md`](../../../../docs/testflight/tasks/AURA-LEG-004.md)
 - Apple references checked 2026-07-29: [Manage App Privacy](https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy) requires a privacy-policy URL for iOS apps and directs Account Holder/Admin/App Manager to select `No, we do not collect data from this app` only when the audited app and third-party partners do not collect data. [App privacy details](https://developer.apple.com/app-store/app-privacy-details/) defines collection as off-device transmission accessible beyond the real-time request.

@@ -2,7 +2,7 @@
 id: AURA-MON-008
 title: Configure the production StoreKit catalog
 gate: TF-G2
-status: blocked_external
+status: not_applicable
 ownerBoundary: Owner
 dependsOn: [AURA-OPS-009, AURA-OPS-010, AURA-MON-002]
 evidence: quality/evidence/testflight/AURA-MON-008/README.md

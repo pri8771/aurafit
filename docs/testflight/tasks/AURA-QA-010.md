@@ -2,7 +2,7 @@
 id: AURA-QA-010
 title: Execute StoreKit sandbox and TestFlight purchase matrix
 gate: TF-G2
-status: blocked_external
+status: not_applicable
 ownerBoundary: Owner + agent + sandbox account
 dependsOn: [AURA-MON-008, AURA-OPS-012A]
 evidence: quality/evidence/testflight/AURA-QA-010/README.md

@@ -2,11 +2,11 @@
 id: AURA-OPS-010
 title: Verify App ID and App Store Connect app record
 gate: TF-G1
-status: human_review_required
+status: done
 ownerBoundary: Owner + agent
 dependsOn: [AURA-OPS-009]
 evidence: quality/evidence/testflight/AURA-OPS-010/README.md
-lastVerified: 2026-08-13
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

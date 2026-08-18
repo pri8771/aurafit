@@ -1,5 +1,13 @@
 # AURA-MKT-004 evidence — privacy and support pages published
 
+- **2026-08-18 update:** the hosted AuraFit privacy, support, and product pages were regenerated
+  from the DEC-006 (one full, free product) sources and pushed as `priyanshchordia.com` `main @
+  4372f22`; verified live by `curl` on 2026-08-18: HTTP `200` and **0 tier words** on all three
+  URLs. The same URLs were entered in App Store Connect and version 1.0 was submitted for App
+  Review the same day. Checklist box checked on that basis. The site repository's
+  `legal_approved` flag state was not re-checked here. Record:
+  `quality/evidence/release/1.0-3-full-free/SUBMISSION-2026-08-18.md`.
+
 **Date:** 2026-08-13
 
 ## Host decision (supersedes the 2026-07-29 OpenAI Sites preference)

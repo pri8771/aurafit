@@ -1,5 +1,11 @@
 # AURA-OPS-012B evidence — final archive runbook
 
+- **2026-08-18 (later) update:** the same `AuraFit-1.0-3.xcarchive` was uploaded to App Store
+  Connect (`Upload succeeded` 13:34:57 local), processed, attached to version 1.0, and submitted
+  for App Review (~13:41 local). Immutable identifiers are recorded in
+  `quality/evidence/release/1.0-3-full-free/{README.md,SUBMISSION-2026-08-18.md}`. Device QA
+  prerequisites were **waived by the owner for this submission** (DEC-007), not run.
+
 - **2026-08-18 update:** a signed Release archive and App Store-method export of `1.0 (3)` were
   produced locally (`destination: export`, **not uploaded**) after the release gate passed
   94/94; IPA SHA-256 `d5300abd3b31a1b1d11692d0d55b072a28736625d052efef8445fbf02e606664`. Device

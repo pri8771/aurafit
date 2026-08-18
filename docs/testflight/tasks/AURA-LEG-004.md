@@ -2,11 +2,11 @@
 id: AURA-LEG-004
 title: Publish App Store privacy answers
 gate: TF-G3
-status: blocked_external
+status: done
 ownerBoundary: Owner
 dependsOn: [AURA-MKT-004]
 evidence: quality/evidence/testflight/AURA-LEG-004/README.md
-lastVerified: 2026-07-29
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

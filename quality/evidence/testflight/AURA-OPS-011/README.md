@@ -1,5 +1,9 @@
 # AURA-OPS-011 evidence — release identity freeze runbook
 
+- **2026-08-18 (later) update:** `1.0 (3)` was uploaded and submitted for App Review the same
+  day; the tuple is now consumed. Builds 1 and 2 remain in App Store Connect unused. Next build
+  must be `≥ 4`. Record: `quality/evidence/release/1.0-3-full-free/SUBMISSION-2026-08-18.md`.
+
 - **2026-08-18 update:** builds `1` and `2` are consumed in App Store Connect; the owner's
   DEC-006 decision (one full, free product) fixed the next candidate at `1.0 (3)` and
   `CURRENT_PROJECT_VERSION` was bumped to `3` in both configurations. Beta scope for build 3:

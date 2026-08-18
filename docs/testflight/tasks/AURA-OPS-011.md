@@ -2,11 +2,11 @@
 id: AURA-OPS-011
 title: Freeze release identity and beta scope
 gate: TF-G1
-status: planned
+status: done
 ownerBoundary: Owner + agent
 dependsOn: [AURA-OPS-010]
 evidence: quality/evidence/testflight/AURA-OPS-011/README.md
-lastVerified: 2026-07-29
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

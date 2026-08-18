@@ -2,11 +2,11 @@
 id: AURA-OPS-013
 title: Upload and clear App Store Connect processing
 gate: TF-G1
-status: blocked_external
+status: done
 ownerBoundary: Owner/App Manager/Developer
 dependsOn: [AURA-OPS-012B]
 evidence: quality/evidence/testflight/AURA-OPS-013/README.md
-lastVerified: 2026-07-29
+lastVerified: 2026-08-18
 parent: ../../TESTFLIGHT_READINESS.md
 ---
 

@@ -1,5 +1,10 @@
 # AURA-QA-004 evidence — accessibility and supported layout
 
+- **2026-08-18 update:** **not run**; VoiceOver is deferred (DEC-005) and the Dynamic Type /
+  appearance / layout matrix was consciously waived by the owner for the 1.0 (3) App Store
+  submission on 2026-08-18 (DEC-007, `quality/waivers/1.0-3-device-qa-owner-waiver-2026-08-18.md`).
+  Remains open, not done, for any later build.
+
 - Status: `blocked_external` — this is an execution-ready matrix, not proof of accessibility.
 - Canonical plan: [`docs/testflight/tasks/AURA-QA-004.md`](../../../../docs/testflight/tasks/AURA-QA-004.md)
 - Dependency: `AURA-OPS-012A` signed Release build on physical iPhone; smallest/largest supported phones when distinct.

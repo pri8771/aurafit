@@ -1,5 +1,9 @@
 # AURA-QA-005 evidence — performance, lifecycle, storage, and thermal smoke
 
+- **2026-08-18 update:** **not run**; consciously waived by the owner for the 1.0 (3) App Store
+  submission on 2026-08-18 (DEC-007, `quality/waivers/1.0-3-device-qa-owner-waiver-2026-08-18.md`).
+  Remains open, not done, for any later build.
+
 - Status: `blocked_external` — no physical measurements or budget approvals exist yet.
 - Canonical plan: [`docs/testflight/tasks/AURA-QA-005.md`](../../../../docs/testflight/tasks/AURA-QA-005.md)
 - Dependency: `AURA-OPS-012A` signed Release build on physical iPhone. Simulator may prepare safe storage only; it cannot satisfy a measurement row.
